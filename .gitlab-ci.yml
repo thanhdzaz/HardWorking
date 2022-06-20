@@ -1,0 +1,48 @@
+stages:
+  - build
+  - deploy
+
+build:production:
+  stage: build
+  script:
+    - yarn
+    - yarn build
+    - Remove-Item 'C:\\deploy\\master\\VQMSFE\\build' -Recurse
+    - Copy-Item -Path ${CI_PROJECT_DIR}\build -Destination "C:\\deploy\\master\\VQMSFE\\build" -Recurse
+  tags:
+    - MES
+  only:
+    - master
+
+build:development:
+  stage: build
+  script:
+    - yarn
+    - yarn build
+    - Remove-Item 'C:\\deploy\\dev\\VQMSFE\\build' -Recurse
+    - Copy-Item -Path ${CI_PROJECT_DIR}\build -Destination "C:\\deploy\\dev\\VQMSFE\\build" -Recurse
+  tags:
+    - MES
+  only:
+    - dev
+
+deploy:production:
+  stage: deploy
+  script:
+    - powershell C:\\windows\system32\inetsrv\appcmd stop site "VQMSFE"
+    - powershell C:\\windows\system32\inetsrv\appcmd delete site "VQMSFE"
+    - $physicalpath = "C:\deploy\master\VQMSFE\iis\$(get-date -f MM-dd-yyyy_HH_mm_ss)"
+    - powershell Copy-Item -Path 'C:\\deploy\\master\\VQMSFE\\build' -Destination $physicalpath -Recurse
+    - powershell C:\\windows\system32\inetsrv\appcmd add site /name:VQMSFE /bindings:http://*:3000 /physicalpath:"$physicalpath"
+  only:
+    - master
+deploy:development:
+  stage: deploy
+  script:
+    - powershell C:\\windows\system32\inetsrv\appcmd stop site VQMSFE
+    - powershell Start-Sleep -Seconds 30
+    - Remove-Item 'C:\\deploy\\dev\\VQMSFE\\iis' -Recurse
+    - Copy-Item -Path 'C:\\deploy\\dev\\VQMSFE\\build' -Destination "C:\\deploy\\dev\\VQMSFE\\iis" -Recurse
+    - powershell C:\\windows\system32\inetsrv\appcmd start site VQMSFE
+  only:
+    - dev

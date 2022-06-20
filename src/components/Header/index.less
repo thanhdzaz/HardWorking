@@ -1,0 +1,234 @@
+.trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.trigger:hover {
+  color: #1890ff;
+}
+
+.logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}
+
+/* Let's get this party started */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: #455a64;
+  -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+  background: #455a64;
+}
+
+.sidebar {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+    3px 10px 30px 3px rgba(0, 0, 0, 0.19);
+}
+
+.header-container {
+  -webkit-box-shadow: 0px 6px 50px -18px rgba(0, 0, 0, 0.81);
+  -moz-box-shadow: 0px 6px 50px -18px rgba(0, 0, 0, 0.81);
+  box-shadow: 0px 6px 50px -18px rgba(0, 0, 0, 0.81);
+}
+
+.title-txt {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  font-weight: bold;
+  margin-left: -6rem;
+}
+
+
+.ant-modal-title{
+  font-size: 24px !important;
+}
+
+.SearchContainer{
+  margin-top: 20px !important;
+}
+
+.ant-card-body {
+  min-height: 80vh;
+}
+
+.ant-notification{
+  z-index: 9999999999 !important;
+}
+.user-name-drop{
+  display: none !important;
+}
+
+.user-name{
+  display: block;
+}
+.ant-collapse-header{
+  color: #31d43f !important;
+}
+
+
+div.ant-form-item-label {
+  text-align: left;
+  label.ant-form-item-required::before {
+    content: "" !important;
+  }
+  label.ant-form-item-required::after {
+    color: #ff1519;
+    font-size: 14px;
+    font-family: SimSun, sans-serif;
+    line-height: 1;
+    content: ":*" !important;
+  }
+}
+
+.ant-notification-notice-success
+{
+    background-color: rgb(217, 255, 217) !important;
+}
+.ant-notification-notice-error
+{
+    background-color: #ffb6b6 !important;
+}
+.ant-notification-notice-message
+{
+    font-size: 30px;
+    font-weight: 700;
+}
+.ant-notification-notice-icon
+{
+    margin: auto;
+    text-align: center;
+}
+
+.ant-spin-dot {
+  color: rgb(111, 255, 28);
+}
+
+
+// for floating modal
+
+.float-detail-card{
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 9999999999;
+  animation: slide-in 0.2s forwards;
+  -webkit-animation: slide-in 0.2s forwards;
+  width: 350px;
+  max-height: 560px;
+  overflow-y: scroll;
+
+}
+
+
+
+
+
+@keyframes slide-in {
+  100% { transform: translateX(0%); }
+}
+
+@-webkit-keyframes slide-in {
+  100% { -webkit-transform: translateX(0%); }
+}
+  
+@keyframes slide-out {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+@-webkit-keyframes slide-out {
+  0% { -webkit-transform: translateX(0%); }
+  100% { -webkit-transform: translateX(-100%); }
+}
+
+// end
+
+
+//spin
+
+[data-icon="loading"], .ant-spin-dot{
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.ant-spin-text { color: rgb(255, 255, 255); }
+
+//end
+
+thead[class*="ant-table-thead"] th {
+  background-color: #d8d7d7 !important;
+  font-weight: 600 !important;
+}
+thead[class*="ant-table-thead"] th:hover {
+  cursor: pointer;
+}
+.ant-table-cell-scrollbar {
+  background-color: none !important;
+}
+
+.ant-modal-header {
+  background-color: #27cb96 !important;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.ant-modal-content {
+  border-radius: 4px;
+}
+
+.ck-file-dialog-button{
+  display: none !important;
+}
+
+.ant-pagination-options-size-changer {
+  div:nth-last-child(1) {
+    div .ant-select-dropdown {
+      div {
+        .rc-virtual-list {
+          .rc-virtual-list-holder-inner {
+            div:nth-last-child(1) {
+              span::after {
+                content: "All";
+              }
+              .ant-select-item-option-content {
+                display: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+//modal potions alway top
+.ant-modal-root{
+  .ant-modal-wrap{
+      max-height: 100vh;
+      .ant-modal{
+      padding-bottom: 20px !important;
+      top: 20px !important;
+      }
+  }
+}

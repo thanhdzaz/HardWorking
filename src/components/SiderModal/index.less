@@ -1,0 +1,43 @@
+.siderModal {
+    &{
+    
+        transition: ease-in 3000ms linear;
+        height: 100vh;
+    }
+
+    .ant-modal-content{
+        height: 100vh;
+        top: 0px !important;
+        .ant-modal-header{
+            background-color: white !important;
+            border-bottom: none !important;
+            justify-content: center;
+            text-align: center;
+        }
+        .ant-modal-body{
+            padding: 25px;
+            min-height: 88vh;
+            max-height: 88vh;
+            overflow-y: scroll !important;
+            
+        }
+        .ant-modal-footer{
+            border-top: none !important;
+            padding: 0px !important;
+            padding-left: 50px !important;
+            padding-right: 50px !important;
+            display: flex;
+            justify-content: space-between;
+            button{
+                width: 47%;
+            }
+        }
+        .ant-modal-close{
+            width: fit-content !important;
+        }
+    }
+}
+.ant-modal-root .ant-modal-wrap .siderModal{
+    top: 0px !important;
+
+}
