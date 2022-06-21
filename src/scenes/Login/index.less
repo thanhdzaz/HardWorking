@@ -1,0 +1,63 @@
+@import '~antd/lib/style/themes/default.less';
+
+.main {
+  width: 368px;
+  margin: 0 auto;
+  @media screen and (max-width: @screen-sm) {
+    width: 95%;
+  }
+
+  .icon {
+    font-size: 24px;
+    color: rgba(0, 0, 0, 0.2);
+    margin-left: 16px;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: @primary-color;
+    }
+  }
+
+  .other {
+    text-align: left;
+    margin-top: 24px;
+    line-height: 22px;
+
+    .register {
+      float: right;
+    }
+  }
+}
+.ant-notification-notice-success
+{
+    background-color: rgb(217, 255, 217) !important;
+}
+.ant-notification-notice-error
+{
+    background-color: #ffb6b6 !important;
+}
+.ant-notification-notice-message
+{
+    font-size: 30px;
+    font-weight: 700;
+}
+.ant-notification-notice-icon
+{
+    margin: auto;
+    text-align: center;
+}
+
+@media screen and (max-width: 650px){
+  .ant-row {
+    .ant-col-8{
+      max-width: 100% !important;
+      flex: 1;
+      justify-content: center;
+    }
+    .ant-col-offset-8{
+      margin: 0 !important;
+    }
+  }
+}

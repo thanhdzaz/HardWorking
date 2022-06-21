@@ -8,15 +8,28 @@ import PieChartExample from './components/PieChartExample';
 import LineChartExample from './components/LineChartExample';
 import ListExample from './components/ListExample';
 import React from 'react';
+import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+import { firebaseApp } from 'firebase';
+
+
+const db = getFirestore(firebaseApp());
 
 export class Dashboard extends React.Component<any>
 {
-    componentDidMount(): void
+    async componentDidMount(): Promise<void>
     {
         setTimeout(() => this.setState({ cardLoading: false }), 1000);
         setTimeout(() => this.setState({ lineChartLoading: false }), 1500);
         setTimeout(() => this.setState({ barChartLoading: false }), 2000);
         setTimeout(() => this.setState({ pieChartLoading: false }), 1000);
+
+        const projectCollection = collection(db,'project');
+        const project = await getDocs(projectCollection);
+        const projectList = project.docs.map(doc => doc.data());
+
+        console.log(projectList,'lisssssssssssss');
+        
+
     }
 
   state = {

@@ -9,6 +9,13 @@ export const userRouter: any = [
         isLayout: true,
         showInMenu: false,
     },
+    {
+        path: '/user/login',
+        name: 'login',
+        title: 'LogIn',
+        component: LoadableComponent(() => import('scenes/Login')),
+        showInMenu: false,
+    },
 ];
 
 export const appRouters: any = [
