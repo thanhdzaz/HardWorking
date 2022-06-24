@@ -1,18 +1,23 @@
-import './index.less';
 import 'famfamfam-flags/dist/sprite/famfamfam-flags.css';
+import './index.less';
 
 
 import { inject, observer } from 'mobx-react';
 
-import Stores from 'stores/storeIdentifier';
-import SessionStore from 'stores/sessionStore';
-import React from 'react';
 import { Select } from 'antd';
+import { getStore } from 'firebase';
+import { collection, getDocs } from 'firebase/firestore/lite';
+import { ProjectDto } from 'models/Task/dto';
+import React from 'react';
+import ProjectStore from 'stores/projectStore';
+import SessionStore from 'stores/sessionStore';
+import Stores from 'stores/storeIdentifier';
 
 // const { Option } = Select;
 
 export interface IProjectChooseProps {
   sessionStore?: SessionStore;
+  projectStore?: ProjectStore;
   os: string;
 }
 
@@ -21,7 +26,7 @@ export interface State {
     visible: boolean;
 }
 
-@inject(Stores.SessionStore)
+@inject(Stores.SessionStore,Stores.ProjectStore)
 @observer
 class ProjectChoose extends React.Component<IProjectChooseProps,State>
 {
@@ -29,6 +34,15 @@ class ProjectChoose extends React.Component<IProjectChooseProps,State>
         project: [],
         visible: false,
     };
+
+    async componentDidMount():Promise<void>
+    {
+        const projectCollection = collection(getStore(),'project');
+        const project = await getDocs(projectCollection);
+        const projectList:ProjectDto[] = project.docs.map(doc => doc.data() as ProjectDto);
+        this.props.projectStore?.setProject(projectList);
+        
+    }
 
     changeProject(id:string):void
     {
@@ -58,14 +72,14 @@ class ProjectChoose extends React.Component<IProjectChooseProps,State>
                     showSearch
                     onChange={(val)=>this.changeProject(val)}
                 >
-                    {/* {this.props.projectStore?.allProject !== null && this.props.projectStore?.allProject.length > 0 && this.props.projectStore?.allProject.map((p:any) =>(
-                        <Option
-                            key={p.idProject}
-                            value={p.idProject}
+                    {this.props.projectStore?.listProject !== null && (this.props.projectStore?.listProject?.length ?? 0) > 0 && this.props.projectStore?.listProject?.map((p:any) =>(
+                        <Select.Option
+                            key={p.id}
+                            value={p.id}
                         >
-                            {p.nameProject}
-                        </Option>
-                    ))} */}
+                            {p.title}
+                        </Select.Option>
+                    ))}
                 </Select>
             </>
         );

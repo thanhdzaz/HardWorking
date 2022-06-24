@@ -23,7 +23,8 @@ export default class Stores
   
   static RequestChangeEbom = 'requestChangeEbom';
 
-  static ProjectStore = 'projectStore';
   static IpqcStore = 'ipqcStore';
+
+  static ProjectStore = 'projectStore';
 
 }

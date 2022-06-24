@@ -1,5 +1,6 @@
 import { getAnalytics } from 'firebase/analytics';
 import { FirebaseApp, initializeApp } from 'firebase/app';
+import { Firestore, getFirestore } from 'firebase/firestore/lite';
 
 export const firebaseApp = ():FirebaseApp=>
 {
@@ -20,3 +21,6 @@ export const firebaseApp = ():FirebaseApp=>
     
     return app;
 };
+
+export const getStore = ():Firestore => getFirestore(firebaseApp());
+

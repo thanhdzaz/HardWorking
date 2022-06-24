@@ -22,6 +22,9 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import LoginModel from 'models/Login/loginModel';
 import React from 'react';
 import rules from './index.validation';
+import Cookies from 'js-cookie';
+import ProjectStore from 'stores/projectStore';
+
 
 const FormItem = Form.Item;
 declare let abp: any;
@@ -30,6 +33,7 @@ export interface ILoginProps {
   authenticationStore?: AuthenticationStore;
   sessionStore?: SessionStore;
   accountStore?: AccountStore;
+  projectStore?: ProjectStore;
   history: any;
   location: any;
 }
@@ -46,7 +50,7 @@ const styleCustom = {
     width: '100%',
     // position: 'absolute',
 };
-@inject(Stores.AuthenticationStore, Stores.SessionStore, Stores.AccountStore)
+@inject(Stores.AuthenticationStore, Stores.SessionStore, Stores.AccountStore,Stores.ProjectStore)
 @observer
 class Login extends React.Component<ILoginProps, State>
 {
@@ -58,8 +62,8 @@ class Login extends React.Component<ILoginProps, State>
 
   componentDidMount():void
   {
-      const auth = getAuth();
-      alert(auth.currentUser?.email);
+      //   const auth = getAuth();
+      //   alert(auth.currentUser?.email);
 
   }
 
@@ -77,12 +81,18 @@ class Login extends React.Component<ILoginProps, State>
 
       const auth = getAuth();
       signInWithEmailAndPassword(auth, values.userNameOrEmailAddress, values.password)
-          .then((userCredential) =>
+          .then(async(userCredential) =>
           {
               // Signed in
               const user = userCredential.user;
               console.log(user,'hehe');
+              Cookies.set('Abp.AuthToken',user.getIdToken());
+              this.setState({ loading: false });
               
+              const { state } = location as any;
+              
+              window.location = state ? state.from.pathname : '/';
+            
               // ...
           })
           .catch((_error) =>
@@ -194,16 +204,7 @@ class Login extends React.Component<ILoginProps, State>
                               <Col
                                   span={12}
                                   offset={0}
-                              >
-                                  {/* <Checkbox
-                                      checked={loginModel?.rememberMe}
-                                      style={{ paddingRight: 8 }}
-                                      onChange={loginModel?.toggleRememberMe}
-                                  />
-                                  {L('Lưu phiên đăng nhập')}
-                                  <br />
-                                  <a href="/">{L('Quên mật khẩu?')}</a> */}
-                              </Col>
+                              />
                           </Row>
                           <Row>
                               <Col span={4} />

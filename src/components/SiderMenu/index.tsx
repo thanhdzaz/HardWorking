@@ -106,7 +106,7 @@ const SiderMenu = (props: ISiderMenuProps): JSX.Element =>
                                         shape="square"
                                         src={AbpLogo}
                                     />
-                                    <b style={{ color: 'white',letterSpacing: '1px', fontSize: 15,lineHeight: 5,textAlign: 'center' }}>Quản lý sản xuất</b>
+                                    <b style={{ color: 'white',letterSpacing: '1px', fontSize: 15,lineHeight: 5,textAlign: 'center' }}>Quản lý công việc</b>
                                 </Col>
                             )}
                 </Link>

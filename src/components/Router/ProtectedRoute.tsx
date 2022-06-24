@@ -1,6 +1,8 @@
 
 
+import { isGranted } from 'lib/abpUtility';
 import {
+    Redirect,
     // Redirect,
     Route } from 'react-router-dom';
 
@@ -11,7 +13,7 @@ import {
 const ProtectedRoute = (
     {
         component: Component,
-        // permission,
+        permission,
         render,
         ...rest
     }: {
@@ -27,29 +29,29 @@ const ProtectedRoute = (
             {...rest}
             render={props =>
             {
-                // if (!abp.auth.getToken())
-                // {
-                //     return (
-                //         <Redirect
-                //             to={{
-                //                 pathname: '/user/login',
-                //                 state: { from: props.location },
-                //             }}
-                //         />
-                //     );
-                // }
+                if (!abp.auth.getToken())
+                {
+                    return (
+                        <Redirect
+                            to={{
+                                pathname: '/user/login',
+                                state: { from: props.location },
+                            }}
+                        />
+                    );
+                }
 
-                // if (permission && !isGranted(permission))
-                // {
-                //     return (
-                //         <Redirect
-                //             to={{
-                //                 pathname: '/exception?type=401',
-                //                 state: { from: props.location },
-                //             }}
-                //         />
-                //     );
-                // }
+                if (permission && !isGranted(permission))
+                {
+                    return (
+                        <Redirect
+                            to={{
+                                pathname: '/exception?type=401',
+                                state: { from: props.location },
+                            }}
+                        />
+                    );
+                }
 
                 return Component ? <Component {...props} /> : render(props);
             }}
