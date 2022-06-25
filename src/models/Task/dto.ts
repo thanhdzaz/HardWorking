@@ -26,6 +26,7 @@ export interface UserProjectDto{
     id: string;
     userId: string;
     projectId: string;
+    members: object;
 }
 
 export interface StatusDto{
