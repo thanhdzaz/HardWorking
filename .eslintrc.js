@@ -259,7 +259,10 @@ module.exports = {
     'react/no-string-refs': 'warn',
     // React Hooks rules
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
+    'react-hooks/exhaustive-deps': [
+        0,
+        {}
+    ],
     // TS rules
     '@typescript-eslint/explicit-function-return-type': 0,
     '@typescript-eslint/explicit-member-accessibility': 0,

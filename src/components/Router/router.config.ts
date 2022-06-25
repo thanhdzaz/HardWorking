@@ -39,12 +39,30 @@ export const appRouters: any = [
         children: [],
     },
     {
+        path: '/users',
+        name: 'users',
+        permission: '',
+        title: 'Quản lý người dùng',
+        showInMenu: true,
+        component: LoadableComponent(() => import('scenes/User')),
+        children: [],
+    },
+    {
         path: '/project',
         name: 'project',
         permission: '',
         title: 'Dự án',
         showInMenu: true,
         component: LoadableComponent(() => import('scenes/Project')),
+    },
+
+    {
+        path: '/about',
+        name: 'abiot',
+        permission: '',
+        title: 'About',
+        showInMenu: true,
+        component: LoadableComponent(() => import('scenes/About')),
         children: [],
     },
     {

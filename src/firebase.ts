@@ -1,6 +1,10 @@
 import { getAnalytics } from 'firebase/analytics';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { Firestore, getFirestore } from 'firebase/firestore/lite';
+import { addDoc, collection, deleteDoc, doc, Firestore, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore/lite';
+import { UserInfo } from 'models/User/dto';
+
+import Notify from 'components/Notify';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 
 export const firebaseApp = ():FirebaseApp=>
 {
@@ -24,3 +28,113 @@ export const firebaseApp = ():FirebaseApp=>
 
 export const getStore = ():Firestore => getFirestore(firebaseApp());
 
+class FirestoreService
+{
+   db = getStore();
+
+   add = async (collectionName: string,data: any): Promise<any> =>
+   {
+       try
+       {
+           const db = collection(this.db,collectionName);
+
+           const docRef = await addDoc(db,data);
+
+           this.update(collectionName,docRef.id,{ id: docRef.id });
+   
+           return Promise.resolve(docRef);
+       }
+       catch (error)
+       {
+           return Promise.reject(error);
+       }
+     
+   };
+
+
+   update = async (collectionName: string,docName: string,data: any): Promise<any> =>
+   {
+       try
+       {
+           const docRef = doc(this.db, collectionName, docName);
+           return await updateDoc(docRef, data);
+       }
+       catch (error)
+       {
+           return Promise.reject(error);
+       }
+   };
+
+   addWithId= async(collectionName: string,id:string,data:any): Promise<any>=>
+   {
+       try
+       {
+           const docRef = await setDoc(doc(this.db, collectionName, id), data);
+           this.update(collectionName,id,{ id });
+
+           return Promise.resolve(docRef);
+       }
+       catch (error)
+       {
+           return Promise.reject(error);
+       }
+
+   };
+
+   get = async(collectionName:string):Promise<any> =>
+   {
+        
+       const coll = collection(this.db,collectionName);
+       const docs = await getDocs(coll);
+       const res = docs.docs.map(doc => doc.data());
+       return res;
+
+   };
+
+   delete = async (collectionName: string,id: string):Promise<any> =>
+   {
+       try
+       {
+           await deleteDoc(doc(this.db, collectionName, id));
+           return Promise.resolve(true);
+       }
+       catch (error)
+       {
+           return Promise.reject(error);
+       }
+   };
+
+   createUser = async (user: UserInfo): Promise<UserInfo | any> =>
+   {
+
+       try
+       {
+           const auth = getAuth();
+           createUserWithEmailAndPassword(auth, user.email, user.password ?? '123456')
+               .then(async(userCredential) =>
+               {
+               // Signed in
+                   const u = userCredential.user;
+                   await this.addWithId('Users',u.uid,user);
+               // ...
+               })
+               .catch((error) =>
+               {
+               //    const errorCode = error.code;
+                   const errorMessage = error.message;
+                   Notify('error',errorMessage);
+               // ..
+               });
+           return Promise.resolve(user);
+       }
+       catch (error)
+       {
+        
+           return Promise.reject(error);
+       }
+   };
+
+}
+
+
+export const firestore = new FirestoreService();
