@@ -47,6 +47,7 @@ export const appRouters: any = [
         component: LoadableComponent(() => import('scenes/User')),
         children: [],
     },
+
     {
         path: '/project',
         name: 'project',
@@ -54,6 +55,15 @@ export const appRouters: any = [
         title: 'Dự án',
         showInMenu: true,
         component: LoadableComponent(() => import('scenes/Project')),
+    },
+
+    {
+        path: '/task',
+        name: 'task',
+        permission: '',
+        title: 'Quản lý công việc',
+        showInMenu: true,
+        component: LoadableComponent(() => import('scenes/Task')),
     },
 
     {

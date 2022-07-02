@@ -10,6 +10,7 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import initializeStores from './stores/storeInitializer';
 import { firebaseApp } from 'firebase';
+import { RootProvider, rootStore } from 'stores';
 
  
 // moment.tz.setDefault(abp.timing.timeZoneInfo.iana.timeZoneId);
@@ -25,13 +26,20 @@ const stores = initializeStores();
 firebaseApp();
 
 ReactDOM.render(
-    <Provider {...stores}>
-        <BrowserRouter>
-            <ConfigProvider locale={vi}>
-                <App />
-            </ConfigProvider>
-        </BrowserRouter>
-    </Provider>,
+    <RootProvider value={rootStore}>
+        <Provider
+            {...stores}
+            value={{
+                store: stores,
+            }}
+        >
+            <BrowserRouter>
+                <ConfigProvider locale={vi}>
+                    <App />
+                </ConfigProvider>
+            </BrowserRouter>
+        </Provider>
+    </RootProvider>,
     document.getElementById('root') as HTMLElement,
 );
 
