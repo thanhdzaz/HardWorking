@@ -1,4 +1,5 @@
 import LoadableComponent from '../Loadable/index';
+import { ProjectOutlined, UserOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons';
 
 export const userRouter: any = [
     {
@@ -33,6 +34,7 @@ export const appRouters: any = [
         path: '/dashboard',
         name: 'dashboard',
         permission: '',
+        icon: HomeOutlined,
         title: 'Dashboard',
         showInMenu: true,
         component: LoadableComponent(() => import('scenes/Dashboard')),
@@ -41,6 +43,7 @@ export const appRouters: any = [
     {
         path: '/users',
         name: 'users',
+        icon: UserOutlined,
         permission: '',
         title: 'Quản lý người dùng',
         showInMenu: true,
@@ -51,6 +54,7 @@ export const appRouters: any = [
     {
         path: '/project',
         name: 'project',
+        icon: ProjectOutlined,
         permission: '',
         title: 'Dự án',
         showInMenu: true,
@@ -71,6 +75,7 @@ export const appRouters: any = [
         name: 'abiot',
         permission: '',
         title: 'About',
+        icon: QuestionCircleOutlined,
         showInMenu: true,
         component: LoadableComponent(() => import('scenes/About')),
         children: [],

@@ -62,10 +62,12 @@ module.exports = {
             ])
       );
 
-      const instanceOfMiniCssExtractPlugin = webpackConfig.plugins.find(
-        (plugin) => plugin.options && plugin.options.ignoreOrder != null,
-      );
-      instanceOfMiniCssExtractPlugin.options.ignoreOrder = true;
+      // const instanceOfMiniCssExtractPlugin = webpackConfig.plugins.find(
+      //   (plugin) => plugin.options && plugin.options.ignoreOrder != null,
+      // );
+
+      // if (instanceOfMiniCssExtractPlugin)
+      //   instanceOfMiniCssExtractPlugin.options.ignoreOrder = true;
       
       return webpackConfig;
     },

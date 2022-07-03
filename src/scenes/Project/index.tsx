@@ -1,33 +1,62 @@
-import { Card, Col, Form, FormInstance, Input, Modal, Row, Table } from 'antd';
-import Header from 'components/HeaderTool';
+import { SettingFilled } from '@ant-design/icons';
+import ProTable from '@ant-design/pro-table';
+import { Button, Card, Dropdown, Menu } from 'antd';
 import { getStore } from 'firebase';
-import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore/lite';
-import { L } from 'lib/abpUtility';
+import { collection, getDocs } from 'firebase/firestore/lite';
 import { ProjectDto } from 'models/Task/dto';
-import React, { useEffect, useState } from 'react';
-import rules from './index.validation';
+import { useEffect, useState } from 'react';
+import { CreateOrUpdateProject } from './components/createOrUpdate';
 
 const ProjectManagement = (): JSX.Element =>
 {
     const [projectData, setProjectData] = useState<ProjectDto[]>([]);
-    const [visible, setVisible] = useState(false);
-    const formRef = React.createRef<FormInstance>();
     const projectCollection = collection(getStore(),'project');
 
     const columns = [
         {
             title: 'STT',
             dataIndex: 'id',
+            align: 'center',
+            width: 55,
             key: 'index',
             render: (_, item) => projectData.indexOf(item) + 1,
         },
         {
+            title: <SettingFilled />,
+            align: 'center',
+            width: 55,
+            dataIndex: 'id',
+            render: (_, record) =>
+            {
+                return (
+                    <Dropdown
+                        overlay={(
+                            <Menu>
+                                <Menu.Item>
+                                    <CreateOrUpdateProject
+                                        getProject={getProject}
+                                        act="update"
+                                        record={record}
+                                    />
+                                </Menu.Item>
+                            </Menu>
+                        )}
+                        trigger={['click']}
+                    >
+                        <Button icon={<SettingFilled />} />
+                    </Dropdown>
+                );
+            },
+        },
+        {
             title: 'Tên dự án',
+            align: 'center',
             dataIndex: 'title',
             key: 'name',
         },
         {
             title: 'Mô tả',
+            align: 'center',
             dataIndex: 'description',
             key: 'description',
         },
@@ -37,28 +66,19 @@ const ProjectManagement = (): JSX.Element =>
         const project = await getDocs(projectCollection);
         const projectList:ProjectDto[] = project.docs.map(doc => doc.data() as ProjectDto);
         setProjectData(projectList);
+        return projectList;
     };
 
-    const toggleModal = () =>
+    const onSearch = (keyword: string):boolean =>
     {
-        setVisible(!visible);
-    };
 
-    const handleSubmit = () =>
-    {
-        formRef.current?.validateFields().then(async (values) =>
+        getProject().then(data =>
         {
-            const docRef = await addDoc(projectCollection, values);
-            const itemRef = doc(getStore(), 'project', docRef.id);
-            await updateDoc(itemRef, {
-                id: docRef.id,
-            }).then(() =>
-            {
-                toggleModal();
-                getProject();
-                formRef.current?.resetFields();
-            }).catch();
+            const cloneProjectData = [...data];
+            const resultSearch = cloneProjectData.filter(i => i.title.toLowerCase().includes(keyword.toLowerCase()));
+            setProjectData(resultSearch);
         });
+        return true;
     };
 
     useEffect(() =>
@@ -68,62 +88,38 @@ const ProjectManagement = (): JSX.Element =>
 
     return (
         <Card>
-            <Header Click2={toggleModal} />
-            <Table
-                style={{ marginTop: 10 }}
-                size='small'
+            <ProTable
+                rowSelection={{
+               
+                }}
+                rowKey="id"
+                columns={columns as any}
+                headerTitle={(
+                    <div>
+                        <CreateOrUpdateProject
+                            getProject={getProject}
+                            act="create"
+                        />
+                    </div>
+                )}
+                search={false}
+                toolbar={undefined}
+                pagination={{
+                    pageSize: 10,
+                    showTotal: (total, range) =>
+                        `${range[0]} - ${range[1]} trên ${total} dự án`,
+                }}
+                options={{
+                    search: {
+                        onSearch: onSearch,
+                    },
+                }}
+                locale={{
+                    emptyText: (<div>Trống</div>),
+                    selectAll: 'Chọn tất cả',
+                }}
                 dataSource={projectData}
-                columns={columns}
             />
-            <Modal
-                title={'Thêm dự án'}
-                cancelButtonProps={{ style: { display: 'none ' } }}
-                okText={'Thêm'}
-                visible={visible}
-                onOk={handleSubmit}
-                onCancel={toggleModal}
-            >
-                <Form
-                    ref={formRef}
-                    className=""
-                >
-                    <Row
-                        style={{ marginTop: 10 }}
-                    >
-                        <Col
-                            span={24}
-                        >
-                            <Form.Item
-                                name="title"
-                                rules={rules.title}
-                                label="Tên dự án"
-                            >
-                                <Input
-                                    placeholder={L('Vui lòng nhập')}
-                                    size="large"
-                                />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row
-                        style={{ marginTop: 10 }}
-                    >
-                        <Col
-                            span={24}
-                        >
-                            <Form.Item
-                                name="description"
-                                label="Mô tả dự án"
-                            >
-                                <Input
-                                    placeholder={L('Vui lòng nhập')}
-                                    size="large"
-                                />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                </Form>
-            </Modal>
         </Card>
     );
 };

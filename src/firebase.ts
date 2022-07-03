@@ -42,7 +42,7 @@ class FirestoreService
 
            this.update(collectionName,docRef.id,{ id: docRef.id });
    
-           return Promise.resolve(docRef);
+           return Promise.resolve({ ...data, id: docRef.id });
        }
        catch (error)
        {

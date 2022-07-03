@@ -20,13 +20,13 @@ export interface ProjectDto{
     id: string;
     title: string;
     description?: string;
+    members?: UserProjectDto[];
 }
 
 export interface UserProjectDto{
     id: string;
     userId: string;
     projectId: string;
-    members: object;
 }
 
 export interface StatusDto{
