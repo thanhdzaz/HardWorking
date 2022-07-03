@@ -1,25 +1,74 @@
+/* eslint-disable no-unused-vars */
+import Loading from 'components/Loading';
+import { firebaseApp, firestore } from 'firebase';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { observer } from 'mobx-react';
+import { UserInfo } from 'models/User/dto';
+import { useEffect, useState } from 'react';
+import { useStore } from 'stores';
 import './App.css';
-import { inject } from 'mobx-react';
 import Router from './components/Router';
-import SessionStore from './stores/sessionStore';
-import Stores from './stores/storeIdentifier';
-import React from 'react';
 
-export interface IAppProps {
-    sessionStore?: SessionStore;
-}
 
-@inject(Stores.SessionStore)
-@inject(Stores.AuthenticationStore)
-class App extends React.Component<IAppProps>
+const App = observer(()=>
 {
+    const {
+        sessionStore,
+        permission,
+    } = useStore();
 
+    const [permissions,setPermissions] = useState<string[]>([]);
 
-    render(): JSX.Element
+    // const _ = useForceUpdate();
+
+    useEffect(()=>
+    {
+        permissions;
+    },[permissions]);
+
+    useEffect(()=>
+    {
+        onAuthStateChanged(getAuth(firebaseApp()),(user) =>
+        {
+            
+            if (user)
+            {
+                const uid = user.uid;
+                console.log(uid,'uid');
+                firestore.getByDoc('Users',uid).then((doc:UserInfo) =>
+                {
+                    sessionStore.setCurrentLogin(doc).then(val=>
+                    {
+                        console.log(val,'val');
+                        
+                        const p = permission.getMyPermission(val);
+                        setPermissions(p);
+                    });
+                });
+            }
+            else
+            {
+                // User is signed out
+                // ...
+            }
+        });
+
+    },[]);
+
+    if (!permission.permissionsList || permission.permissionsList.length === 0)
     {
         return (
-            <Router />
+            <div>
+                <Loading />
+            </div>
         );
     }
-}
+  
+    return (
+        <Router />
+    );
+    
+});
+    
+
 export default App;

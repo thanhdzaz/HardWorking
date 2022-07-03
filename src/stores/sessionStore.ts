@@ -1,11 +1,12 @@
+import { firebaseApp, firestore } from 'firebase';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { action, makeObservable, observable } from 'mobx';
+import type { UserInfo } from 'models/User/dto';
 
-import { GetCurrentLoginInformations } from '../services/session/dto/getCurrentLoginInformations';
-import sessionService from '../services/session/sessionService';
-
+// import { GetCurrentLoginInformations } from '../services/session/dto/getCurrentLoginInformations';
 class SessionStore
 {
-  @observable currentLogin: GetCurrentLoginInformations = new GetCurrentLoginInformations();
+  @observable currentLogin: UserInfo = {} as any;
 
   @observable loading: Boolean = false;
   @observable project = localStorage.getItem('project') || '';
@@ -16,12 +17,35 @@ class SessionStore
       makeObservable(this);
   }
 
-  @action
-  async getCurrentLoginInformations(): Promise<void>
+@action
+  async setCurrentLogin(login:UserInfo):Promise<string>
   {
-      const result = await sessionService.getCurrentLoginInformations();
-      this.currentLogin = result;
+      this.currentLogin = login;
+      return login.role;
   }
+
+  @action
+async getCurrentLoginInformations(): Promise<void>
+{
+    onAuthStateChanged(getAuth(firebaseApp()),(user) =>
+    {
+        if (user)
+        {
+            const uid = user.uid;
+            console.log(uid,'uid');
+            firestore.getByDoc('Users',uid).then((doc) =>
+            {
+                this.currentLogin = doc;
+            
+            });
+        }
+        else
+        {
+            // User is signed out
+            // ...
+        }
+    });
+}
 
   @action
   setLoading = (status: Boolean): void =>

@@ -1,3 +1,4 @@
+import ProTable from '@ant-design/pro-table';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import { useStore } from 'stores';
@@ -12,7 +13,15 @@ const Task = observer((
     console.log(toJS(projectStore.listProject));
   
     
-    return <></>;
+    return (
+        <div>
+            <ProTable
+                toolBarRender={false}
+                toolbar={{}}
+                search={false}
+            />
+        </div>
+    );
 });
 
 

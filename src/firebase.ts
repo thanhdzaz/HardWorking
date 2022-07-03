@@ -1,6 +1,6 @@
 import { getAnalytics } from 'firebase/analytics';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { addDoc, collection, deleteDoc, doc, Firestore, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore/lite';
+import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore/lite';
 import { UserInfo } from 'models/User/dto';
 
 import Notify from 'components/Notify';
@@ -87,6 +87,16 @@ class FirestoreService
        const coll = collection(this.db,collectionName);
        const docs = await getDocs(coll);
        const res = docs.docs.map(doc => doc.data());
+       return res;
+
+   };
+
+   getByDoc = async(collectionName:string,id:string):Promise<any> =>
+   {
+        
+       const coll = doc(this.db,collectionName,id);
+       const docs = await getDoc(coll);
+       const res = docs.data();
        return res;
 
    };

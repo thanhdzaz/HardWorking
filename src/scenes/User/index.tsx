@@ -22,6 +22,12 @@ const User = ():JSX.Element =>
         });
     };
 
+    // const deleteUser = async(uid:string) =>
+    // {
+      
+
+    // };
+
     useEffect(()=>
     {
         getAllUsers();

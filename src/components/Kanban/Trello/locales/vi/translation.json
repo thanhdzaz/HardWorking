@@ -1,0 +1,16 @@
+{
+  "Add another lane": "+",
+  "Click to add card": "Thêm nhiệm vụ",
+  "Delete lane": "Xóa nhóm",
+  "Lane actions": "Nhóm ...",
+  "button": {
+    "Add card": "Thêm mới",
+    "Add lane": "Thêm nhóm",
+    "Cancel": "Hủy"
+  },
+  "placeholder": {
+    "title": "Tên ... ",
+    "description": "Mô tả",
+    "label": "label"
+  }
+}

@@ -44,11 +44,19 @@ export const appRouters: any = [
         path: '/users',
         name: 'users',
         icon: UserOutlined,
-        permission: '',
+        permission: 'USERS_VIEW|ROLES_VIEW',
         title: 'Quản lý người dùng',
         showInMenu: true,
         component: LoadableComponent(() => import('scenes/User')),
-        children: [],
+        children: [
+            {
+                path: '/role-management',
+                name: 'role-management',
+                title: 'Quản lý vai trò',
+                permission: 'ROLES_VIEW',
+                showInMenu: true,
+            },
+        ],
     },
 
     {
@@ -67,7 +75,16 @@ export const appRouters: any = [
         permission: '',
         title: 'Quản lý công việc',
         showInMenu: true,
-        component: LoadableComponent(() => import('scenes/Task')),
+        children: [
+            {
+                path: '/kanban',
+                name: 'kanban',
+                permission: '',
+                title: 'Bảng Kanban',
+                showInMenu: true,
+                component: LoadableComponent(() => import('scenes/Task/Kanban')),
+            },
+        ],
     },
 
     {

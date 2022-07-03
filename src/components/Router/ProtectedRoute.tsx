@@ -1,16 +1,14 @@
 
 
 import { isGranted } from 'lib/abpUtility';
+import { observer } from 'mobx-react';
 import {
     Redirect,
-    // Redirect,
-    Route } from 'react-router-dom';
+    Route,
+} from 'react-router-dom';
 
-// import { isGranted } from 'lib/abpUtility';
 
-// declare let abp: any;
-
-const ProtectedRoute = (
+const ProtectedRoute = observer((
     {
         component: Component,
         permission,
@@ -24,6 +22,8 @@ const ProtectedRoute = (
     },
 ): JSX.Element =>
 {
+    console.log(permission,'::::');
+
     return (
         <Route
             {...rest}
@@ -40,7 +40,6 @@ const ProtectedRoute = (
                         />
                     );
                 }
-
                 if (permission && !isGranted(permission))
                 {
                     return (
@@ -57,6 +56,6 @@ const ProtectedRoute = (
             }}
         />
     );
-};
+});
 
 export default ProtectedRoute;

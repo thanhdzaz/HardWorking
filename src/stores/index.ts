@@ -3,6 +3,7 @@
 import { createContext, useContext } from 'react';
 import AccountStore from './accountStore';
 import AuthenticationStore from './authenticationStore';
+import { Permissions } from './permissionStore';
 import ProjectStore from './projectStore';
 import SessionStore from './sessionStore';
 import UserStore from './userStore';
@@ -13,6 +14,7 @@ export const rootStore = {
     sessionStore: new SessionStore(),
     accountStore: new AccountStore(),
     projectStore: new ProjectStore(),
+    permission: new Permissions(),
 };
 
 export type TRootStore = typeof rootStore;

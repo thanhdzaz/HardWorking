@@ -1,0 +1,138 @@
+.smooth-dnd-container {
+  .vertical {
+    .smooth-dnd-draggable-wrapper {
+      cursor: move;
+    }
+  }
+}
+
+.card-border {
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.card-progress {
+  width: 80%;
+  &[color="blue"] {
+    .ant-progress {
+      .ant-progress-text {
+        color: #1890ff !important;
+      }
+    }
+  }
+
+  &[color="orange"] {
+    .ant-progress {
+      .ant-progress-text {
+        color: #f58632 !important;
+      }
+    }
+  }
+
+  &[color="red"] {
+    .ant-progress {
+      .ant-progress-text {
+        color: #e5493a !important;
+      }
+    }
+  }
+
+  &[color="grey"] {
+    .ant-progress {
+      .ant-progress-text {
+        color: grey !important;
+      }
+    }
+  }
+}
+
+.card-item-name {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  transition: all 0.3s ease-in-out;
+  &:hover {
+    color: var(--ant-primary-color);
+    text-decoration: underline;
+  }
+}
+
+.popoverChooseColorKanban {
+  width: 256px;
+  height: 96px;
+
+  background: #ffffff;
+  border: 1px solid #e2e3e9;
+  box-shadow: 1px 4px 4px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  z-index: 100;
+  display: grid;
+  padding: 10px;
+  padding-top: 12px;
+  grid-template-columns: auto auto auto auto auto auto;
+
+  div > .circle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+  > .circle-btn .circle-btn-active {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+}
+
+.menuKanban {
+  box-sizing: border-box;
+  position: absolute;
+  width: 189px;
+  height: 46px;
+  right: 10px;
+  top: 40px;
+  background: #ffffff;
+  border: 1px solid #e2e3e9;
+  box-shadow: 1px 4px 4px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99;
+  > .member {
+    cursor: pointer;
+    width: 169px;
+    height: 32px;
+    background: #f4f5f7;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+  }
+}
+
+.ellip-custom {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: "#9EA3A9";
+}
+
+.lane-header-custom {
+  box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+}
+
+.react-trello-lane {
+  > .sc-jqUVSM {
+    > .smooth-dnd-container {
+      min-height: calc((65vh - 80px));
+    }
+  }
+}
+
+span[color="blue"] {
+  // kanban parent text color
+  color: #1890ff;
+}
+
+.svg-parent-ic {
+  margin-bottom: -5px;
+}

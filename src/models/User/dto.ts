@@ -9,5 +9,6 @@ export interface UserInfo{
     phoneNumber?: string;
     avatarUrl?: string;
     gender?: number;
+    role: string;
     address?: string;
 }
