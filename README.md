@@ -50,6 +50,8 @@
     ├── Users
     ├── Project
     ├── Task
+    ├── UserProject
+    ├── Role
     └── Comment
 
 #### Hướng đẫn chạy
