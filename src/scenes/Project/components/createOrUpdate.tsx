@@ -38,10 +38,10 @@ export const CreateOrUpdateProject: React.FC<propType> = ({
     const columns = [
         {
             title: 'STT',
-            dataIndex: 'index',
             align: 'center',
             width: 55,
             key: 'index',
+            render: (_, record) => allUserOfProject.indexOf(record) + 1,
         },
         {
             title: 'Họ và tên',
@@ -76,7 +76,7 @@ export const CreateOrUpdateProject: React.FC<propType> = ({
                 .map((i) => ({ userId: i.userId, id: i.id }));
             setSelectedsUserProject(userProjects);
         }
-        const data = users.map((us, index) => ({ ...us, index })).filter(us => us.role !== 'ADMIN');
+        const data = users.filter(us => us.role !== 'ADMIN');
         setAllUserOfProject(data);
         return data;
     };
@@ -197,17 +197,27 @@ export const CreateOrUpdateProject: React.FC<propType> = ({
                                 }}
                             />
                         )
-                    : <div>Sửa</div>
+                    : (
+                            <div onClick={() =>
+                            {
+                                const originalSelectedUserId = selectedUserProject.map(i => i.userId);
+                                setSelectedUserId(originalSelectedUserId);
+                                setViewType('info');
+                                setIsSave(true);
+                            }}
+                            >Sửa
+                            </div>
+                        )
             }
         >
             <Tabs
                 activeKey={viewType}
                 onChange={(key) =>
                 {
-                    // if (act === 'update')
-                    // {
-                    setViewType(key);
-                    // }
+                    if (act === 'update')
+                    {
+                        setViewType(key);
+                    }
                 }}
             >
                 <Tabs.TabPane
@@ -253,7 +263,8 @@ export const CreateOrUpdateProject: React.FC<propType> = ({
                                     const cloneSelectedUserId = [...selectedUserId];
                                     if (isAdd)
                                     {
-                                        setSelectedUserId((prev) => [...prev, row.id]);
+                                        cloneSelectedUserId.push(row.id);
+                                        setSelectedUserId([...cloneSelectedUserId]);
                                     }
                                     else
                                     {
@@ -262,7 +273,9 @@ export const CreateOrUpdateProject: React.FC<propType> = ({
                                         cloneSelectedUserId.splice(index, 1);
                                         setSelectedUserId(cloneSelectedUserId);
                                     }
-                                    setIsSave(false);
+                                    const originalSelectedUserIds = selectedUserProject.map(i => i.userId);
+                                    const isDifference = originalSelectedUserIds.sort().toString() !== cloneSelectedUserId.sort().toString();
+                                    isDifference ? setIsSave(false) : setIsSave(true);
                                 },
                                 onSelectAll: (
                                     isSelected: boolean,
@@ -288,8 +301,9 @@ export const CreateOrUpdateProject: React.FC<propType> = ({
                                         newSelectedUserIds = selectedUserId.filter(i => !userIds.includes(i));
                                     }
                                     setSelectedUserId(newSelectedUserIds);
-                                    setIsSave(false);
-                                    
+                                    const originalSelectedUserIds = selectedUserProject.map(i => i.userId);
+                                    const isDifference = originalSelectedUserIds.sort().toString() !== newSelectedUserIds.sort().toString();
+                                    isDifference ? setIsSave(false) : setIsSave(true);
                                 },
                                 selectedRowKeys: selectedUserId,
                             }}
