@@ -8,6 +8,8 @@ import AbpLogo from 'asset/navigation/logo.png';
 import { appRouters } from '../Router/router.config';
 import utils from 'utils/utils';
 import { Link } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { permissionsAtom } from 'stores/atom/permission';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -34,6 +36,7 @@ const SiderMenu = (props: ISiderMenuProps): JSX.Element =>
 {
     const { collapsed, history, onCollapse } = props;
     const currentRoute = utils.getRoute(history.location.pathname);
+    const permissionList = useRecoilValue(permissionsAtom);
 
     const renderMenu = (menuList: IMenu[]): JSX.Element =>
     {
@@ -43,7 +46,7 @@ const SiderMenu = (props: ISiderMenuProps): JSX.Element =>
                     .filter((item: any) => !item.isLayout && item.showInMenu)
                     .map((route: any) =>
                     {
-                        if (route.permission && !isGranted(route.permission))
+                        if (route.permission && !isGranted(route.permission,permissionList))
                         {
                             return null;
                         }

@@ -13,7 +13,7 @@ export class NotFoundRoute extends Component
                         return (
                             <Redirect
                                 to={{
-                                    pathname: '/exception?type=404',
+                                    pathname: '/dashboard',
                                     state: { from: props.location },
                                 }}
                             />

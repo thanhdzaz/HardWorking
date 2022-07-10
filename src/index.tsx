@@ -12,6 +12,8 @@ import initializeStores from './stores/storeInitializer';
 import { firebaseApp } from 'firebase';
 import { RootProvider, rootStore } from 'stores';
 
+import { RecoilRoot } from 'recoil';
+
  
 // moment.tz.setDefault(abp.timing.timeZoneInfo.iana.timeZoneId);
 // TODO: Add SDKs for Firebase products that you want to use
@@ -26,20 +28,22 @@ const stores = initializeStores();
 firebaseApp();
 
 ReactDOM.render(
-    <RootProvider value={rootStore}>
+    <RecoilRoot>
         <Provider
             {...stores}
             value={{
                 store: stores,
             }}
         >
-            <BrowserRouter>
-                <ConfigProvider locale={vi}>
-                    <App />
-                </ConfigProvider>
-            </BrowserRouter>
+            <RootProvider value={rootStore}>
+                <BrowserRouter>
+                    <ConfigProvider locale={vi}>
+                        <App />
+                    </ConfigProvider>
+                </BrowserRouter>
+            </RootProvider>
         </Provider>
-    </RootProvider>,
+    </RecoilRoot>,
     document.getElementById('root') as HTMLElement,
 );
 

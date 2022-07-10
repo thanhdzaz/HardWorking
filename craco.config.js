@@ -25,6 +25,7 @@ module.exports = {
       'services': path.resolve(__dirname, "src/services/"),
       'stores': path.resolve(__dirname, "src/stores/"),
       'utils': path.resolve(__dirname, "src/utils/"),
+      'constant': path.resolve(__dirname, "src/constant/"),
     },
     plugins: [],
     configure: (webpackConfig, { env, paths }) => {

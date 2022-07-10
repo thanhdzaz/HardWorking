@@ -2,8 +2,8 @@
 
 import { Route, Switch } from 'react-router-dom';
 
-import ProtectedRoute from './ProtectedRoute';
 import utils from '../../utils/utils';
+import ProtectedRoute from './ProtectedRoute';
 
 const Router = ():any =>
 {
@@ -16,6 +16,7 @@ const Router = ():any =>
                 path="/user"
                 render={(props: any) => <UserLayout {...props} />}
             />
+             
             <ProtectedRoute
                 render={(props: any) => (
                     <AppLayout
@@ -24,6 +25,8 @@ const Router = ():any =>
                     />
                 )}
             />
+        
+           
         </Switch>
     );
 };

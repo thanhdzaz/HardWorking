@@ -1,11 +1,7 @@
-import { rootStore } from 'stores';
 import AppConsts from './appconst';
 
 declare let abp: any;
 
-const {
-    permission,
-} = rootStore;
 
 export function L(key: string, sourceName?: string): string
 {
@@ -13,9 +9,10 @@ export function L(key: string, sourceName?: string): string
     return abp.localization.localize(key, sourceName || localizationSourceName);
 }
 
-export function isGranted(_permissionName: string): boolean
+export function isGranted(_permissionName: string,listPermissions: string[]): boolean
 {
-    const p = permission.myPermissions;
+    const p = listPermissions;
+
     if (_permissionName.includes('|'))
     {
         const name = _permissionName.split('|');

@@ -1,5 +1,5 @@
-
-
+import { firebaseApp } from 'firebase';
+import { getAuth } from 'firebase/auth';
 import { inject } from 'mobx-react';
 import React from 'react';
 import AuthenticationStore from 'stores/authenticationStore';
@@ -15,6 +15,7 @@ class Logout extends React.Component<ILogoutProps>
     componentDidMount(): void
     {
         this.props.authenticationStore?.logout();
+        getAuth(firebaseApp()).signOut();
         localStorage.removeItem('project');
         window.location.href = '/';
     }

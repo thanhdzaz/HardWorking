@@ -5,7 +5,9 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { observer } from 'mobx-react';
 import { UserInfo } from 'models/User/dto';
 import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 import { useStore } from 'stores';
+import { permissionsAtom } from 'stores/atom/permission';
 import './App.css';
 import Router from './components/Router';
 
@@ -17,9 +19,11 @@ const App = observer(()=>
         permission,
     } = useStore();
 
-    const [permissions,setPermissions] = useState<string[]>([]);
+    const [permissions,setPermissions] = useRecoilState(permissionsAtom);
 
+    const [isReady,setIsReady] = useState(false);
     // const _ = useForceUpdate();
+
 
     useEffect(()=>
     {
@@ -44,6 +48,12 @@ const App = observer(()=>
                         const p = permission.getMyPermission(val);
                         setPermissions(p);
                     });
+                }).finally(()=>
+                {
+                    setTimeout(() =>
+                    {
+                        setIsReady(true);
+                    },500);
                 });
             }
             else
@@ -55,7 +65,7 @@ const App = observer(()=>
 
     },[]);
 
-    if (!permission.permissionsList || permission.permissionsList.length === 0)
+    if (!isReady) // ((!permission.permissionsList || permission.permissionsList.length === 0) || !permission.myPermissions || permission.myPermissions.length === 0)
     {
         return (
             <div>

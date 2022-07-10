@@ -1,14 +1,15 @@
 
 
 import { isGranted } from 'lib/abpUtility';
-import { observer } from 'mobx-react';
 import {
     Redirect,
     Route,
 } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { permissionsAtom } from 'stores/atom/permission';
 
 
-const ProtectedRoute = observer((
+const ProtectedRoute = (
     {
         component: Component,
         permission,
@@ -22,8 +23,8 @@ const ProtectedRoute = observer((
     },
 ): JSX.Element =>
 {
-    console.log(permission,'::::');
 
+    const permissionList = useRecoilValue(permissionsAtom);
     return (
         <Route
             {...rest}
@@ -40,12 +41,12 @@ const ProtectedRoute = observer((
                         />
                     );
                 }
-                if (permission && !isGranted(permission))
+                if (permission && !isGranted(permission,permissionList))
                 {
                     return (
                         <Redirect
                             to={{
-                                pathname: '/exception?type=401',
+                                pathname: '/dashboard',
                                 state: { from: props.location },
                             }}
                         />
@@ -56,6 +57,6 @@ const ProtectedRoute = observer((
             }}
         />
     );
-});
+};
 
 export default ProtectedRoute;

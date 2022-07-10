@@ -86,7 +86,7 @@ class FirestoreService
         
        const coll = collection(this.db,collectionName);
        const docs = await getDocs(coll);
-       const res = docs.docs.map(doc => doc.data());
+       const res = docs.docs.map(doc => ({ ...doc.data(),id: doc.id }));
        return res;
 
    };
@@ -148,3 +148,5 @@ class FirestoreService
 
 
 export const firestore = new FirestoreService();
+
+export const auth = getAuth(firebaseApp());

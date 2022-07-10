@@ -2,7 +2,7 @@
 import { EllipsisOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Popover } from 'antd';
 import * as React from 'react';
-import { COLOR_TINT } from 'constants/index';
+import { COLOR_TINT } from 'constant/index';
 import { observer } from 'mobx-react';
 
 export const CustomLaneHeader = observer(({
