@@ -45,7 +45,7 @@
 
 
 
-#### Cấu trúc database
+#### [Cấu trúc database](https://dbdesigner.page.link/xT4EXJ7DvbBqEsq47)
     .
     ├── Users
     ├── Project
@@ -53,6 +53,8 @@
     ├── UserProject
     ├── Role
     └── Comment
+    
+    DB link
 
 #### Hướng đẫn chạy
 
