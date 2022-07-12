@@ -15,6 +15,23 @@ export interface TaskDto{
     // tagId?: string;
 }
 
+export const TYPE_LEAVE = [
+    {
+        key: 'day',
+        name: 'Ngày',
+        total: 1,
+    },
+    {
+        key: 'week',
+        name: 'Tuần',
+        total: 7,
+    },
+    {
+        key: 'month',
+        name: 'Tháng',
+        total: 30,
+    },
+];
 
 export interface ProjectDto{
     id: string;

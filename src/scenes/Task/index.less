@@ -1,0 +1,693 @@
+.issue_process_bar {
+  height: 20px !important;
+
+  > .ant-progress-outer {
+    height: 20px !important;
+
+    > .ant-progress-inner {
+      height: 20px !important;
+
+      > .ant-progress-bg {
+        height: 20px !important;
+      }
+    }
+  }
+
+  > .ant-progress-text {
+    position: absolute;
+    left: attr(title) !important;
+    top: 30%;
+    font-weight: bold;
+    font-size: 12px;
+  }
+}
+
+.create-issue-container {
+  min-height: 60vh;
+  .footer {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+    float: left;
+    width: 100%;
+
+    button {
+      margin-left: 10px;
+    }
+  }
+
+  .left-side {
+    padding: 15px;
+    padding-right: 20px;
+    width: 65%;
+    float: left;
+    .title-form-control {
+      position: none;
+      outline: none;
+      margin-bottom: 0px !important;
+    }
+
+    .title-confirm-wrapper {
+      position: relative;
+      .title-confirm {
+        position: absolute;
+        top: 100%;
+        right: 0;
+      }
+    }
+
+    .description {
+      padding: 10px 10px;
+      border-radius: 8px;
+      background-color: #f4f5f7;
+      img {
+        width: 40%;
+      }
+    }
+
+    .desc-confirm-wrapper {
+      margin: 5px 0px 10px;
+    }
+
+    > .ant-row {
+      > .ant-col {
+        .ant-form-item-control-input-content {
+          .ant-select > .ant-select-selector,
+          input,
+          textarea {
+            border: none;
+            background-color: #f4f5f7;
+            border-radius: 4px;
+          }
+        }
+      }
+    }
+
+    > .div-btn {
+      display: flex;
+      flex-direction: row;
+      color: #1890ff;
+      align-items: center;
+      align-content: center;
+      cursor: pointer;
+      margin-bottom: 10px;
+
+      > span {
+        margin-right: 5px;
+      }
+
+      user-select: none;
+    }
+
+    .exchange-wrapper {
+      position: relative;
+
+      .send-exchange-btn {
+        @width: 25px;
+        position: absolute;
+        height: @width;
+        width: @width;
+        right: calc(@width - 20px);
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        padding: 0;
+        margin: 0;
+      }
+    }
+
+    .child-issue-wrapper {
+      padding: 6px 15px;
+      border-radius: 5px;
+      background-color: #f4f5f7;
+      cursor: pointer;
+    }
+    .row-child-issue-input-wrapper {
+      margin-top: 8px;
+      .child-issue-input-wrapper {
+        position: relative;
+        margin-bottom: 0;
+        .close-icon {
+          position: absolute;
+          color: rgba(0, 0, 0, 0.25);
+          right: 10px;
+          top: 50%;
+          font-size: 14px;
+          transform: translateY(-50%);
+        }
+      }
+    }
+    .message-wrapper {
+      .messages-region {
+        height: auto !important;
+        .content {
+          height: calc(100vh - 450px) !important;
+        }
+        .input-region {
+          position: unset !important;
+          border-top: 1px solid rgb(197, 197, 198) !important;
+        }
+      }
+      .header {
+        border-bottom: 1px solid rgb(197, 197, 198) !important;
+      }
+    }
+  }
+  .right-side {
+    padding: 15px;
+    width: 35%;
+    height: auto;
+    float: left;
+  
+    > .user-container {
+      padding: 15px;
+      width: 100%;
+      margin-top: 10px;
+      height: fit-content;
+      border: 1px solid #dfe1e6;
+      border-radius: 10px;
+  
+      .history-wrapper {
+        max-height: 20vh;
+        overflow-y: scroll;
+      }
+  
+      // border: 1px solid #E2E3E9;
+      > .ant-row > .ant-col {
+        > .ant-select {
+          width: 150px;
+  
+          > .ant-select-selector {
+            border: none !important;
+          }
+        }
+      }
+  
+      .divider {
+        margin-top: 5px;
+        border-top: 0.009px silver solid;
+      }
+  
+      .priority {
+        padding: 5px 10px;
+        color: #fff;
+        border-radius: 20px;
+      }
+    }
+  
+    .ant-select[blue] {
+      > .ant-select-selector {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 5px;
+        border: none;
+        height: 32px;
+        align-content: center;
+        background-color: var(--ant-primary-color);
+        color: white;
+      }
+  
+      .ant-select-arrow {
+        color: white;
+      }
+    }
+  }
+}
+
+.issue-detail-container {
+  .footer {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+    float: left;
+    width: 100%;
+
+    button {
+      margin-left: 10px;
+    }
+  }
+
+  .left-side {
+    padding: 15px;
+    padding-right: 20px;
+    width: 65%;
+    height: 80vh;
+    float: left;
+    overflow-y: scroll;
+    .title-form-control {
+      position: none;
+      outline: none;
+      margin-bottom: 0px !important;
+    }
+
+    .title-confirm-wrapper {
+      position: relative;
+      .title-confirm {
+        position: absolute;
+        top: 100%;
+        right: 0;
+      }
+    }
+
+    .description {
+      padding: 10px 10px;
+      border-radius: 8px;
+      background-color: #f4f5f7;
+      img {
+        width: 40%;
+      }
+    }
+
+    .desc-confirm-wrapper {
+      margin: 5px 0px 10px;
+    }
+
+    > .ant-row {
+      > .ant-col {
+        .ant-form-item-control-input-content {
+          .ant-select > .ant-select-selector,
+          input,
+          textarea {
+            border: none;
+            background-color: #f4f5f7;
+            border-radius: 4px;
+          }
+        }
+      }
+    }
+
+    > .div-btn {
+      display: flex;
+      flex-direction: row;
+      color: #1890ff;
+      align-items: center;
+      align-content: center;
+      cursor: pointer;
+      margin-bottom: 10px;
+
+      > span {
+        margin-right: 5px;
+      }
+
+      user-select: none;
+    }
+
+    .exchange-wrapper {
+      position: relative;
+
+      .send-exchange-btn {
+        @width: 25px;
+        position: absolute;
+        height: @width;
+        width: @width;
+        right: calc(@width - 20px);
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        padding: 0;
+        margin: 0;
+      }
+    }
+
+    .child-issue-wrapper {
+      padding: 6px 15px;
+      border-radius: 5px;
+      background-color: #f4f5f7;
+      cursor: pointer;
+    }
+    .row-child-issue-input-wrapper {
+      margin-top: 8px;
+      .child-issue-input-wrapper {
+        position: relative;
+        margin-bottom: 0;
+        .close-icon {
+          position: absolute;
+          color: rgba(0, 0, 0, 0.25);
+          right: 10px;
+          top: 50%;
+          font-size: 14px;
+          transform: translateY(-50%);
+        }
+      }
+    }
+    .message-wrapper {
+      .messages-region {
+        height: auto !important;
+        .content {
+          height: calc(100vh - 450px) !important;
+        }
+        .input-region {
+          position: unset !important;
+          border-top: 1px solid rgb(197, 197, 198) !important;
+        }
+      }
+      .header {
+        border-bottom: 1px solid rgb(197, 197, 198) !important;
+      }
+    }
+  }
+
+  .right-side {
+    padding: 0 15px;
+    width: 35%;
+    height: auto;
+    float: left;
+
+    > .ant-form-item {
+      margin-bottom: 0 !important;
+    }
+  
+    > .user-container {
+      padding: 15px;
+      width: 100%;
+      margin-top: 10px;
+      height: fit-content;
+      border: 1px solid #dfe1e6;
+      border-radius: 10px;
+  
+      .history-wrapper {
+        max-height: 20vh;
+        overflow-y: scroll;
+      }
+  
+      // border: 1px solid #E2E3E9;
+      > .ant-row > .ant-col {
+        > .ant-select {
+          width: 150px;
+  
+          > .ant-select-selector {
+            border: none !important;
+          }
+        }
+      }
+  
+      .divider {
+        margin-top: 5px;
+        border-top: 0.009px silver solid;
+      }
+  
+      .priority {
+        padding: 5px 10px;
+        color: #fff;
+        border-radius: 20px;
+      }
+    }
+  
+    .ant-select[blue] {
+      > .ant-select-selector {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 5px;
+        border: none;
+        height: 32px;
+        align-content: center;
+        background-color: var(--ant-primary-color);
+        color: white;
+      }
+  
+      .ant-select-arrow {
+        color: white;
+      }
+    }
+  }
+}
+
+
+.ant-popover-content {
+  border: 1px solid #1890ff !important;
+  .ant-popover-inner-content {
+    padding: 6px 10px !important;
+  }
+}
+
+.rounded-modal.modal-create {
+  position: relative;
+  top: 20px
+}
+
+.ant-popover-arrow {
+  .ant-popover-arrow-content {
+    border: 1px solid #1890ff !important;
+    background-color: #1890ff !important;
+  }
+}
+
+.user_select,
+.no-border-select {
+  .ant-select-selector {
+    border: none !important;
+    background-color: transparent !important;
+    :hover {
+      background-color: transparent !important;
+    }
+  }
+}
+
+.layout {
+  overflow: hidden;
+  height: 82vh;
+
+  .header {
+    background-color: #fff;
+    padding: 0;
+    height: 40px;
+
+    .row-header {
+      height: 100%;
+      padding: 0 20px;
+      .left-col {
+        max-height: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+
+        .text {
+          font-weight: 600;
+          flex-basis: 80px;
+        }
+      }
+
+      .right-col {
+        max-height: 100%;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: flex-end;
+        svg {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .content {
+    overflow: hidden;
+    background-color: #fff;
+    height: calc((78vh - 40px));
+    border: 1px solid #dfe1e6;
+
+    .ant-tabs .ant-tabs-nav {
+      display: none;
+    }
+  }
+}
+
+.calendar {
+  .content-right__btn-active {
+    color: #1890ff !important;
+  }
+  .calendar__header {
+    display: flex;
+    flex-direction: column;
+    .calendar__content {
+      width: 100%;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      .calendar__content-left {
+        display: flex;
+        align-items: center;
+        .calendar__content__add-issue-btn {
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          padding: 0;
+          margin-right: 10px;
+        }
+        .month-picker {
+          width: 100px;
+          > .ant-form-item {
+            margin-bottom: 0 !important;
+          }
+          .ant-picker {
+            border: none !important;
+          }
+        }
+      }
+      .calendar__content-right {
+        display: flex;
+        align-items: center;
+        .content-right__btn-grey {
+          margin-right: 10px;
+          color: grey;
+          cursor: pointer;
+        }
+        .content-right__status-picker {
+        }
+        .content-right__status-text {
+          margin-right: 5px;
+          color: black;
+          font-weight: 600;
+          width: fit-content;
+          block-size: fit-content;
+        }
+        .content-right__date-range-picker {
+          margin-right: 10px;
+          > .ant-form-item {
+            margin-bottom: 0 !important;
+          }
+        }
+        @media only screen and (max-width: 1240px) {
+          .content-right__btn-grey {
+            width: 30px;
+            text-align: center;
+          }
+          .content-right__status-text {
+            width: 40px;
+            text-align: center;
+          }
+        }
+      }
+    }
+    .calendar__header-bottom {
+      flex: 1;
+      display: flex;
+      color: black;
+      font-size: 26px;
+      font-weight: bold;
+      justify-content: center;
+    }
+  }
+
+  .calendar__cell-wrapper {
+    height: 100%;
+    margin-bottom: 0px !important;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    .text {
+      white-space: nowrap;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.popup-detail {
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -6px;
+    .menu {
+      border-radius: 7px;
+    }
+    .btn-option {
+      margin-right: 20px;
+      margin-top: 5px;
+    }
+  }
+
+  .ant-modal {
+    top: 10px !important;
+    .ant-modal-header {
+      padding: 12px 24px !important;
+    }
+    .ant-card-body {
+      padding-top: 0px !important;
+    }
+  }
+  .card-containter {
+    border: none !important;
+    .ant-card-body {
+      padding: 0 12px 12px !important;
+    }
+  }
+  .ant-upload-list .ant-upload-list-picture-card {
+    width: fit-content;
+  }
+
+  .ant-upload-list-picture-card-container {
+    display: none;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 15px;
+  height: 15px;
+}
+
+/* rounded modal if had class */
+.rounded-modal {
+  .ant-modal-content {
+    border-radius: 10px;
+    .ant-modal-header {
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      overflow: hidden;
+    }
+    .ant-modal-body {
+      padding-top: 10px;
+      border-bottom-right-radius: 10px;
+      border-bottom-left-radius: 10px;
+      overflow: hidden;
+    }
+    .ant-modal-footer {
+      border-bottom-right-radius: 10px;
+      border-bottom-left-radius: 10px;
+      overflow: hidden;
+    }
+  }
+}
+
+.issue-detail-page {
+  .issue-detail-container {
+    .left-side {
+      height: 100%;
+      overflow: unset;
+    }
+    .right-side {
+      > .user-container {
+        .history-wrapper {
+          max-height: 50vh;
+          overflow-y: scroll;
+        }
+      }
+    }
+  }
+}
+
+.smooth-dnd-container {
+  .smooth-dnd-draggable-wrapper {
+    cursor: move;
+  }
+}
+
+.ant-upload-list {
+  .ant-upload-list-picture-card-container {
+    // display: none;
+    width: 200px !important;
+    height: 200px !important;
+    background-size: cover;
+  }
+  .ant-upload-select-picture-card {
+    width: 100% !important;
+    height: 100px !important;
+  }
+}
