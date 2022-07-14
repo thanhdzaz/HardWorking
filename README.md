@@ -43,7 +43,21 @@
 
     - Thảo luận trong 1 công việc: khi thảo luận có thể tag 1 thành viên khác, khi được tag thì thành viên sẽ nhận được thông báo qua mail, qua web notify
 
-
+### Chức năng
+- Admin: 
+	- Đăng nhập
+	- Đăng xuất
+	- Quản lý người dùng
+	- Quản lý vai trò
+	- Quản lý dự án
+	- Quản lý công việc
+	- Xin nghỉ
+- Người dùng
+	- Đăng nhập
+	- Đăng xuẩt
+	- Quản lý công việc
+	- Chấm công
+	- Xin nghỉ
 
 #### [Cấu trúc database](https://dbdesigner.page.link/xT4EXJ7DvbBqEsq47)
     .
