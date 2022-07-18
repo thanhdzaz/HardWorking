@@ -96,6 +96,24 @@ export const appRouters: any = [
     },
 
     {
+        path: '/timekeeping',
+        name: 'timekeeping',
+        permission: '',
+        title: 'Chấm công',
+        showInMenu: true,
+        children: [
+            {
+                path: '/leave-rule',
+                name: 'leave-rule',
+                permission: '',
+                title: 'Quy định xin nghỉ',
+                showInMenu: true,
+                component: LoadableComponent(() => import('scenes/LeaveRule')),
+            },
+        ],
+    },
+
+    {
         path: '/about',
         name: 'abiot',
         permission: '',

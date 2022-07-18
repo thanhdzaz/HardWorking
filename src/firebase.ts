@@ -32,7 +32,7 @@ class FirestoreService
 {
    db = getStore();
 
-   add = async (collectionName: string,data: any): Promise<any> =>
+   add = async (collectionName: string, data: any): Promise<any> =>
    {
        try
        {
