@@ -14,6 +14,8 @@ import {
     Slider,
     Upload,
 } from 'antd';
+import { PRIORITY_LIST, STATUS_LIST } from 'constant';
+import { firestore } from 'firebase';
 import React, { useEffect, useState } from 'react';
 // import { useSearchParams } from 'react-router-dom';
 // import { CharacterAvatar } from '../../../components/avatar/CharacterAvatar';
@@ -37,7 +39,6 @@ export function CreateIssuePage({
     const [meta] = useState([]);
 
     const [craeteState] = useState(false);
-    const [currentType, setCurrent] = useState('0');
     const [subIssues, setSubIssues] = useState<any[]>([]);
 
 
@@ -54,15 +55,41 @@ export function CreateIssuePage({
         //
     };
 
+    const onOk = () =>
+    {
+        form.current?.validateFields().then(async (vals) =>
+        {
+            const data = {
+                title: vals?.title ?? '',
+                description: vals?.description ?? '',
+                status: vals?.status ?? '',
+                priority: vals?.priority ?? '',
+                startTime: vals?.date[0].format('DD/MM/YYYY') ?? '',
+                endTime: vals?.date[1].format('DD/MM/YYYY') ?? '',
+            };
+            firestore.add('Tasks',data).then(({ id }) =>
+            {
+                if (subIssues.length > 0)
+                {
+                    subIssues.forEach(issue =>
+                    {
+                        firestore.add('Tasks',{ ...data,title: issue,parentId: id });
+
+                    });
+                }
+            });
+            
+        });
+    };
+
 
     useEffect(() =>
     {
         form?.current?.setFieldsValue({
-            type: project !== '0' ? '0' : '1',
-            status: '0',
+            status: 0,
             progress: 0,
+            priority: 2,
         });
-        setCurrent(project !== '0' ? '0' : '1');
     }, [meta, project, listStatus]);
 
     return (
@@ -72,6 +99,7 @@ export function CreateIssuePage({
             okText='Thêm mới'
             visible
             onCancel={onCancel}
+            onOk={onOk}
         >
             <Form
                 ref={form}
@@ -208,23 +236,7 @@ export function CreateIssuePage({
                                 }
                             </Select>
                         </Form.Item>
-                        <Form.Item
-                            name="type"
-                            label="Loại công việc"
-                            labelCol={{ span: 24 }}
-                        >
-                            <Select
-                                value={currentType}
-                                onSelect={(val) =>
-                                {
-                                    setCurrent(val);
-                                }}
-                            >
-                                {
-                                //
-                                }
-                            </Select>
-                        </Form.Item>
+                        
                     </div>
                     <div className="right-side">
                         <Form.Item name="status">
@@ -236,7 +248,15 @@ export function CreateIssuePage({
                             >
                                
                                 {
-                                //
+                                    STATUS_LIST.map((status) =>(
+                                        <Select.Option
+                                            key={status.id}
+                                            value={status.id}
+                                        >
+                                            {status.title}
+                                        </Select.Option>
+                                    ))
+
                                 }
                             </Select>
                         </Form.Item>
@@ -316,7 +336,7 @@ export function CreateIssuePage({
                             <Row style={{ marginTop: '10px' }}>
                                 <Col>
                                     <Form.Item
-                                        name="priority_real"
+                                        name="priority"
                                         label="Độ ưu tiên"
                                         rules={[
                                             {
@@ -327,7 +347,15 @@ export function CreateIssuePage({
                                     >
                                         <Select style={{ width: 150 }}>
                                             {
-                                            //
+                                                PRIORITY_LIST.map((status) =>(
+                                                    <Select.Option
+                                                        key={status.id}
+                                                        value={status.id}
+                                                    >
+                                                        {status.title}
+                                                    </Select.Option>
+                                                ))
+
                                             }
                                         </Select>
                                     </Form.Item>

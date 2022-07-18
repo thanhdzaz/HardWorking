@@ -1,5 +1,5 @@
 import LoadableComponent from '../Loadable/index';
-import { ProjectOutlined, UserOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons';
+import { ProjectOutlined, UserOutlined, QuestionCircleOutlined, HomeOutlined, DatabaseOutlined } from '@ant-design/icons';
 
 export const userRouter: any = [
     {
@@ -81,6 +81,7 @@ export const appRouters: any = [
         path: '/task',
         name: 'task',
         permission: '',
+        icon: DatabaseOutlined,
         title: 'Quản lý công việc',
         showInMenu: true,
         children: [

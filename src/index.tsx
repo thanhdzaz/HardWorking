@@ -1,6 +1,5 @@
 import './index.css';
 
-import { ConfigProvider } from 'antd';
 import vi from 'antd/lib/locale/vi_VN';
 import { Provider } from 'mobx-react';
 import 'moment-timezone';
@@ -13,6 +12,7 @@ import { firebaseApp } from 'firebase';
 import { RootProvider, rootStore } from 'stores';
 
 import { RecoilRoot } from 'recoil';
+import ConfigProvider from 'antd/es/config-provider';
 
  
 // moment.tz.setDefault(abp.timing.timeZoneInfo.iana.timeZoneId);
@@ -36,11 +36,11 @@ ReactDOM.render(
             }}
         >
             <RootProvider value={rootStore}>
-                <BrowserRouter>
-                    <ConfigProvider locale={vi}>
+                <ConfigProvider locale={vi}>
+                    <BrowserRouter>
                         <App />
-                    </ConfigProvider>
-                </BrowserRouter>
+                    </BrowserRouter>
+                </ConfigProvider>
             </RootProvider>
         </Provider>
     </RecoilRoot>,

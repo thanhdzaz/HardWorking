@@ -14,6 +14,62 @@ export const COLOR_TINT = [
     '#F2A49C', // 11
 ];
 
+export const STATUS_LIST = [
+    {
+        id: 0,
+        title: 'Khởi tạo',
+        color: 'red',
+    },
+    {
+        id: 1,
+        title: 'Đang làm',
+        color: '#FFFF00',
+    },
+    {
+        id: 2,
+        title: 'Hoàn thành',
+        color: '#FFFF00',
+    },
+    {
+        id: 3,
+        title: 'Xác nhận',
+        color: '#FFFF00',
+    },
+    {
+        id: 4,
+        title: 'Đóng',
+        color: '#FFFF00',
+    },
+];
+
+
+export const PRIORITY_LIST = [
+    {
+        id: 0,
+        title: 'Rất thấp',
+        color: 'red',
+    },
+    {
+        id: 1,
+        title: 'Thấp',
+        color: '#FFFF00',
+    },
+    {
+        id: 2,
+        title: 'Trung bình',
+        color: '#FFFF00',
+    },
+    {
+        id: 3,
+        title: 'Cao',
+        color: '#FFFF00',
+    },
+    {
+        id: 4,
+        title: 'Rất cao',
+        color: '#FFFF00',
+    },
+];
 
 export const PERMISSIONS = [
     {

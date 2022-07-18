@@ -121,6 +121,7 @@ const ProjectManagement = (): JSX.Element =>
                 dataSource={projectData}
             />
         </Card>
+
     );
 };
 

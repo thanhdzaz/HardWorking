@@ -1,53 +1,44 @@
-import { Progress } from 'antd';
+import { Popover, Progress, Typography } from 'antd';
 import { ReactComponent as Calendar } from 'asset/calendar.svg';
 import moment from 'moment';
 // import { ReactComponent as Trello } from 'assets/trello.svg';
 import { observer } from 'mobx-react';
+import { PRIORITY_LIST } from 'constant';
+import React from 'react';
+import { useRecoilValue } from 'recoil';
+import { taskAtom } from 'stores/atom/task';
+import { TaskDto } from 'models/Task/dto';
 
-const priorityObj = {
-    0: {
-        color: 'blue',
-        name: 'Bình thường',
-    },
-    1: {
-        color: 'yellow',
-        name: 'Trung bình',
-    },
-    2: {
-        color: 'red',
-        name: 'Cao',
-    },
-};
 
 export const Card = observer((props)=>
 {
     const {
         onClick,
         title,
-        // handleShowPopUp,
+        handleShowPopUp,
         priority,
-        // parent_id: parentId,
+        parentId,
         start_datetime: start,
         end_datetime: end,
         progress,
     } = props;
 
-    // const [parent, setParent] = React.useState(null);
-    // React.useEffect(() =>
-    // {
-    //     if (parentId)
-    //     {
-    //         setParent(() =>
-    //             issue.find((p) => p.id.toString() === parentId.toString()),
-    //         );
-    //     }
-    // }, [parentId, issue]);
+    const task = useRecoilValue(taskAtom);
 
-    // const listPriority = useRecoilValue(listProjectPriorityAtom);
+    const [parent, setParent] = React.useState<TaskDto | null>(null);
+    React.useEffect(() =>
+    {
+        if (parentId)
+        {
+            setParent(() =>
+                task.find((p) => p.id.toString() === parentId.toString()) ?? null,
+            );
+        }
+    }, [parentId, task]);
 
-    const prio =
-    // listPriority.find((item) => item.id.toString() === priority?.toString()) ??
-    priorityObj[priority];
+
+    const prio = PRIORITY_LIST.find((item) => item.id.toString() === priority?.toString());
+
 
     return (
         <article
@@ -63,10 +54,9 @@ export const Card = observer((props)=>
             className="card-border"
             onDoubleClick={onClick}
         >
-            {/* {parent && (
-                <Popover content={<Trans>Công việc cha</Trans>}>
+            {parent && (
+                <Popover content={'Công việc cha'}>
                     <div
-                        type="text"
                         style={{
                             cursor: 'pointer',
                             display: 'flex',
@@ -79,14 +69,13 @@ export const Card = observer((props)=>
                             e.currentTarget.blur();
                         }}
                     >
-                        <Trello
+                        {/* <Trello
                             className="svg-parent-ic"
                             stroke="#1890FF"
                             height="20"
                             width="20"
-                        />
+                        /> */}
                         <Typography.Text
-                            color="blue"
                             underline
                             ellipsis
                         >
@@ -94,7 +83,7 @@ export const Card = observer((props)=>
                         </Typography.Text>
                     </div>
                 </Popover>
-            )} */}
+            )}
             <div
                 style={{
                     fontWeight: 'bold',
@@ -181,7 +170,7 @@ export const Card = observer((props)=>
                                 color: 'white',
                             }}
                         >
-                            {prio.name}
+                            {prio.title}
                         </div>
                     )
                 : null}
