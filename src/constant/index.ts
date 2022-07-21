@@ -122,3 +122,11 @@ export const PERMISSIONS = [
         'key': 'PJ_EDIT',
     },
 ];
+
+export const NGHI_KHONG_PHEP = 0;
+export const NGHI_CO_PHEP = 1;
+
+export const LEAVE_STATUS_OBJ = {
+    0: 'Nghỉ không phép',
+    1: 'Nghỉ có phép',
+};
