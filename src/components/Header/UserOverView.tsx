@@ -1,19 +1,19 @@
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Badge, Dropdown, Menu, Modal, Select } from 'antd';
+import { L } from 'lib/abpUtility';
 import { inject, observer } from 'mobx-react';
 import React from 'react';
-import AuthenticationStore from 'stores/authenticationStore';
-import Stores from 'stores/storeIdentifier';
-import profilePicture from 'images/user.png';
 import { Link } from 'react-router-dom';
-import { LogoutOutlined } from '@ant-design/icons';
-import { L } from 'lib/abpUtility';
 import { GetUserOutput } from 'services/user/dto/getUserOutput';
+import AuthenticationStore from 'stores/authenticationStore';
 import SessionStore from 'stores/sessionStore';
+import Stores from 'stores/storeIdentifier';
 
 
 interface Props{
     tokenAuth?: AuthenticationStore;
     sessionStore?: SessionStore;
+    avatarUrl?: string;
 }
 
 
@@ -30,11 +30,19 @@ const userDropdownMenu = (that) => (
             </div>
         </Menu.Item>
         <Menu.Item
-            key="2"
+            key="0"
             className="user-name-drop"
             onClick={()=>that.setState({ visible: true })}
         >
            Dự án
+        </Menu.Item>
+        <Menu.Item
+            key="11"
+        >
+            <Link to="/user-info">
+                <UserOutlined />
+                <span> {L('Thông tin cá nhân')}</span>
+            </Link>
         </Menu.Item>
         <Menu.Item key="2">
             
@@ -105,12 +113,6 @@ class UserOverView extends React.Component<Props,State>
                         ))} */}
                     </Select>
                 </Modal>
-                <div
-                    className="user-name"
-                    style={{ marginRight: 10 , fontWeight: 'bold' }}
-                >
-                    {localStorage.getItem('uName') || ''}
-                </div>
                 <Dropdown
                     overlay={()=>userDropdownMenu(this)}
                     className={'user-drop-down'}
@@ -124,7 +126,8 @@ class UserOverView extends React.Component<Props,State>
                             style={{ height: 32, width: 32 }}
                             shape="circle"
                             alt="profile"
-                            src={profilePicture}
+                            icon={!this.props.avatarUrl && <UserOutlined />}
+                            src={this.props.avatarUrl}
                         />
                     </Badge>
                 </Dropdown>

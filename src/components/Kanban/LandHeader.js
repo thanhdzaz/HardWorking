@@ -1,27 +1,27 @@
 /* eslint-disable no-alert */
-import { EllipsisOutlined } from '@ant-design/icons';
-import { Dropdown, Menu, Popover } from 'antd';
-import * as React from 'react';
+import { Dropdown } from 'antd';
 import { COLOR_TINT } from 'constant/index';
 import { observer } from 'mobx-react';
+import * as React from 'react';
 
 export const CustomLaneHeader = observer(({
     title,
     changeColor,
-    onDelete,
+    // onDelete,
     color,
-    updateTitle,
+    // updateTitle,
     onDoubleClick,
-    handleStartCreate,
-    index: ordered,
+    // handleStartCreate,
+    // index: ordered,
 })=>
 {
     const [showPopover, setShowPopOver] = React.useState(false);
+    showPopover;
     const [showMenu, setShowMenu] = React.useState(false);
-    const [isEdit, setIsEdit] = React.useState(false);
-    const [saveState, setSaveState] = React.useState(false);
-    const [t, setT] = React.useState(title);
-    const inputRef = React.useRef();
+    // const [isEdit, setIsEdit] = React.useState(false);
+    // const [saveState, setSaveState] = React.useState(false);
+    const [t] = React.useState(title);
+    // const inputRef = React.useRef();
     return (
         <div>
             <header
@@ -81,22 +81,22 @@ export const CustomLaneHeader = observer(({
                         </div>
                     )}
                 >
-                    <Popover content={'Đổi màu'}>
-                        <span
-                            style={{
-                                borderTopLeftRadius: 10,
-                                width: 9,
-                                height: 40,
-                                backgroundColor: color,
-                                cursor: 'pointer',
-                            }}
-                            onClick={() =>
-                            {
-                                setShowPopOver(!showPopover);
-                                setShowMenu(false);
-                            }}
-                        />
-                    </Popover>
+                    {/* <Popover content={'Đổi màu'}> */}
+                    <span
+                        style={{
+                            borderTopLeftRadius: 10,
+                            width: 9,
+                            height: 40,
+                            backgroundColor: color,
+                            cursor: 'pointer',
+                        }}
+                        // onClick={() =>
+                        // {
+                        //     setShowPopOver(!showPopover);
+                        //     setShowMenu(false);
+                        // }}
+                    />
+                    {/* </Popover> */}
                 </Dropdown>
 
                 <div
@@ -109,41 +109,8 @@ export const CustomLaneHeader = observer(({
                         width: '90%',
                     }}
                 >
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        value={t}
-                        style={{ border: 'none', width: '100%' }}
-                        onKeyDown={(e) =>
-                        {
-                            if (e.keyCode === 13)
-                            {
-                                updateTitle(t);
-                                setIsEdit(false);
-                                setTimeout(() =>
-                                {
-                                    e.target.blur();
-                                }, 10);
-                            }
-                        }}
-                        onChange={(e) =>
-                        {
-                            setT(e.target.value);
-                            setSaveState(false);
-                        }}
-                        onFocus={() =>
-                        {
-                            setIsEdit(true);
-                            setSaveState(true);
-                        }}
-                        onBlur={() =>
-                        {
-                            if (isEdit && !saveState)
-                            {
-                                setT(title);
-                            }
-                        }}
-                    />
+                    {t}
+                        
                 </div>
 
                 <div
@@ -159,7 +126,7 @@ export const CustomLaneHeader = observer(({
                         setShowPopOver(false);
                     }}
                 />
-                <Dropdown
+                {/* <Dropdown
                     trigger={['click']}
                     overlay={(
                         <Menu
@@ -221,7 +188,7 @@ export const CustomLaneHeader = observer(({
                             <EllipsisOutlined width={40} />
                         </div>
                     </Popover>
-                </Dropdown>
+                </Dropdown> */}
             </header>
         </div>
     );

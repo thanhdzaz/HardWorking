@@ -11,6 +11,9 @@ import UserOverView from './UserOverView';
 // import AppComponentBase from 'components/AppComponentBase';
 
 import utils from '../../utils/utils';
+import { auth, firestore } from 'firebase';
+import { userInfoAtom } from 'stores/atom/user';
+import { useRecoilState } from 'recoil';
 
 export interface IHeaderProps {
   collapsed?: any;
@@ -22,9 +25,15 @@ export interface IHeaderProps {
 export const Header:React.FC <IHeaderProps> = (props)=>
 {
     const [os, setOs] = React.useState('PC');
+    const [userInfo,setUserInfo] = useRecoilState(userInfoAtom);
+    
     React.useEffect(()=>
     {
         setOs(utils.getOS());
+        firestore.getByDoc('Users',auth.currentUser?.uid ?? '').then((userInfo) =>
+        {
+            setUserInfo(userInfo);
+        });
     },[]);
    
     return (
@@ -72,7 +81,13 @@ export const Header:React.FC <IHeaderProps> = (props)=>
                     alignItems: 'center' }}
                 span={3}
             >
-                <UserOverView />
+                <div
+                    className="user-name"
+                    style={{ marginRight: 10 , fontWeight: 'bold' }}
+                >
+                    {userInfo?.fullName ?? ''}
+                </div>
+                <UserOverView avatarUrl={userInfo.avatarUrl} />
             </Col>
         </Row>
     );

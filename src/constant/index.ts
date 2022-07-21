@@ -47,7 +47,7 @@ export const PRIORITY_LIST = [
     {
         id: 0,
         title: 'Rất thấp',
-        color: 'red',
+        color: 'yellow',
     },
     {
         id: 1,
@@ -57,17 +57,17 @@ export const PRIORITY_LIST = [
     {
         id: 2,
         title: 'Trung bình',
-        color: '#FFFF00',
+        color: '#00F044',
     },
     {
         id: 3,
         title: 'Cao',
-        color: '#FFFF00',
+        color: '#f00008',
     },
     {
         id: 4,
         title: 'Rất cao',
-        color: '#FFFF00',
+        color: '#ff0000',
     },
 ];
 

@@ -1,5 +1,6 @@
 import { getAnalytics } from 'firebase/analytics';
 import { FirebaseApp, initializeApp } from 'firebase/app';
+import { FirebaseStorage, getStorage,ref, StorageReference, uploadBytes,getDownloadURL } from 'firebase/storage';
 import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore/lite';
 import { UserInfo } from 'models/User/dto';
 
@@ -148,6 +149,30 @@ class FirestoreService
 
 }
 
+class Storage
+{
+    storage:FirebaseStorage;
+    reference:StorageReference;
+    constructor()
+    {
+        this.storage = getStorage(firebaseApp());
+        this.reference = ref(this.storage);
+    }
+
+    async upload(reference:string,file:any)
+    {
+        if (!file)
+        {
+            throw new Error('File lỗi');
+            return;
+        }
+        const { ref: f } = await uploadBytes(ref(this.storage,reference),file);
+
+        return getDownloadURL(f);
+    }
+}
+
+export const storage = new Storage();
 
 export const firestore = new FirestoreService();
 

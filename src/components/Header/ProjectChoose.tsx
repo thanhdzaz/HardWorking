@@ -5,13 +5,16 @@ import './index.less';
 import { observer } from 'mobx-react';
 
 import { Select } from 'antd';
-import { getStore } from 'firebase';
-import { collection, getDocs } from 'firebase/firestore/lite';
+import { firestore, getStore } from 'firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore/lite';
 import { ProjectDto } from 'models/Task/dto';
 import { useEffect } from 'react';
 import ProjectStore from 'stores/projectStore';
 import SessionStore from 'stores/sessionStore';
 import { useStore } from 'stores';
+import { UserInfo } from 'models/User/dto';
+import { useSetRecoilState } from 'recoil';
+import { userAtom } from 'stores/atom/user';
 
 // const { Option } = Select;
 
@@ -36,6 +39,8 @@ const ProjectChoose = observer(
             sessionStore,
         } = useStore();
 
+        const setUser = useSetRecoilState(userAtom);
+
         const getProject = async()=>
         {
             
@@ -47,13 +52,42 @@ const ProjectChoose = observer(
             
         };
 
-        useEffect(
-            ()=>
-            {
-                getProject();
-            }
-            ,[]);
+        useEffect(()=>
+        {
+            getProject();
+            getUserProject();
+        },[]);
     
+        const getUserProject = async() =>
+        {
+            if (localStorage.getItem('project'))
+            {
+                const q = query(firestore.collection('UsersProject'),where('projectId', '==', localStorage.getItem('project')));
+          
+                const querySnapshot = await getDocs(q);
+                const ids:string[] = [];
+                const user:UserInfo[] = [];
+                querySnapshot.forEach((doc) =>
+                {
+                    ids.push(doc.data().userId);
+                });
+                if (ids.length > 0)
+                {
+                    
+                    const userQuery = query(firestore.collection('Users'),where('id', 'in', ids));
+                    const userQuerySnapshot = await getDocs(userQuery);
+
+                    userQuerySnapshot.forEach((doc) =>
+                    {
+                        // console.log(doc.id,'=>',doc.data());
+                        user.push(doc.data() as any);
+                    });
+                
+                }
+                setUser(user);
+            }
+            
+        };
 
         const changeProject = (id:string):void =>
         {

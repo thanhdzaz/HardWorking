@@ -17,6 +17,8 @@ import {
 import { PRIORITY_LIST, STATUS_LIST } from 'constant';
 import { firestore } from 'firebase';
 import React, { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from 'stores/atom/user';
 // import { useSearchParams } from 'react-router-dom';
 // import { CharacterAvatar } from '../../../components/avatar/CharacterAvatar';
 // import { priorityObj } from '../../../constants';
@@ -38,6 +40,7 @@ export function CreateIssuePage({
     const form = React.createRef<FormInstance>();
     const [meta] = useState([]);
 
+    const users = useRecoilValue(userAtom);
     const [craeteState] = useState(false);
     const [subIssues, setSubIssues] = useState<any[]>([]);
 
@@ -295,7 +298,14 @@ export function CreateIssuePage({
                                         >
                                            
                                             {
-                                            //
+                                                users.map((user) =>(
+                                                    <Select.Option
+                                                        key={user.id}
+                                                        value={user.id}
+                                                    >
+                                                        {user.fullName}
+                                                    </Select.Option>
+                                                ))
                                             }
                                         </Select>
                                     </Form.Item>

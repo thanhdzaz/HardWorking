@@ -94,6 +94,13 @@ export const appRouters: any = [
             },
         ],
     },
+    {
+        showInMenu: false,
+        name: 'u-info',
+        path: '/user-info',
+        title: 'Thông tin người dùng',
+        component: LoadableComponent(() => import('scenes/UserInfo')),
+    },
 
     {
         path: '/timekeeping',

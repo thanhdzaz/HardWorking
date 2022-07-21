@@ -17,6 +17,7 @@ import {
     Card,
     Col,
     Form,
+    FormInstance,
     Input, Modal, notification,
     Row,
     Select,
@@ -29,16 +30,18 @@ import { firestore } from 'firebase';
 import { TaskDto } from 'models/Task/dto';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { taskAtom } from 'stores/atom/task';
 // import ImageCarousel from './ImageCarousel';
 
 export const IssueDetail:React.FunctionComponent<any> = ({
     id,
     loading,
     setLoading,
-    formRef,
     onCancel,
 }) =>
 {
+    const formRef = React.createRef<FormInstance>();
     const [imageLinks] = useState([]);
     const [currentRecord, setCurrentRecord] = useState<TaskDto>({ id: '0' } as any);
     const [userList] = useState([]);
@@ -48,8 +51,9 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     const [subIssues] = useState([] as any);
     const [idIssue, setIdIssue] = useState(id);
     const [hideActivities, setHideActivities] = useState(true);
-    const [imgLoading] = useState(true);
+    // const [imgLoading] = useState(true);
     const [description] = useState('');
+    const task = useRecoilValue(taskAtom);
 
     const [showInputSubIssue, setShowInputSubIssue] = useState(false);
     const titleInputRef = React.createRef<Input>();
@@ -83,6 +87,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     {
         firestore.getByDoc('Tasks',idIssue ?? '').then(setCurrentRecord);
     };
+    console.log(currentRecord,'currentRecord');
 
     // set record
     useEffect(() =>
@@ -91,7 +96,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         {
             handleGetIssueById();
         }
-    }, [formRef, idIssue]);
+    }, [idIssue]);
 
     const handleUpdate = (key, value):boolean =>
     {
@@ -119,7 +124,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                 });
                 handleGetIssueById();
             }
-        });
+        }).catch((err) =>err);
         return true;
     };
 
@@ -133,8 +138,9 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     // set data
     useEffect(() =>
     {
-        if (currentRecord.id !== '0')
+        if (formRef.current && currentRecord.id !== '0')
         {
+            
            
             formRef?.current?.setFieldsValue({
                 ...currentRecord,
@@ -182,181 +188,183 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     return (
         <Modal
             title="Chi tiết công việc"
+            width="80%"
             visible
             onCancel={onCancel}
         >
-            <Card className="card-containter">
-                <div className="issue-detail-container">
-                    <div
-                        className="left-side"
-                        style={{ paddingTop: 0 }}
-                    >
-                        <Skeleton
-                            loading={loading}
-                            active
+            <Form ref={formRef}>
+                <Card className="card-containter">
+                    <div className="issue-detail-container">
+                        <div
+                            className="left-side"
+                            style={{ paddingTop: 0 }}
                         >
-                            <h3 style={{ marginTop: 10, fontSize: 14 }}>
-                            Tiêu đề:
-                            </h3>
-                            <Form.Item
-                                name="title"
-                                className="title-form-control"
-                                rules={[{ required: true, message: 'Tên không được rỗng' }]}
+                            <Skeleton
+                                loading={loading}
+                                active
                             >
-                                <Input
-                                    ref={titleInputRef}
-                                    placeholder="Tên công việc"
-                                    style={{ fontSize: 22 }}
-                                    onFocus={() => setShowTitleTool(true)}
-                                />
-                            </Form.Item>
-                            <div className="title-confirm-wrapper">
-                                {showTitleTool && (
-                                    <div className="title-confirm">
-                                        <Button
-                                            onClick={() =>
-                                            {
-                                                handleUpdate(
-                                                    'title',
-                                                    titleInputRef.current && titleInputRef.current.input.value,
-                                                );
-                                                setShowTitleTool(false);
-                                            }}
-                                        >
-                                            <CheckOutlined />
-                                        </Button>
-                                        <Button
-                                            onClick={() =>
-                                            {
-                                                formRef?.current?.setFieldsValue({
-                                                    title: currentRecord.title,
-                                                });
-                                                setShowTitleTool(false);
-                                            }}
-                                        >
-                                            <CloseOutlined />
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                            <h3 style={{ marginTop: 10, fontSize: 14 }}>
-                            Mô tả:
-                            </h3>
-                            {!showCkeditor && description === '' && (
-                                <Form.Item name="description">
+                                <h3 style={{ marginTop: 10, fontSize: 14 }}>
+                            Tiêu đề:
+                                </h3>
+                                <Form.Item
+                                    name="title"
+                                    className="title-form-control"
+                                    rules={[{ required: true, message: 'Tên không được rỗng' }]}
+                                >
                                     <Input
-                                        placeholder="Nhập mô tả....."
-                                        onClick={() =>
-                                        {
-                                            setCkeditor(true);
-                                        }}
+                                        ref={titleInputRef}
+                                        placeholder="Tên công việc"
+                                        style={{ fontSize: 22 }}
+                                        onFocus={() => setShowTitleTool(true)}
                                     />
                                 </Form.Item>
-                            )}
-                            <Input.TextArea />
-                        </Skeleton>
-                        <Skeleton
-                            loading={loading}
-                            active
-                        >
-                            <h3 style={{ fontSize: 14 }}>
-                            Nhiệm vụ con
-                            </h3>
-                            <Row gutter={[0, 8]}>
-                                {subIssues.map((is, index) => (
-                                    <Col
-                                        key={is.id}
-                                        span={24}
-                                    >
-                                        <div
-                                            className="child-issue-wrapper"
-                                            onClick={() => setIdIssue(is.id)}
-                                        >
-                                        Nhiệm con {index + 1}: {is.title}
+                                <div className="title-confirm-wrapper">
+                                    {showTitleTool && (
+                                        <div className="title-confirm">
+                                            <Button
+                                                onClick={() =>
+                                                {
+                                                    handleUpdate(
+                                                        'title',
+                                                        titleInputRef.current && titleInputRef.current.input.value,
+                                                    );
+                                                    setShowTitleTool(false);
+                                                }}
+                                            >
+                                                <CheckOutlined />
+                                            </Button>
+                                            <Button
+                                                onClick={() =>
+                                                {
+                                                    formRef?.current?.setFieldsValue({
+                                                        title: currentRecord.title,
+                                                    });
+                                                    setShowTitleTool(false);
+                                                }}
+                                            >
+                                                <CloseOutlined />
+                                            </Button>
                                         </div>
-                                    </Col>
-                                ))}
-                            </Row>
-                            <Row
-                                className="row-child-issue-input-wrapper"
-                                gutter={[0, 8]}
-                            >
-                                <Col span={24}>
-                                    {showInputSubIssue && (
-                                        <Form.Item
-                                            className="child-issue-input-wrapper"
-                                            name="subIssue"
-                                        >
-                                            <Input
-                                                ref={subIssueInputRef}
-                                                placeholder={`Nhập tên nhiệm vụ con ${subIssues.length + 1}...`}
-                                                onFocus={() => setShowSubIssueTool(true)}
-                                            />
-                                            <div className="title-confirm-wrapper">
-                                                {showSubIssueTool && (
-                                                    <div className="title-confirm">
-                                                        <Button
-                                                            onClick={() =>
-                                                            {
-                                                                handleCreateSubIssue(
-                                                                    subIssueInputRef.current && subIssueInputRef.current.input.value,
-                                                                );
-                                                                setShowSubIssueTool(false);
-                                                                setShowInputSubIssue(false);
-                                                            }}
-                                                        >
-                                                            <CheckOutlined />
-                                                        </Button>
-                                                        <Button
-                                                            onClick={() =>
-                                                            {
-                                                                setShowSubIssueTool(false);
-                                                                setShowInputSubIssue(false);
-                                                            }}
-                                                        >
-                                                            <CloseOutlined />
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </Form.Item>
                                     )}
-                                </Col>
-                                {!showInputSubIssue && (
-                                    <Col
-                                        span={24}
-                                        style={{ marginTop: -8 }}
-                                    >
-                                        <Button
-                                            type="dashed"
-                                            onClick={() => setShowInputSubIssue(true)}
-                                        >
-                                            <PlusOutlined /> Thêm nhiệm vụ con
-                                        </Button>
-                                    </Col>
+                                </div>
+                                <h3 style={{ marginTop: 10, fontSize: 14 }}>
+                            Mô tả:
+                                </h3>
+                                {!showCkeditor && description === '' && (
+                                    <Form.Item name="description">
+                                        <Input
+                                            placeholder="Nhập mô tả....."
+                                            onClick={() =>
+                                            {
+                                                setCkeditor(true);
+                                            }}
+                                        />
+                                    </Form.Item>
                                 )}
-                            </Row>
-                            <h3 style={{ marginTop: 10, fontSize: 14 }}>Thêm tệp đính kèm</h3>
-                            <Spin
-                                size="large"
-                                spinning={imgLoading}
+                                <Input.TextArea />
+                            </Skeleton>
+                            <Skeleton
+                                loading={loading}
+                                active
                             >
-                                <div style={{ minHeight: imageLinks.length ? 50 : 0 }}>
-                                    {/* <ImageCarousel
+                                <h3 style={{ fontSize: 14 }}>
+                            Nhiệm vụ con
+                                </h3>
+                                <Row gutter={[0, 8]}>
+                                    {subIssues.map((is, index) => (
+                                        <Col
+                                            key={is.id}
+                                            span={24}
+                                        >
+                                            <div
+                                                className="child-issue-wrapper"
+                                                onClick={() => setIdIssue(is.id)}
+                                            >
+                                        Nhiệm con {index + 1}: {is.title}
+                                            </div>
+                                        </Col>
+                                    ))}
+                                </Row>
+                                <Row
+                                    className="row-child-issue-input-wrapper"
+                                    gutter={[0, 8]}
+                                >
+                                    <Col span={24}>
+                                        {showInputSubIssue && (
+                                            <Form.Item
+                                                className="child-issue-input-wrapper"
+                                                name="subIssue"
+                                            >
+                                                <Input
+                                                    ref={subIssueInputRef}
+                                                    placeholder={`Nhập tên nhiệm vụ con ${subIssues.length + 1}...`}
+                                                    onFocus={() => setShowSubIssueTool(true)}
+                                                />
+                                                <div className="title-confirm-wrapper">
+                                                    {showSubIssueTool && (
+                                                        <div className="title-confirm">
+                                                            <Button
+                                                                onClick={() =>
+                                                                {
+                                                                    handleCreateSubIssue(
+                                                                        subIssueInputRef.current && subIssueInputRef.current.input.value,
+                                                                    );
+                                                                    setShowSubIssueTool(false);
+                                                                    setShowInputSubIssue(false);
+                                                                }}
+                                                            >
+                                                                <CheckOutlined />
+                                                            </Button>
+                                                            <Button
+                                                                onClick={() =>
+                                                                {
+                                                                    setShowSubIssueTool(false);
+                                                                    setShowInputSubIssue(false);
+                                                                }}
+                                                            >
+                                                                <CloseOutlined />
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </Form.Item>
+                                        )}
+                                    </Col>
+                                    {!showInputSubIssue && (
+                                        <Col
+                                            span={24}
+                                            style={{ marginTop: -8 }}
+                                        >
+                                            <Button
+                                                type="dashed"
+                                                onClick={() => setShowInputSubIssue(true)}
+                                            >
+                                                <PlusOutlined /> Thêm nhiệm vụ con
+                                            </Button>
+                                        </Col>
+                                    )}
+                                </Row>
+                                <h3 style={{ marginTop: 10, fontSize: 14 }}>Thêm tệp đính kèm</h3>
+                                <Spin
+                                    size="large"
+                                    spinning={false}// imgLoading
+                                >
+                                    <div style={{ minHeight: imageLinks.length ? 50 : 0 }}>
+                                        {/* <ImageCarousel
                                     imageLinks={imageLinks}
                                     onItemClick={handleItemClick}
                                 /> */}
-                                </div>
-                            </Spin>
-                            {/* <ImageVideoPreview
+                                    </div>
+                                </Spin>
+                                {/* <ImageVideoPreview
                             items={imageLinks}
                             imageGalleryRef={imageGalleryRef}
                             startIndex={startIndex}
                             setStartIndex={setStartIndex}
                         /> */}
 
-                            <div style={{ marginTop: 10 }}>
-                                {/* <Upload
+                                <div style={{ marginTop: 10 }}>
+                                    {/* <Upload
                                 listType="picture-card"
                                 beforeUpload={() => false}
                                 onChange={(e) => handleUploadFile(e)}
@@ -372,117 +380,119 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                     </div>
                                 </div>
                             </Upload> */}
-                            </div>
-                        </Skeleton>
-                        <Skeleton
-                            loading={loading}
-                            active
-                        >
-                            <Row>
-                                <Col span={24}>
-                                    <Form.Item
-                                        label="Công việc cha"
-                                        name="parent_id"
-                                        labelCol={{ span: 24 }}
-                                    >
-                                        <Select
-                                            placeholder="Tên công việc"
-                                            optionFilterProp="children"
-                                            filterOption={(input:any, option:any) =>
-                                                option?.children
-                                                    .toLowerCase()
-                                                    .includes(input.toLowerCase())
-                                            }
-                                            showSearch
-                                            allowClear
-                                            onSelect={(val) => handleUpdate('parent_id',val)}
-                                        >
-                                            {[]
-                                                .filter(
-                                                    (item:any) =>
-                                                        item.id.toString() !== idIssue &&
-                                                !subIssues.map((is) => is.id).includes(item.id),
-                                                )
-                                                .map((item:any) => (
-                                                    <Select.Option
-                                                        key={item.id.toString()}
-                                                        value={item.id.toString()}
-                                                    >
-                                                        {item.title}
-                                                    </Select.Option>
-                                                ))}
-                                        </Select>
-                                    </Form.Item>
-                                </Col>
-                          
-                            
-                            </Row>
-                        </Skeleton>
-                    </div>
-                    <div className="right-side">
-                        {!loading && (
-                            <Form.Item name="status">
-                                <Select
-                                    style={{ width: 150 }}
-                                    {...{
-                                        blue: 'blue',
-                                    } as any}
-                                >
-                          
-                                    {
-                                        STATUS_LIST.map((status) =>(
-                                            <Select.Option
-                                                key={status.id}
-                                                value={status.id}
-                                            >
-                                                {status.title}
-                                            </Select.Option>
-                                        ))
-
-                                    }
-                                </Select>
-                            </Form.Item>
-
-                        )}
-
-                        <div className="user-container">
+                                </div>
+                            </Skeleton>
                             <Skeleton
                                 loading={loading}
-                                avatar
                                 active
                             >
                                 <Row>
-                                    <Col span={3}>
-                                        {/* <CharacterAvatar
+                                    <Col span={24}>
+                                        <Form.Item
+                                            label="Công việc cha"
+                                            name="parentId"
+                                            labelCol={{ span: 24 }}
+                                        >
+                                            <Select
+                                                placeholder="Tên công việc"
+                                                optionFilterProp="children"
+                                                filterOption={(input:any, option:any) =>
+                                                    option?.children
+                                                        .toLowerCase()
+                                                        .includes(input.toLowerCase())
+                                                }
+                                                showSearch
+                                                allowClear
+                                                onSelect={(val) => handleUpdate('parentId',val)}
+                                            >
+                                                {
+                                                    task
+                                                        .filter(
+                                                            (item:any) =>
+                                                                item.id.toString() !== idIssue &&
+                                                !subIssues.map((is) => is.id).includes(item.id),
+                                                        )
+                                                        .map((item:any) => (
+                                                            <Select.Option
+                                                                key={item.id.toString()}
+                                                                value={item.id.toString()}
+                                                            >
+                                                                {item.title}
+                                                            </Select.Option>
+                                                        ))}
+                                            </Select>
+                                        </Form.Item>
+                                    </Col>
+                          
+                            
+                                </Row>
+                            </Skeleton>
+                        </div>
+                        <div className="right-side">
+                            {!loading && (
+                                <Form.Item name="status">
+                                    <Select
+                                        style={{ width: 150 }}
+                                        {...{
+                                            blue: 'blue',
+                                        } as any}
+                                        onChange={(val)=>handleUpdate('status',val)}
+                                    >
+                          
+                                        {
+                                            STATUS_LIST.map((status) =>(
+                                                <Select.Option
+                                                    key={status.id}
+                                                    value={status.id}
+                                                >
+                                                    {status.title}
+                                                </Select.Option>
+                                            ))
+
+                                        }
+                                    </Select>
+                                </Form.Item>
+
+                            )}
+
+                            <div className="user-container">
+                                <Skeleton
+                                    loading={loading}
+                                    avatar
+                                    active
+                                >
+                                    <Row>
+                                        <Col span={3}>
+                                            {/* <CharacterAvatar
                                         title={currentUser}
                                         size={35}
                                     /> */}
-                                    </Col>
-                                    <Col span={21}>
-                                        <Form.Item name="assign_to">
-                                            <Select
-                                                placeholder="Giao cho"
-                                                className="user_select"
-                                                allowClear
-                                                onSelect={(val) => handleUpdate('assign_to', val)}
-                                                onChange={(_val) =>
-                                                {
-                                                // const _user = userList.find(
-                                                //     (u) => u.id.toString() === val?.toString(),
-                                                // );
-                                                // if (_user)
-                                                // {
-                                                //     setCurrentUser(
-                                                //         (_user?.firstName ?? '') + (_user?.lastName ?? ''),
-                                                //     );
-                                                // }
-                                                // else
-                                                // {
-                                                //     setCurrentUser('');
-                                                // }
-                                                }}
-                                            >
-                                                {userList &&
+                                        </Col>
+                                        <Col span={21}>
+                                            <Form.Item name="assign_to">
+                                                <Select
+                                                    placeholder="Giao cho"
+                                                    className="user_select"
+                                                    allowClear
+                                                    onSelect={(val) => handleUpdate('assignTo', val)}
+                                                    onChange={(_val) =>
+                                                    {
+                                                        // const _user = userList.find(
+                                                        //     (u) => u.id.toString() === val?.toString(),
+                                                        // );
+                                                        // if (_user)
+                                                        // {
+                                                        //     setCurrentUser(
+                                                        //         (_user?.firstName ?? '') + (_user?.lastName ?? ''),
+                                                        //     );
+                                                        // }
+                                                        // else
+                                                        // {
+                                                        //     setCurrentUser('');
+                                                        // }
+                                                    }}
+                                                >
+                                                    {userList &&
                         userList.length > 0 &&
                         userList.map((item:any) => (
                             <Select.Option
@@ -493,130 +503,100 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                 {item?.lastName ?? ''}
                             </Select.Option>
                         ))}
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col
-                                        span={24}
-                                        style={{ height: 40, marginTop: 0 }}
-                                    >
-                                        <ProFormSlider
-                                            fieldProps={{
-                                                onAfterChange: (val) => handleUpdate('progress', val),
-                                                defaultValue: currentRecord.progress,
-                                            }}
-                                            name="progress"
-                                            width="lg"
-                                            min={0}
-                                            max={100}
-                                        />
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-                                        <span>
-                                            <CalendarOutlined /> Từ:{' '}
-                                            {moment(currentRecord.startTime).format(
-                                                'HH:mm:ss DD/MM/YYYY',
-                                            )}
-                                        </span>
-                                        <span style={{ marginLeft: 15 }}>
-                    Đến:{' '}
-                                            {moment(currentRecord.endTime).format(
-                                                'HH:mm:ss DD/MM/YYYY',
-                                            )}
-                                        </span>
-                                    </Col>
-                                </Row>
-                                <Row style={{ marginTop: 5 }}>
-                                    <Col span={24}>
-                                        <Form.Item
-                                            style={{ marginTop: 0 }}
-                                            name="priority_real"
-                                            label="Độ ưu tiên"
+                                                </Select>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col
+                                            span={24}
+                                            style={{ height: 40, marginTop: 0 }}
                                         >
-                                            <Select
-                                                style={{ width: 150 }}
-                                                onSelect={(val) => handleUpdate('priority', val)}
+                                            <ProFormSlider
+                                                fieldProps={{
+                                                    onAfterChange: (val) => handleUpdate('progress', val),
+                                                    defaultValue: currentRecord.progress,
+                                                }}
+                                                name="progress"
+                                                width="lg"
+                                                min={0}
+                                                max={100}
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col>
+                                            <span>
+                                                <CalendarOutlined /> Từ:{' '}
+                                                {currentRecord.startTime}
+                                            </span>
+                                            <span style={{ marginLeft: 15 }}>
+                    Đến:{' '}
+                                                {currentRecord.endTime}
+                                            </span>
+                                        </Col>
+                                    </Row>
+                                    <Row style={{ marginTop: 5 }}>
+                                        <Col span={24}>
+                                            <Form.Item
+                                                style={{ marginTop: 0 }}
+                                                name="priority"
+                                                label="Độ ưu tiên"
                                             >
-                                                {
-                                                    PRIORITY_LIST.map((status) =>(
-                                                        <Select.Option
-                                                            key={status.id}
-                                                            value={status.id}
-                                                        >
-                                                            {status.title}
-                                                        </Select.Option>
-                                                    ))
+                                                <Select
+                                                    style={{ width: 150 }}
+                                                    onSelect={(val) => handleUpdate('priority', val)}
+                                                >
+                                                    {
+                                                        PRIORITY_LIST.map((status) =>(
+                                                            <Select.Option
+                                                                key={status.id}
+                                                                value={status.id}
+                                                            >
+                                                                {status.title}
+                                                            </Select.Option>
+                                                        ))
 
-                                                }
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-                                <div className="divider" />
-                                <Row style={{ marginTop: 5 }}>
-                                    <Col span={24}>
-                                        <Row>
-                                            <Col span={7}>ID nhiệm vụ:</Col>
-                                            <Col span={17}>{idIssue}</Col>
-                                        </Row>
-                                    </Col>
-                                    <Col span={24}>
-                                        <Row>
-                                            <Col span={7}>Thêm mới:</Col>
-                                            <Col span={17}>
-                                                {/* {moment(currentRecord.createdDate).format(
-                                                'HH:mm:ss DD/MM/YYYY',
-                                            )} */}
-                                            </Col>
-                                        </Row>
-                                    </Col>
-                                    {/* <Col span={24}>
-                  <Row>
-                    <Col span={7}>Loại công việc:</Col>
-                    <Col span={17}>
-                      {meta?.type?.listValue[currentType].value}
-                    </Col>
-                  </Row>
-                </Col> */}
-                                    <Col span={24} />
-                                </Row>
-                            </Skeleton>
-                        </div>
-                        <div className="user-container">
-                            <Skeleton
-                                loading={loading}
-                                active
-                            >
-                                <Row>
-                                    <Col span={24}>
-                                        <Title level={5}>
+                                                    }
+                                                </Select>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                   
+                                </Skeleton>
+                            </div>
+                            <div className="user-container">
+                                <Skeleton
+                                    loading={loading}
+                                    active
+                                >
+                                    <Row>
+                                        <Col span={24}>
+                                            <Title level={5}>
                     Lịch sử{' '}
-                                            {!hideActivities
-                                                ? (
-                                                        <DownOutlined
-                                                            style={{ fontSize: 14 }}
-                                                            onClick={() => setHideActivities(true)}
-                                                        />
-                                                    )
-                                                : (
-                                                        <RightOutlined
-                                                            style={{ fontSize: 14 }}
-                                                            onClick={() => setHideActivities(false)}
-                                                        />
-                                                    )}
-                                        </Title>
+                                                {!hideActivities
+                                                    ? (
+                                                            <DownOutlined
+                                                                style={{ fontSize: 14 }}
+                                                                onClick={() => setHideActivities(true)}
+                                                            />
+                                                        )
+                                                    : (
+                                                            <RightOutlined
+                                                                style={{ fontSize: 14 }}
+                                                                onClick={() => setHideActivities(false)}
+                                                            />
+                                                        )}
+                                            </Title>
                                     
-                                    </Col>
-                                </Row>
-                            </Skeleton>
+                                        </Col>
+                                    </Row>
+                                </Skeleton>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </Card>
+                </Card>
+            </Form>
         </Modal>
     );
 };

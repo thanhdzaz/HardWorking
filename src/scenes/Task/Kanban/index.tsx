@@ -132,6 +132,7 @@ const KB = observer((_):JSX.Element=>
                         pageMode='modal'
                         onCancel={()=>
                         {
+                            getAll();
                             setVisible(false);
                         }}
                     />
@@ -145,6 +146,7 @@ const KB = observer((_):JSX.Element=>
                         id={curentId}
                         onCancel={()=>
                         {
+                            getAll();
                             setVisible2(false);
                         }}
                     />
