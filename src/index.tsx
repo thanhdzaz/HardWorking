@@ -6,7 +6,7 @@ import 'moment-timezone';
 import * as ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+// import registerServiceWorker from './registerServiceWorker';
 import initializeStores from './stores/storeInitializer';
 import { firebaseApp } from 'firebase';
 import { RootProvider, rootStore } from 'stores';
@@ -47,5 +47,5 @@ ReactDOM.render(
     document.getElementById('root') as HTMLElement,
 );
 
-registerServiceWorker();
+// registerServiceWorker();
 
