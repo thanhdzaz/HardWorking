@@ -33,11 +33,11 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
         // Nếu số ngày nghỉ có trong quy định nghỉ
         if (isExistInLeaveRule)
         {
-            const { dateBefore } = leaveRule;
+            const { totalDateBefore } = leaveRule;
             const now = moment();
             const totalDayFromNowToDayOff =
         moment(startDate, 'YYYY-MM-DD 00:00:00').diff(now, 'days') + 1;
-            if (totalDayFromNowToDayOff >= dateBefore)
+            if (totalDayFromNowToDayOff >= totalDateBefore)
             {
                 status = NGHI_CO_PHEP;
             }
