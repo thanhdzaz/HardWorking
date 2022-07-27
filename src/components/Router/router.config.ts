@@ -1,5 +1,5 @@
 import LoadableComponent from '../Loadable/index';
-import { ProjectOutlined, UserOutlined, QuestionCircleOutlined, HomeOutlined, DatabaseOutlined } from '@ant-design/icons';
+import { ProjectOutlined, UserOutlined, QuestionCircleOutlined, HomeOutlined, DatabaseOutlined, CheckSquareOutlined } from '@ant-design/icons';
 
 export const userRouter: any = [
     {
@@ -106,6 +106,7 @@ export const appRouters: any = [
     {
         path: '/timekeeping',
         name: 'timekeeping',
+        icon: CheckSquareOutlined,
         permission: '',
         title: 'Chấm công',
         showInMenu: true,
@@ -125,6 +126,22 @@ export const appRouters: any = [
                 title: 'Lịch sử nghỉ',
                 showInMenu: true,
                 component: LoadableComponent(() => import('scenes/LeaveHistory')),
+            },
+            {
+                path: '/my-timekeeping',
+                name: 'my-timekeeping',
+                permission: '',
+                title: 'Chấm công của tôi',
+                showInMenu: true,
+                component: LoadableComponent(() => import('scenes/MyTimekeeping')),
+            },
+            {
+                path: '/total-timekeeping',
+                name: 'total-timekeeping',
+                permission: '',
+                title: 'Tổng hợp chấm công',
+                showInMenu: true,
+                component: LoadableComponent(() => import('scenes/TotalTimekeeping')),
             },
         ],
     },

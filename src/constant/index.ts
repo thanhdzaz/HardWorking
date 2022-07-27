@@ -130,3 +130,8 @@ export const LEAVE_STATUS_OBJ = {
     0: 'Nghỉ không phép',
     1: 'Nghỉ có phép',
 };
+
+export const SHIFT_OBJ = {
+    startTime: '08:00:00',
+    endTime: '17:00:00',
+};

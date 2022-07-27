@@ -87,7 +87,7 @@ export const Header:React.FC <IHeaderProps> = (props)=>
                 >
                     {userInfo?.fullName ?? ''}
                 </div>
-                <UserOverView avatarUrl={userInfo.avatarUrl} />
+                <UserOverView avatarUrl={userInfo?.avatarUrl} />
             </Col>
         </Row>
     );
