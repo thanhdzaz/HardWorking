@@ -1,3 +1,4 @@
+
 export interface TaskDto{
     id: string;
     title: string;
@@ -13,6 +14,21 @@ export interface TaskDto{
     projectId: string;
     parentId?: string;
     // tagId?: string;
+}
+
+
+export interface CheckLog{
+    id: string;
+	taskId: string;
+	field: string;
+	newValue: string;
+	action: string;
+	oldValue: string;
+	userId: string;
+    time: {
+        seconds: number;
+        nanoseconds: number;
+    };
 }
 
 export const TYPE_LEAVE = [

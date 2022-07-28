@@ -11,3 +11,8 @@ export const userInfoAtom = atom({
     default: {} as UserInfo,
     key: 'userInfoAtom',
 });
+
+export const listUserInfoAtom = atom({
+    default: [] as UserInfo[],
+    key: 'listUserInfoAtom',
+});

@@ -16,3 +16,19 @@ export const iconRotate = (deg:number):any =>
         },
     });
 };
+
+export const ACTION = {
+    update: 'Cập nhật',
+    add: 'Thêm mới',
+    delete: 'Xóa',
+};
+
+
+export const LOGKEYS = {
+    assignTo: 'Giao cho',
+    title: 'Tên nhiệm vụ',
+    description: 'Mô tả',
+    parentId: 'Công việc cha',
+    status: 'Trạng thái',
+    progress: 'Tiến độ',
+};

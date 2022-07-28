@@ -30,52 +30,40 @@ const App = observer(()=>
         permissions;
     },[permissions]);
 
-    useEffect(()=>
+
+    !auth.currentUser && onAuthStateChanged(getAuth(firebaseApp()),(user) =>
     {
-        if (!auth.currentUser)
+            
+        if (user)
         {
-            setIsReady(true);
+            const uid = user.uid;
+            console.log(uid,'uid');
+            firestore.getByDoc('Users',uid).then((doc:UserInfo) =>
+            {
+                sessionStore.setCurrentLogin(doc).then(val=>
+                {
+                    console.log(val,'val');
+                        
+                    const p = permission.getMyPermission(val);
+                    setPermissions(p);
+                });
+            }).finally(()=>
+            {
+                setTimeout(() =>
+                {
+                    setIsReady(true);
+                },500);
+            });
         }
         else
         {
-            onAuthStateChanged(getAuth(firebaseApp()),(user) =>
-            {
-            
-                if (user)
-                {
-                    const uid = user.uid;
-                    console.log(uid,'uid');
-                    firestore.getByDoc('Users',uid).then((doc:UserInfo) =>
-                    {
-                        sessionStore.setCurrentLogin(doc).then(val=>
-                        {
-                            console.log(val,'val');
-                        
-                            const p = permission.getMyPermission(val);
-                            setPermissions(p);
-                        });
-                    }).finally(()=>
-                    {
-                        console.log('ready');
-                    
-                        setTimeout(() =>
-                        {
-                            setIsReady(true);
-                        },500);
-                    });
-                }
-                else
-                {
-                // User is signed out
-                // ...
-                }
-            });
+            // User is signed out
+            // ...
         }
-        
+    });
 
-    },[]);
 
-    if (!isReady) // ((!permission.permissionsList || permission.permissionsList.length === 0) || !permission.myPermissions || permission.myPermissions.length === 0)
+    if (!isReady && auth.currentUser) // ((!permission.permissionsList || permission.permissionsList.length === 0) || !permission.myPermissions || permission.myPermissions.length === 0)
     {
         return (
             <div>

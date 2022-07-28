@@ -12,8 +12,8 @@ import UserOverView from './UserOverView';
 
 import utils from '../../utils/utils';
 import { auth, firestore } from 'firebase';
-import { userInfoAtom } from 'stores/atom/user';
-import { useRecoilState } from 'recoil';
+import { listUserInfoAtom, userInfoAtom } from 'stores/atom/user';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
 export interface IHeaderProps {
   collapsed?: any;
@@ -26,10 +26,12 @@ export const Header:React.FC <IHeaderProps> = (props)=>
 {
     const [os, setOs] = React.useState('PC');
     const [userInfo,setUserInfo] = useRecoilState(userInfoAtom);
+    const setListUserInfo = useSetRecoilState(listUserInfoAtom);
     
     useEffect(()=>
     {
         setOs(utils.getOS());
+        firestore.get('Users').then(setListUserInfo);
        
     },[]);
    

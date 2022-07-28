@@ -2,6 +2,7 @@
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 
 import {
+    Avatar,
     Button,
     Col,
     DatePicker,
@@ -41,8 +42,9 @@ export function CreateIssuePage({
     const [meta] = useState([]);
 
     const users = useRecoilValue(userAtom);
-    const [craeteState] = useState(false);
+    const [createState] = useState(false);
     const [subIssues, setSubIssues] = useState<any[]>([]);
+    const [avatar, setAvatar] = useState<string>('');
 
 
     const handleCreate = () =>
@@ -266,7 +268,7 @@ export function CreateIssuePage({
                         <div className="user-container">
                             <Row>
                                 <Col span={2}>
-                                    {/* <Avatar src="https://joeschmoe.io/api/v1/random" /> */}
+                                    <Avatar src={avatar === '' ? 'https://joeschmoe.io/api/v1/random' : avatar} />
                                     {/* <CharacterAvatar
                                         title={currentUser}
                                         size={35}
@@ -280,9 +282,11 @@ export function CreateIssuePage({
                                             allowClear
                                             onChange={(val) =>
                                             {
-                                                // const us = userList.find(
-                                                //     (u) => u.id.toString() === val?.toString(),
-                                                // );
+                                                const us = users.find(
+                                                    (u) => u.id.toString() === val?.toString(),
+                                                );
+                                                console.log(val,us,users,us?.avatarUrl);
+                                                
                                                 // if (us)
                                                 // {
                                                 //     setCurrentUser(
@@ -293,7 +297,7 @@ export function CreateIssuePage({
                                                 // {
                                                 //     setCurrentUser('');
                                                 // }
-                                                val;
+                                                setAvatar(us?.avatarUrl ?? '');
                                             }}
                                         >
                                            
@@ -384,7 +388,7 @@ export function CreateIssuePage({
                                 <Button
                                     onClick={() =>
                                     {
-                                        if (craeteState)
+                                        if (createState)
                                         {
                                             history?.back();
                                         }

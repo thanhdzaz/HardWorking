@@ -1,4 +1,4 @@
-import { firebaseApp, firestore } from 'firebase';
+import { auth, firebaseApp, firestore } from 'firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { action, makeObservable, observable } from 'mobx';
 import type { UserInfo } from 'models/User/dto';
@@ -15,6 +15,7 @@ class SessionStore
   constructor()
   {
       makeObservable(this);
+      this.currentLogin = auth.currentUser ?? {} as any;
   }
 
 @action

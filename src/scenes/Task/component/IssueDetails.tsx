@@ -18,20 +18,24 @@ import {
     Col,
     Form,
     FormInstance,
-    Input, Modal, notification,
-    Row,
+    Input, Modal, Row,
     Select,
     Skeleton,
     Spin,
 } from 'antd';
 import Title from 'antd/lib/typography/Title';
+import Notify from 'components/Notify';
 import { PRIORITY_LIST, STATUS_LIST } from 'constant';
-import { firestore } from 'firebase';
-import { TaskDto } from 'models/Task/dto';
+import { auth, firestore } from 'firebase';
+import { getDocs, query, where } from 'firebase/firestore/lite';
+import { checkLog } from 'hook/useCheckLog';
+import { CheckLog, TaskDto } from 'models/Task/dto';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { taskAtom } from 'stores/atom/task';
+import { listUserInfoAtom } from 'stores/atom/user';
+import { ACTION, LOGKEYS } from 'utils';
 // import ImageCarousel from './ImageCarousel';
 
 export const IssueDetail:React.FunctionComponent<any> = ({
@@ -44,21 +48,20 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     const formRef = React.createRef<FormInstance>();
     const [imageLinks] = useState([]);
     const [currentRecord, setCurrentRecord] = useState<TaskDto>({ id: '0' } as any);
-    const [userList] = useState([]);
+    const userList = useRecoilValue(listUserInfoAtom);
     const [showTitleTool, setShowTitleTool] = useState(false);
     const [showSubIssueTool, setShowSubIssueTool] = useState(false);
     const [showCkeditor, setCkeditor] = useState(false);
-    const [subIssues] = useState([] as any);
+    const [subIssues,setSubIssues] = useState([] as any);
     const [idIssue, setIdIssue] = useState(id);
     const [hideActivities, setHideActivities] = useState(true);
     // const [imgLoading] = useState(true);
-    const [description] = useState('');
+    const [description,setDescription] = useState('');
     const task = useRecoilValue(taskAtom);
-
     const [showInputSubIssue, setShowInputSubIssue] = useState(false);
     const titleInputRef = React.createRef<Input>();
     const subIssueInputRef = React.createRef<Input>();
-
+    const [logs,setLogs] = useState<CheckLog[]>([]);
 
     const showSkeleton = () =>
     {
@@ -87,7 +90,6 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     {
         firestore.getByDoc('Tasks',idIssue ?? '').then(setCurrentRecord);
     };
-    console.log(currentRecord,'currentRecord');
 
     // set record
     useEffect(() =>
@@ -114,16 +116,23 @@ export const IssueDetail:React.FunctionComponent<any> = ({
             return false;
         }
 
-        firestore.update('Tasks',idIssue ?? '', { [key]: value }).then(({ data: d }) =>
+        firestore.update('Tasks',idIssue ?? '', { [key]: value }).then(() =>
         {
-            if (d.id)
+           
+            Notify('success','Cập nhật thành công');
+            checkLog({
+                action: 'update',
+                field: key,
+                userId: auth.currentUser?.uid ?? '',
+                newValue: value,
+                oldValue: currentRecord[key] ?? '',
+                taskId: currentRecord.id,
+            }).then(()=>
             {
-                notification.success({
-                    message: 'Cập nhật nhiệm vụ thành công',
-                    placement: 'topRight',
-                });
+                setCurrentRecord({ ...currentRecord, [key]: value });
                 handleGetIssueById();
-            }
+            });
+            
         }).catch((err) =>err);
         return true;
     };
@@ -132,8 +141,9 @@ export const IssueDetail:React.FunctionComponent<any> = ({
 
     useEffect(() =>
     {
-        //
-    }, []);
+        
+        handleGetIssueById();
+    }, [idIssue]);
 
     // set data
     useEffect(() =>
@@ -155,6 +165,33 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         }
     }, [currentRecord]);
 
+
+    const getLogs = async() =>
+    {
+        const q = query(firestore.collection('CheckLogs'),where('taskId', '==', currentRecord.id));
+        const querySnapshot = await getDocs(q);
+                
+        const l:CheckLog[] = [];
+        querySnapshot.forEach((doc: any) =>
+        {
+            l.push(doc.data());
+        });
+        setLogs(l.sort((a, b) =>b.time.seconds - a.time.seconds));
+    };
+
+    const getSubIssue = async() =>
+    {
+        const q = query(firestore.collection('Tasks'),where('parentId', '==', currentRecord.id));
+        const querySnapshot = await getDocs(q);
+                
+        const l:CheckLog[] = [];
+        querySnapshot.forEach((doc: any) =>
+        {
+            l.push(doc.data());
+        });
+        setSubIssues(l);
+    };
+
     // get meta and user by tenant
     useEffect(() =>
     {
@@ -163,7 +200,14 @@ export const IssueDetail:React.FunctionComponent<any> = ({
 
     const handleCreateSubIssue = (title) =>
     {
-        title;
+        const parent:any = { ...currentRecord };
+
+        delete parent.title;
+        delete parent.id;
+        delete parent.assignTo;
+        delete parent.parentId;
+        firestore.add('Tasks',{ ...parent,parentId: currentRecord.id,title }).then(getSubIssue);
+        
     };
 
 
@@ -183,6 +227,9 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         //         setConversation(res.data);
         //     });
         // }
+        getLogs();
+        getSubIssue();
+
     }, [currentRecord]);
 
     return (
@@ -250,18 +297,48 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                 <h3 style={{ marginTop: 10, fontSize: 14 }}>
                             Mô tả:
                                 </h3>
-                                {!showCkeditor && description === '' && (
-                                    <Form.Item name="description">
-                                        <Input
-                                            placeholder="Nhập mô tả....."
-                                            onClick={() =>
-                                            {
-                                                setCkeditor(true);
-                                            }}
-                                        />
-                                    </Form.Item>
-                                )}
-                                <Input.TextArea />
+                                <Form.Item
+                                    name="description"
+                                    className="child-issue-wrapper"
+                                >
+                                    <Input.TextArea
+                                        placeholder="Nhập mô tả....."
+                                        value={description}
+                                        autoSize
+                                        onChange={(val)=>
+                                        {
+                                            setDescription(val.currentTarget.value);
+                                        }}
+                                        onClick={() =>
+                                        {
+                                            setCkeditor(true);
+                                        }}
+                                    />
+                                    <div className="title-confirm-wrapper">
+                                        {showCkeditor && (
+                                            <div className="title-confirm">
+                                                <Button
+                                                    onClick={() =>
+                                                    {
+                                                        handleUpdate('description',description);
+                                                    }}
+                                                >
+                                                    <CheckOutlined />
+                                                </Button>
+                                                <Button
+                                                    onClick={() =>
+                                                    {
+                                                        setCkeditor(false);
+                                                    }}
+                                                >
+                                                    <CloseOutlined />
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </Form.Item>
+                            
+                                
                             </Skeleton>
                             <Skeleton
                                 loading={loading}
@@ -469,7 +546,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                     /> */}
                                         </Col>
                                         <Col span={21}>
-                                            <Form.Item name="assign_to">
+                                            <Form.Item name="assignTo">
                                                 <Select
                                                     placeholder="Giao cho"
                                                     className="user_select"
@@ -477,24 +554,28 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                                     onSelect={(val) => handleUpdate('assignTo', val)}
                                                     onChange={(_val) =>
                                                     {
-                                                        // const _user = userList.find(
-                                                        //     (u) => u.id.toString() === val?.toString(),
-                                                        // );
-                                                        // if (_user)
-                                                        // {
-                                                        //     setCurrentUser(
-                                                        //         (_user?.firstName ?? '') + (_user?.lastName ?? ''),
-                                                        //     );
-                                                        // }
-                                                        // else
-                                                        // {
-                                                        //     setCurrentUser('');
-                                                        // }
+                                                        firestore.update('Tasks',id,{
+                                                            assignTo: _val,
+                                                        }).then(()=>
+                                                        {
+                                                            checkLog({
+                                                                action: 'update',
+                                                                field: 'assignTo',
+                                                                userId: auth.currentUser?.uid ?? '',
+                                                                newValue: _val,
+                                                                oldValue: currentRecord.assignTo ?? '',
+                                                                taskId: currentRecord.id,
+                                                            }).then(()=>
+                                                            {
+                                                                setCurrentRecord({ ...currentRecord, assignTo: _val });
+                                                            });
+                                                            Notify('success','Cập nhật thành công');
+                                                        });
                                                     }}
                                                 >
                                                     {userList &&
                         userList.length > 0 &&
-                        userList.map((item:any) => (
+                        userList.map((item) => (
                             <Select.Option
                                 key={item.id.toString()}
                                 value={item.id.toString()}
@@ -566,6 +647,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                 </Skeleton>
                             </div>
                             <div className="user-container">
+                                
                                 <Skeleton
                                     loading={loading}
                                     active
@@ -573,7 +655,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                     <Row>
                                         <Col span={24}>
                                             <Title level={5}>
-                    Lịch sử{' '}
+                                                Lịch sử &nbsp;
                                                 {!hideActivities
                                                     ? (
                                                             <DownOutlined
@@ -588,7 +670,46 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                                             />
                                                         )}
                                             </Title>
-                                    
+                                            {
+                                                !hideActivities && (
+                                                    <div>
+                                                        {
+                                                            logs.map((log) =>
+                                                            {
+                                                                const u = userList.find((u) =>u.id === log.userId);
+
+                                                                if (log.field === 'assignTo')
+                                                                {
+                                                                    const u1 = userList.find((u) =>u.id === log.oldValue);
+                                                                    const u2 = userList.find((u) =>u.id === log.newValue);
+                                                                 
+                                                                    return (
+                                                                        <div key={log.id}>
+                                                                            <b>{moment.unix(log.time.seconds).format('DD/MM/YYYY HH:mm')}</b> <b>{u?.fullName}</b> - {ACTION[log.action]} {LOGKEYS[log.field]} từ <b>{u1?.fullName}</b> sang <b>{u2?.fullName}</b>
+                                                                        </div>
+                                                                    );
+
+                                                                }
+
+                                                                if (log.field === 'parentId')
+                                                                {
+                                                                    const u1 = task.find((u) =>u.id === log.oldValue);
+                                                                    const u2 = task.find((u) =>u.id === log.newValue);
+                                                                 
+                                                                    return (
+                                                                        <div key={log.id}>
+                                                                            <b>{moment.unix(log.time.seconds).format('DD/MM/YYYY HH:mm')}</b> <b>{u?.fullName}</b> - {ACTION[log.action]} {LOGKEYS[log.field]} từ <b>{u1?.title}</b> sang <b>{u2?.title}</b>
+                                                                        </div>
+                                                                    );
+
+                                                                }
+
+                                                                return <div key={log.id}><b>{moment.unix(log.time.seconds).format('DD/MM/YYYY HH:mm')}</b> <b>{u?.fullName}</b> - {ACTION[log.action]} {LOGKEYS[log.field]} từ <b>{log.oldValue}</b> sang <b>{log.newValue}</b></div>;
+                                                            })
+                                                        }
+                                                    </div>
+                                                )
+                                            }
                                         </Col>
                                     </Row>
                                 </Skeleton>
