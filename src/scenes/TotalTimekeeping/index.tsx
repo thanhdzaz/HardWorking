@@ -1,35 +1,45 @@
 /* eslint-disable indent */
 import ProForm, {
-  ProFormDatePicker,
-  ProFormDateRangePicker,
   ProFormDateTimePicker,
   ProFormSelect,
   ProFormText,
 } from '@ant-design/pro-form';
-import { notification } from 'antd';
+import { DatePicker, notification } from 'antd';
 import { SHIFT_OBJ } from 'constant';
-import { auth } from 'firebase';
+import { auth, firestore } from 'firebase';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import Day from './Day';
 import Month from './Month';
 import Week from './Week';
-import { firestore } from 'firebase';
 
 const TotalTimeKeeping = (): JSX.Element =>
 {
   const [viewMode, setViewMode] = useState('day');
   const [dataTimekeeping, setDataTimekeeping] = useState([]);
-  const [dateRange, setDateRange] = useState<any>([]);
+  const [dateRange, setDateRange] = useState<any>([moment(), moment()]);
   const [dataUsers, setDataUsers] = useState<any>([]);
-  // const [date, setDate] = useState(moment());
+  const [date, setDate] = useState(moment());
   const user = auth?.currentUser;
 
   const getTimeKeeping = async () =>
 {
-  const rs = await firestore.get('Timekeeping');
-  setDataTimekeeping(rs);
-};
+    const rs = await firestore.get('Timekeeping');
+    let timekeepings;
+    if (viewMode === 'day')
+{
+      timekeepings = rs.filter((t) => moment(t.date).isSame(date, 'day'));
+    }
+    if (viewMode === 'week' || viewMode === 'month')
+{
+      timekeepings = rs.filter(
+        (t) =>
+          moment(t.date).isSameOrAfter(dateRange[0], 'day') &&
+          moment(t.date).isSameOrBefore(dateRange[1], 'day'),
+      );
+    }
+    setDataTimekeeping(timekeepings);
+  };
 
   const getUsers = async () =>
 {
@@ -44,10 +54,10 @@ const TotalTimeKeeping = (): JSX.Element =>
     setDateRange([startDate, endDate]);
   };
 
-//   const handleSelectDate = (dateMoment) =>
-// {
-//     setDate(dateMoment);
-//   };
+  const handleSelectDate = (dateMoment) =>
+{
+    setDate(dateMoment);
+  };
 
   const handleSelectMonth = (_moment) =>
 {
@@ -189,10 +199,15 @@ const TotalTimeKeeping = (): JSX.Element =>
   const handleSearch = (): void =>
 {};
 
-useEffect(() =>
+  useEffect(() =>
 {
-  getUsers();
-}, []);
+    getTimeKeeping();
+  }, [date, dateRange]);
+
+  useEffect(() =>
+{
+    getUsers();
+  }, []);
 
   useEffect(() =>
 {
@@ -240,40 +255,28 @@ useEffect(() =>
               style={{ width: '25%' }}
           >
             {viewMode === 'day' && (
-              <ProFormDatePicker
-                  width="xl"
+              <DatePicker
                   name="date"
-                  label=""
-                  fieldProps={{
-                  format: 'DD-MM-YYYY',
-                  // onChange: handleSelectDate,
-                }}
+                  format='DD-MM-YYYY'
                   placeholder="Chọn ngày"
+                  onChange={handleSelectDate}
               />
             )}
             {viewMode === 'week' && (
-              <ProFormDateRangePicker
-                  fieldProps={{
-                  format: 'DD-MM-YYYY',
-                  value: dateRange,
-                  onChange: handleSelectDateRange,
-                }}
-                  width="xl"
+              <DatePicker.RangePicker
+                  format='DD-MM-YYYY'
+                  value={dateRange}
                   name="dateRange"
-                  label=""
+                  onChange={handleSelectDateRange}
               />
             )}
             {viewMode === 'month' && (
-              <ProFormDatePicker.Month
-                  width="xl"
+              <DatePicker.MonthPicker
                   name="month"
-                  label=""
-                  fieldProps={{
-                  format: 'MM-YYYY',
-                  value: dateRange[0],
-                  onChange: handleSelectMonth,
-                }}
+                  format='MM-YYYY'
+                  value={dateRange[0]}
                   placeholder="Chọn tháng"
+                  onChange={handleSelectMonth}
               />
             )}
           </div>
