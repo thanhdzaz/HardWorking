@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import Loading from 'components/Loading';
-import { firebaseApp, firestore } from 'firebase';
+import { auth, firebaseApp, firestore } from 'firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { observer } from 'mobx-react';
 import { UserInfo } from 'models/User/dto';
@@ -32,36 +32,46 @@ const App = observer(()=>
 
     useEffect(()=>
     {
-        onAuthStateChanged(getAuth(firebaseApp()),(user) =>
+        if (!auth.currentUser)
         {
+            setIsReady(true);
+        }
+        else
+        {
+            onAuthStateChanged(getAuth(firebaseApp()),(user) =>
+            {
             
-            if (user)
-            {
-                const uid = user.uid;
-                console.log(uid,'uid');
-                firestore.getByDoc('Users',uid).then((doc:UserInfo) =>
+                if (user)
                 {
-                    sessionStore.setCurrentLogin(doc).then(val=>
+                    const uid = user.uid;
+                    console.log(uid,'uid');
+                    firestore.getByDoc('Users',uid).then((doc:UserInfo) =>
                     {
-                        console.log(val,'val');
+                        sessionStore.setCurrentLogin(doc).then(val=>
+                        {
+                            console.log(val,'val');
                         
-                        const p = permission.getMyPermission(val);
-                        setPermissions(p);
-                    });
-                }).finally(()=>
-                {
-                    setTimeout(() =>
+                            const p = permission.getMyPermission(val);
+                            setPermissions(p);
+                        });
+                    }).finally(()=>
                     {
-                        setIsReady(true);
-                    },500);
-                });
-            }
-            else
-            {
+                        console.log('ready');
+                    
+                        setTimeout(() =>
+                        {
+                            setIsReady(true);
+                        },500);
+                    });
+                }
+                else
+                {
                 // User is signed out
                 // ...
-            }
-        });
+                }
+            });
+        }
+        
 
     },[]);
 

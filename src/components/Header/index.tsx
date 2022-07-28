@@ -6,7 +6,7 @@ import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 // import LanguageSelect from '../LanguageSelect';
 import Title from './BreadcrumbTitle';
 import Project from './ProjectChoose';
-import React from 'react';
+import React, { useEffect } from 'react';
 import UserOverView from './UserOverView';
 // import AppComponentBase from 'components/AppComponentBase';
 
@@ -27,15 +27,23 @@ export const Header:React.FC <IHeaderProps> = (props)=>
     const [os, setOs] = React.useState('PC');
     const [userInfo,setUserInfo] = useRecoilState(userInfoAtom);
     
-    React.useEffect(()=>
+    useEffect(()=>
     {
         setOs(utils.getOS());
-        firestore.getByDoc('Users',auth.currentUser?.uid ?? '').then((userInfo) =>
-        {
-            setUserInfo(userInfo);
-        });
+       
     },[]);
    
+    useEffect(() =>
+    {
+        if (auth.currentUser?.uid)
+        {
+            firestore.getByDoc('Users',auth.currentUser?.uid ?? '').then((userInfo) =>
+            {
+                setUserInfo(userInfo);
+            });
+        }
+    },[auth.currentUser]);
+    
     return (
         <Row className="header-container">
             <Col
