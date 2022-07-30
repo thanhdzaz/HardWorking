@@ -15,10 +15,10 @@ import '../index.less';
 const KB = observer((_):JSX.Element=>
 {
   
-    const [visible2,setVisible2] = useState(false);
+    const [visibleIssuePopupDetail, setVisibleIssuePopupDetail] = useState(false);
+    const [visibleIssueCreate, setVisibleIssueCreate] = useState(false);
     const [curentId,setId] = useState('');
 
-    const [visible,setVisible] = useState(false);
     const [task,setTask] = useRecoilState(taskAtom);
 
     const [data,setData] = useState({
@@ -47,6 +47,9 @@ const KB = observer((_):JSX.Element=>
         await firestore.get('Tasks').then(setTask);
     };
 
+    const togglePopupDetail = () => setVisibleIssuePopupDetail(!visibleIssuePopupDetail);
+    const togglePopupCreate = () => setVisibleIssueCreate(!visibleIssueCreate);
+
     useEffect(() =>
     {
         getAll();
@@ -72,7 +75,7 @@ const KB = observer((_):JSX.Element=>
                             handleShowPopUp: ()=>
                             {
                                 setId(item.id);
-                                setVisible2(true);
+                                togglePopupDetail();
                             },
                             // permissions.DW__WORK__VIEW
                             //     ? toggleUpdateModal
@@ -91,7 +94,7 @@ const KB = observer((_):JSX.Element=>
             <Button
                 onClick={()=>
                 {
-                    setVisible(!visible);
+                    togglePopupCreate();
                 }}
             >Thêm mới
             </Button>
@@ -122,32 +125,32 @@ const KB = observer((_):JSX.Element=>
                     // console.log(hi);
                     
                     setId(id);
-                    setVisible2(true);
+                    togglePopupDetail();
                 }}
             />
             {
-                visible && (
+                visibleIssueCreate && (
                   
                     <CreateIssuePage
                         pageMode='modal'
-                        onCancel={()=>
+                        reloadAndClose={()=>
                         {
                             getAll();
-                            setVisible(false);
+                            togglePopupCreate();
                         }}
                     />
                 )
             }
 
             {
-                visible2 && (
+                visibleIssuePopupDetail && (
                     <IssueDetail
                         pageMode='modal'
                         id={curentId}
-                        onCancel={()=>
+                        reloadAndClose={()=>
                         {
                             getAll();
-                            setVisible2(false);
+                            togglePopupDetail();
                         }}
                     />
                 )

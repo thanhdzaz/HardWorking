@@ -15,6 +15,7 @@ import {
     Slider,
     Upload,
 } from 'antd';
+import Notify from 'components/Notify';
 import { PRIORITY_LIST, STATUS_LIST } from 'constant';
 import { firestore } from 'firebase';
 import React, { useEffect, useState } from 'react';
@@ -24,20 +25,18 @@ import { userAtom } from 'stores/atom/user';
 // import { CharacterAvatar } from '../../../components/avatar/CharacterAvatar';
 // import { priorityObj } from '../../../constants';
 
-
 // const listType = ['v_relationship', 'v_list', 'v_user'];
 
 export function CreateIssuePage({
     project = '',
     listStatus = '',
     pageMode = '',
-    onCancel = ()=>
+    reloadAndClose = () =>
     {
-        //
+    //
     },
 } = {})
 {
-
     const form = React.createRef<FormInstance>();
     const [meta] = useState([]);
 
@@ -46,18 +45,18 @@ export function CreateIssuePage({
     const [subIssues, setSubIssues] = useState<any[]>([]);
     const [avatar, setAvatar] = useState<string>('');
 
-
     const handleCreate = () =>
     {
-        form?.current && form.current?.validateFields().then(async (val) =>
-        {
-            val;
-        });
+        form?.current &&
+      form.current?.validateFields().then(async (val) =>
+      {
+          val;
+      });
     };
 
     const handleUploadFile = async ({ fileList: _newFileList }) =>
     {
-        //
+    //
     };
 
     const onOk = () =>
@@ -72,21 +71,23 @@ export function CreateIssuePage({
                 startTime: vals?.date[0].format('DD/MM/YYYY') ?? '',
                 endTime: vals?.date[1].format('DD/MM/YYYY') ?? '',
             };
-            firestore.add('Tasks',data).then(({ id }) =>
+            firestore.add('Tasks', data).then(({ id }) =>
             {
-                if (subIssues.length > 0)
+                if (id)
                 {
-                    subIssues.forEach(issue =>
+                    if (subIssues.length > 0)
                     {
-                        firestore.add('Tasks',{ ...data,title: issue,parentId: id });
-
-                    });
+                        subIssues.forEach((issue) =>
+                        {
+                            firestore.add('Tasks', { ...data, title: issue, parentId: id });
+                        });
+                    }
+                    Notify('success', 'Thêm mới thành công');
+                    reloadAndClose();
                 }
             });
-            
         });
     };
-
 
     useEffect(() =>
     {
@@ -101,21 +102,18 @@ export function CreateIssuePage({
         <Modal
             width={'80%'}
             title="Thêm mới công việc"
-            okText='Thêm mới'
+            okText="Thêm mới"
             visible
-            onCancel={onCancel}
+            onCancel={reloadAndClose}
             onOk={onOk}
         >
             <Form
                 ref={form}
                 style={{ height: 'auto' }}
-            
             >
                 <div className="create-issue-container">
                     <div className="left-side">
-                        <h3 style={{ marginTop: 0, fontSize: 14 }}>
-                           Tiêu đề:
-                        </h3>
+                        <h3 style={{ marginTop: 0, fontSize: 14 }}>Tiêu đề:</h3>
                         <Form.Item
                             name="title"
                             rules={[
@@ -131,15 +129,12 @@ export function CreateIssuePage({
                             />
                         </Form.Item>
                         <div>
-                            <h3 style={{ marginTop: 0, fontSize: 14 }}>
-                                Mô tả:
-                            </h3>
-                         
+                            <h3 style={{ marginTop: 0, fontSize: 14 }}>Mô tả:</h3>
                         </div>
                         <div
                             className="div-btn"
                             // disabled={!permissions.DW__WORK__EDIT}
-                            onClick={() => setSubIssues((prev:any) => [...prev, 1])}
+                            onClick={() => setSubIssues((prev: any) => [...prev, 1])}
                         >
                             <PlusOutlined /> Thêm nhiệm vụ con
                         </div>
@@ -223,10 +218,13 @@ export function CreateIssuePage({
                         >
                             <Select
                                 placeholder="Tên công việc"
-                                filterOption={(input, option):any => (option?.children)?.includes(input as any)}
+                                filterOption={(input, option): any =>
+                                    option?.children?.includes(input as any)
+                                }
                                 filterSort={(optionA: any, optionB: any) =>
-                                    (optionA?.children)?.toLowerCase()
-                                        .localeCompare((optionB?.children)?.toLowerCase())
+                                    optionA?.children
+                                        ?.toLowerCase()
+                                        .localeCompare(optionB?.children?.toLowerCase())
                                 }
                                 allowClear
                                 showSearch
@@ -235,40 +233,40 @@ export function CreateIssuePage({
                                     // setParent(value ?? '');
                                 }}
                             >
-                               
                                 {
                                     //
                                 }
                             </Select>
                         </Form.Item>
-                        
                     </div>
                     <div className="right-side">
                         <Form.Item name="status">
                             <Select
                                 style={{ width: 150 }}
-                                {...{
+                                {...({
                                     blue: 'blue',
-                                } as any}
+                                } as any)}
                             >
-                               
-                                {
-                                    STATUS_LIST.map((status) =>(
-                                        <Select.Option
-                                            key={status.id}
-                                            value={status.id}
-                                        >
-                                            {status.title}
-                                        </Select.Option>
-                                    ))
-
-                                }
+                                {STATUS_LIST.map((status) => (
+                                    <Select.Option
+                                        key={status.id}
+                                        value={status.id}
+                                    >
+                                        {status.title}
+                                    </Select.Option>
+                                ))}
                             </Select>
                         </Form.Item>
                         <div className="user-container">
                             <Row>
                                 <Col span={2}>
-                                    <Avatar src={avatar === '' ? 'https://joeschmoe.io/api/v1/random' : avatar} />
+                                    <Avatar
+                                        src={
+                                            avatar === ''
+                                                ? 'https://joeschmoe.io/api/v1/random'
+                                                : avatar
+                                        }
+                                    />
                                     {/* <CharacterAvatar
                                         title={currentUser}
                                         size={35}
@@ -285,8 +283,8 @@ export function CreateIssuePage({
                                                 const us = users.find(
                                                     (u) => u.id.toString() === val?.toString(),
                                                 );
-                                                console.log(val,us,users,us?.avatarUrl);
-                                                
+                                                console.log(val, us, users, us?.avatarUrl);
+
                                                 // if (us)
                                                 // {
                                                 //     setCurrentUser(
@@ -300,17 +298,14 @@ export function CreateIssuePage({
                                                 setAvatar(us?.avatarUrl ?? '');
                                             }}
                                         >
-                                           
-                                            {
-                                                users.map((user) =>(
-                                                    <Select.Option
-                                                        key={user.id}
-                                                        value={user.id}
-                                                    >
-                                                        {user.fullName}
-                                                    </Select.Option>
-                                                ))
-                                            }
+                                            {users.map((user) => (
+                                                <Select.Option
+                                                    key={user.id}
+                                                    value={user.id}
+                                                >
+                                                    {user.fullName}
+                                                </Select.Option>
+                                            ))}
                                         </Select>
                                     </Form.Item>
                                 </Col>
@@ -360,17 +355,14 @@ export function CreateIssuePage({
                                         ]}
                                     >
                                         <Select style={{ width: 150 }}>
-                                            {
-                                                PRIORITY_LIST.map((status) =>(
-                                                    <Select.Option
-                                                        key={status.id}
-                                                        value={status.id}
-                                                    >
-                                                        {status.title}
-                                                    </Select.Option>
-                                                ))
-
-                                            }
+                                            {PRIORITY_LIST.map((status) => (
+                                                <Select.Option
+                                                    key={status.id}
+                                                    value={status.id}
+                                                >
+                                                    {status.title}
+                                                </Select.Option>
+                                            ))}
                                         </Select>
                                     </Form.Item>
                                 </Col>
@@ -407,14 +399,14 @@ export function CreateIssuePage({
                                         }
                                     }}
                                 >
-                Quay lại
+                  Quay lại
                                 </Button>
-                       
+
                                 <Button
                                     type="primary"
                                     onClick={handleCreate}
                                 >
-              Thêm
+                  Thêm
                                 </Button>
                             </>
                         )}

@@ -42,7 +42,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     id,
     loading,
     setLoading,
-    onCancel,
+    reloadAndClose,
 }) =>
 {
     const formRef = React.createRef<FormInstance>();
@@ -236,8 +236,9 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         <Modal
             title="Chi tiết công việc"
             width="80%"
+            footer={false}
             visible
-            onCancel={onCancel}
+            onCancel={reloadAndClose}
         >
             <Form ref={formRef}>
                 <Card className="card-containter">
