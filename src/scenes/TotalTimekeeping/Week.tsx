@@ -6,7 +6,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import moment from 'moment';
 import './index.less';
 
-const Week:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRange }) =>
+const Week: React.FunctionComponent<any> = ({
+    dataUsers,
+    dataTimekeeping,
+    dateRange,
+}) =>
 {
     const [loading, setLoading] = useState(true);
     const [dataDisplay, setDataDisplay] = useState<any>([]);
@@ -16,72 +20,72 @@ const Week:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRan
 
     useEffect(() =>
     {
-        if (dataUsers.length)
+        const dt = {};
+        dataUsers.forEach((us) =>
         {
-            const dt = {};
-            dataUsers.forEach((us) =>
+            let isOff = true;
+            dataTimekeeping.forEach((_dt) =>
             {
-                let isOff = true;
-                dataTimekeeping.forEach((_dt) =>
+                if (us.id === _dt.userId)
                 {
-                    if (us.id.toString() === _dt.user_id)
-                    {
-                        dt[us.id] = dt[us.id] ? [...dt[us.id], _dt] : [_dt];
-                        isOff = false;
-                    }
-                });
-                if (isOff)
-                {
-                    dt[us.id] = [
-                        {
-                            id: us.id,
-                            user_name: `${us.firstName ?? ''} ${us.lastName ?? ''}`,
-                        },
-                    ];
+                    _dt.userName = us.fullName;
+                    dt[us.id] = dt[us.id] ? [...dt[us.id], _dt] : [_dt];
+                    isOff = false;
                 }
             });
-            const dtDisplay = Object.keys(dt).map((emId) =>
+            if (isOff)
             {
-                const attendances = dt[emId] || [0]; // các lần chấm công trong ngày của 1 nhân viên
+                dt[us.id] = [
+                    {
+                        id: us.id,
+                        userName: us.fullName,
+                    },
+                ];
+            }
+        });
+        const dtDisplay = Object.keys(dt).map((emId) =>
+        {
+            const attendances = dt[emId] || [0]; // các lần chấm công trong ngày của 1 nhân viên
 
-                // tính các các khoảng thời gian chấm công
-                if (attendances.length && attendances[0]?.date)
+            // tính các các khoảng thời gian chấm công
+            if (attendances.length && attendances[0]?.date)
+            {
+                const attendanceGroup = {};
+
+                attendances.forEach((ats) =>
                 {
-                    const attendanceGroup = {};
-
-                    attendances.forEach((ats) =>
-                    {
-                        attendanceGroup[ats.date] = attendances.filter((a) => a.date === ats.date);
-                    });
-
-                    // Tính tổng giờ làm
-                    let totalSeconds = 0;
-                    attendances.forEach((at) =>
-                    {
-                        const [hour, minute, second] = at.salary_time.split(':');
-                        totalSeconds +=
-              parseInt(hour) * 3600 + parseInt(minute) * 60 + parseInt(second);
-                    });
-
-                    const totalHours = Math.floor(totalSeconds / 3600);
-                    const totalMinutes = Math.floor(
-                        (totalSeconds / 3600 - totalHours) * 60,
+                    attendanceGroup[ats.date] = attendances.filter(
+                        (a) => a.date === ats.date,
                     );
+                });
 
-                    return {
-                        user_name: attendances[0].user_name,
-                        total_time: `${totalHours} giờ ${totalMinutes} phút`,
-                        ...attendanceGroup,
-                    };
-                }
+                // Tính tổng giờ làm
+                let totalSeconds = 0;
+                attendances.forEach((at) =>
+                {
+                    const [hour, minute, second] = at.salaryTime.split(':');
+                    totalSeconds +=
+            parseInt(hour) * 3600 + parseInt(minute) * 60 + parseInt(second);
+                });
+
+                const totalHours = Math.floor(totalSeconds / 3600);
+                const totalMinutes = Math.floor(
+                    (totalSeconds / 3600 - totalHours) * 60,
+                );
+
                 return {
-                    user_name: attendances[0].user_name,
-                    total_time: '0 giờ',
+                    userName: attendances[0].userName,
+                    totalTime: `${totalHours} giờ ${totalMinutes} phút`,
+                    ...attendanceGroup,
                 };
-            });
-            setDataDisplay(dtDisplay);
-            setLoading(false);
-        }
+            }
+            return {
+                userName: attendances[0].userName,
+                totalTime: '0 giờ',
+            };
+        });
+        setDataDisplay(dtDisplay);
+        setLoading(false);
     }, [dataTimekeeping, dataUsers, dateRange]);
 
     useEffect(() =>
@@ -91,7 +95,7 @@ const Week:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRan
             const startDate = dateRange[0];
             const endDate = dateRange[1];
             const totalDate = endDate.diff(startDate, 'days');
-            const dates:any[] = [];
+            const dates: any[] = [];
             for (let i = 0; i <= totalDate; i++)
             {
                 const date = startDate.clone().add(i, 'days').format('YYYY-MM-DD');
@@ -101,7 +105,7 @@ const Week:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRan
         }
     }, [dateRange]);
 
-    const columns:any[] = [
+    const columns: any[] = [
         {
             title: 'STT',
             width: 40,
@@ -114,7 +118,7 @@ const Week:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRan
             title: 'Họ và tên',
             width: 150,
             fixed: 'left',
-            dataIndex: 'name',
+            dataIndex: 'userName',
             align: 'center',
             key: 'name',
         },
@@ -130,8 +134,8 @@ const Week:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRan
             width: 150,
             align: 'center',
             fixed: 'left',
-            dataIndex: 'total_time',
-            key: 'total_time',
+            dataIndex: 'totalTime',
+            key: 'totalTime',
         },
         ...dateColums.map((date, index) => ({
             title: date,
@@ -149,7 +153,8 @@ const Week:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRan
                                 <span
                                     key={i}
                                     style={{ display: 'block' }}
-                                >{s.time_range}
+                                >
+                                    {s.timeRange}
                                 </span>
                             ))}
                         </div>
@@ -183,7 +188,7 @@ const Week:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRan
                        `,
                 }}
                 search={false}
-                rowKey={(e:any) => e.id}
+                rowKey={(e: any) => e.id}
                 bordered
             />
         </Spin>

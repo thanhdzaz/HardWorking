@@ -125,6 +125,7 @@ const TotalTimeKeeping = (): JSX.Element =>
 
     const checkInTime = moment(val.checkInTime, 'YYYY-MM-DD HH:mm:ss');
     const checkOutTime = moment(val.checkOutTime, 'YYYY-MM-DD HH:mm:ss');
+    const timeRange = `${checkInTime.format('HH:mm:ss')} - ${checkOutTime.format('HH:mm:ss')}`;
     let noSalaryMilisecond = 0;
     let soonMilisecond = 0;
     let lateMilisecond = 0;
@@ -182,6 +183,7 @@ const TotalTimeKeeping = (): JSX.Element =>
         soonTime,
         lateTime,
         noSalaryTime,
+        timeRange,
       })
       .then((rs) =>
 {
@@ -213,11 +215,10 @@ const TotalTimeKeeping = (): JSX.Element =>
 
   useEffect(() =>
 {
-    viewMode === 'week'
-      ? setDateRange([moment(), moment().add(6, 'd')])
-      : viewMode === 'month'
-      ? setDateRange([moment().startOf('month'), moment().endOf('month')])
-      : '';
+viewMode === 'week'
+? setDateRange([moment(), moment()])
+    : viewMode === 'month' ? setDateRange([moment().startOf('month'), moment().endOf('month')]) : '';
+
   }, [viewMode]);
 
   return (
@@ -247,7 +248,7 @@ const TotalTimeKeeping = (): JSX.Element =>
                 width="xl"
                 options={[
                 { value: 'day', label: 'Theo ngày' },
-                { value: 'week', label: 'Theo tuần' },
+                { value: 'week', label: 'Theo khoảng thời gian' },
                 { value: 'month', label: 'Theo tháng' },
               ]}
             />
@@ -261,6 +262,7 @@ const TotalTimeKeeping = (): JSX.Element =>
                   name="date"
                   format='DD-MM-YYYY'
                   placeholder="Chọn ngày"
+                  allowClear={false}
                   onChange={handleSelectDate}
               />
             )}
@@ -269,6 +271,7 @@ const TotalTimeKeeping = (): JSX.Element =>
                   format='DD-MM-YYYY'
                   value={dateRange}
                   name="dateRange"
+                  allowClear={false}
                   onChange={handleSelectDateRange}
               />
             )}
@@ -277,6 +280,7 @@ const TotalTimeKeeping = (): JSX.Element =>
                   name="month"
                   format='MM-YYYY'
                   value={dateRange[0]}
+                  allowClear={false}
                   placeholder="Chọn tháng"
                   onChange={handleSelectMonth}
               />

@@ -15,21 +15,22 @@ const Day:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
     useEffect(() =>
     {
         setLoading(true);
-        const dt = {};
+        const dt: any = {};
         dataUsers.forEach((us) =>
         {
             let isOff = true;
             dataTimekeeping.forEach((_dt) =>
             {
-                if (us.id.toString() === _dt.user_id)
+                if (us.id === _dt.userId)
                 {
+                    _dt.userName = us.fullName;
                     dt[us.id] = dt[us.id] ? [...dt[us.id], _dt] : [_dt];
                     isOff = false;
                 }
             });
             if (isOff)
             {
-                dt[us.id] = [{ id: us.id, user_name: `${us.firstName ?? ''} ${us.lastName ?? ''}` }];
+                dt[us.id] = [{ id: us.id, userName: us.fullName }];
             }
         });
         const dtDisplay = Object.keys(dt).map((emId) =>
@@ -37,11 +38,11 @@ const Day:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
             const attendances = dt[emId] || [0]; // các lần chấm công trong ngày của 1 nhân viên
             if (attendances.length && attendances[0]?.date)
             { // nếu không nghỉ
-                const attendanceRange = attendances.map((at) => at.time_range);
+                const attendanceRange = attendances.map((at) => at.timeRange);
                 let totalSeconds = 0;
                 attendances.forEach((at) =>
                 {
-                    const [hour, minute, second] = at.salary_time.split(':');
+                    const [hour, minute, second] = at.salaryTime.split(':');
                     totalSeconds +=
             parseInt(hour) * 3600 + parseInt(minute) * 60 + parseInt(second);
                 });
@@ -52,15 +53,15 @@ const Day:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
                 );
 
                 return {
-                    user_name: attendances[0].user_name,
+                    userName: attendances[0].userName,
                     real_shift: attendanceRange.join(', '),
-                    total_time: `${totalHours} giờ ${totalMinutes} phút`,
+                    totalTime: `${totalHours} giờ ${totalMinutes} phút`,
                 };
             }
             return {
-                user_name: attendances[0].user_name,
+                userName: attendances[0].userName,
                 real_shift: '',
-                total_time: '0 giờ',
+                totalTime: '0 giờ',
             };
         });
         setDataDisplay(dtDisplay);
@@ -81,9 +82,9 @@ const Day:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
         {
             title: 'Họ và tên',
             width: 150,
-            dataIndex: 'user_name',
+            dataIndex: 'userName',
             align: 'center',
-            key: 'user_name',
+            key: 'userName',
         },
         {
             title: 'id',
@@ -96,8 +97,8 @@ const Day:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
             title: 'Tổng giờ làm',
             width: 150,
             align: 'center',
-            dataIndex: 'total_time',
-            key: 'total_time',
+            dataIndex: 'totalTime',
+            key: 'totalTime',
         },
         {
             title: 'Giờ làm',
