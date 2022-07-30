@@ -5,16 +5,15 @@ import './index.less';
 import { observer } from 'mobx-react';
 
 import { Select } from 'antd';
-import { firestore, getStore } from 'firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore/lite';
-import { ProjectDto } from 'models/Task/dto';
+import { firestore } from 'firebase';
+import { getDocs, query, where } from 'firebase/firestore/lite';
+import { UserInfo } from 'models/User/dto';
 import { useEffect } from 'react';
+import { useSetRecoilState } from 'recoil';
+import { useStore } from 'stores';
+import { userProjectAtom } from 'stores/atom/user';
 import ProjectStore from 'stores/projectStore';
 import SessionStore from 'stores/sessionStore';
-import { useStore } from 'stores';
-import { UserInfo } from 'models/User/dto';
-import { useSetRecoilState } from 'recoil';
-import { userAtom } from 'stores/atom/user';
 
 // const { Option } = Select;
 
@@ -39,22 +38,11 @@ const ProjectChoose = observer(
             sessionStore,
         } = useStore();
 
-        const setUser = useSetRecoilState(userAtom);
+        const setUser = useSetRecoilState(userProjectAtom);
 
-        const getProject = async()=>
-        {
-            
-            const projectCollection = collection(getStore(),'project');
-            const project = await getDocs(projectCollection);
-            const projectList:ProjectDto[] = project.docs.map(doc => doc.data() as ProjectDto);
-            projectStore?.setProject(projectList);
-        
-            
-        };
 
         useEffect(()=>
         {
-            getProject();
             getUserProject();
         },[]);
     
@@ -71,6 +59,8 @@ const ProjectChoose = observer(
                 {
                     ids.push(doc.data().userId);
                 });
+                console.log(ids,'ids');
+                
                 if (ids.length > 0)
                 {
                     
@@ -79,11 +69,13 @@ const ProjectChoose = observer(
 
                     userQuerySnapshot.forEach((doc) =>
                     {
-                        // console.log(doc.id,'=>',doc.data());
+                        console.log(doc.id,'=>',doc.data());
                         user.push(doc.data() as any);
                     });
                 
                 }
+                console.log(user,'user');
+                
                 setUser(user);
             }
             

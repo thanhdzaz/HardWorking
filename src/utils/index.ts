@@ -31,4 +31,5 @@ export const LOGKEYS = {
     parentId: 'Công việc cha',
     status: 'Trạng thái',
     progress: 'Tiến độ',
+    priority: 'Độ ưu tiên',
 };

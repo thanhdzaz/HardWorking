@@ -137,17 +137,26 @@ const User = ():JSX.Element =>
                 rowKey="id"
                 headerTitle={(
                     <div>
-                        <CreateUser />
+                        <CreateUser onClose={()=>
+                        {
+                            getAllUsers;
+                        }}
+                        />
                     </div>
                 )}
                 search={false}
-                toolbar={undefined}
                 locale={{
                     emptyText: (<div>Trống</div>),
                     selectAll: 'Chọn tất cả',
                 }}
                 dataSource={userList}
                 columns={columns as any}
+                options={{
+                    reload: ()=>
+                    {
+                        getAllUsers();
+                    },
+                }}
             />
         </Card>
     );

@@ -1,13 +1,12 @@
 import { Popover, Progress, Typography } from 'antd';
 import { ReactComponent as Calendar } from 'asset/calendar.svg';
-import moment from 'moment';
 // import { ReactComponent as Trello } from 'assets/trello.svg';
-import { observer } from 'mobx-react';
 import { PRIORITY_LIST } from 'constant';
+import { observer } from 'mobx-react';
+import { TaskDto } from 'models/Task/dto';
 import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { taskAtom } from 'stores/atom/task';
-import { TaskDto } from 'models/Task/dto';
 
 
 export const Card = observer((props)=>
@@ -18,8 +17,8 @@ export const Card = observer((props)=>
         handleShowPopUp,
         priority,
         parentId,
-        start_datetime: start,
-        end_datetime: end,
+        startTime,
+        endTime,
         progress,
     } = props;
 
@@ -65,7 +64,8 @@ export const Card = observer((props)=>
                         }}
                         onClick={(e) =>
                         {
-                            handleShowPopUp && handleShowPopUp(parent.id);
+                            e.stopPropagation();
+                            handleShowPopUp && handleShowPopUp(parentId);
                             e.currentTarget.blur();
                         }}
                     >
@@ -142,7 +142,7 @@ export const Card = observer((props)=>
                         color: '#9EA3A9',
                     }}
                 >
-                    {moment(start).format('DD-MM-YYYY')}
+                    {startTime}
                 </span>
         &nbsp;
                 <Calendar fill="#9EA3A9" />
@@ -152,7 +152,7 @@ export const Card = observer((props)=>
                         color: '#9EA3A9',
                     }}
                 >
-                    {moment(end).format('DD-MM-YYYY')}
+                    {endTime}
                 </span>
             </div>
             <br />

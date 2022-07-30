@@ -7,12 +7,12 @@ import * as ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 // import registerServiceWorker from './registerServiceWorker';
-import initializeStores from './stores/storeInitializer';
 import { firebaseApp } from 'firebase';
 import { RootProvider, rootStore } from 'stores';
+import initializeStores from './stores/storeInitializer';
 
-import { RecoilRoot } from 'recoil';
 import ConfigProvider from 'antd/es/config-provider';
+import { RecoilRoot } from 'recoil';
 
  
 // moment.tz.setDefault(abp.timing.timeZoneInfo.iana.timeZoneId);

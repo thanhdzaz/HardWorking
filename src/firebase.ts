@@ -27,6 +27,25 @@ export const firebaseApp = ():FirebaseApp=>
     return app;
 };
 
+
+export const firebaseAppForUser = ():FirebaseApp=>
+{
+    const firebaseConfig = {
+        apiKey: 'AIzaSyA31beHVFBEZlbGaHa2NrUYv4HvjAq31IA',
+        authDomain: 'hardworking-8888.firebaseapp.com',
+        projectId: 'hardworking-8888',
+        storageBucket: 'hardworking-8888.appspot.com',
+        messagingSenderId: '769195953001',
+        appId: '1:769195953001:web:6d5d56b947f868ef284bf8',
+        measurementId: 'G-MLYFL6LEMR',
+    };
+    
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig,'admin');
+    
+    return app;
+};
+
 export const getStore = ():Firestore => getFirestore(firebaseApp());
 
 class FirestoreService
@@ -122,7 +141,7 @@ class FirestoreService
 
        try
        {
-           const auth = getAuth();
+           const auth = getAuth(firebaseAppForUser());
            createUserWithEmailAndPassword(auth, user.email, user.password ?? '123456')
                .then(async(userCredential) =>
                {

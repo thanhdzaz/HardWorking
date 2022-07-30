@@ -4,7 +4,13 @@ import { Button } from 'antd';
 import { firestore } from 'firebase';
 import { UserInfo } from 'models/User/dto';
 
-export const CreateUser = ():JSX.Element =>
+interface Props{
+    onClose: (_event: any) => void
+}
+
+export const CreateUser:React.FunctionComponent<Props> = ({
+    onClose,
+}):JSX.Element =>
 {
     return (
         <ModalForm
@@ -16,7 +22,7 @@ export const CreateUser = ():JSX.Element =>
             trigger={<Button icon={<PlusOutlined />} />}
             onFinish={async(val:UserInfo)=>
             {
-                await firestore.createUser({ ...val,fullName: val.firstName + ' ' + val.lastName,password: '123456' });
+                await firestore.createUser({ ...val,fullName: val.firstName + ' ' + val.lastName,password: '123456' }).then(onClose);
                 return Promise.resolve(true);
             }}
         >

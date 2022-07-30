@@ -13,9 +13,7 @@ import {
 } from '@ant-design/icons';
 import { ProFormSlider } from '@ant-design/pro-form';
 import {
-    Button,
-    Card,
-    Col,
+    Button, Col,
     Form,
     FormInstance,
     Input, Modal, Row,
@@ -26,15 +24,15 @@ import {
 import Title from 'antd/lib/typography/Title';
 import Notify from 'components/Notify';
 import { PRIORITY_LIST, STATUS_LIST } from 'constant';
-import { auth, firestore } from 'firebase';
-import { getDocs, query, where } from 'firebase/firestore/lite';
+import { firestore } from 'firebase';
+import { deleteField, getDocs, query, where } from 'firebase/firestore/lite';
 import { checkLog } from 'hook/useCheckLog';
 import { CheckLog, TaskDto } from 'models/Task/dto';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { taskAtom } from 'stores/atom/task';
-import { listUserInfoAtom } from 'stores/atom/user';
+import { userProjectAtom } from 'stores/atom/user';
 import { ACTION, LOGKEYS } from 'utils';
 // import ImageCarousel from './ImageCarousel';
 
@@ -48,7 +46,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     const formRef = React.createRef<FormInstance>();
     const [imageLinks] = useState([]);
     const [currentRecord, setCurrentRecord] = useState<TaskDto>({ id: '0' } as any);
-    const userList = useRecoilValue(listUserInfoAtom);
+    const userList = useRecoilValue(userProjectAtom);
     const [showTitleTool, setShowTitleTool] = useState(false);
     const [showSubIssueTool, setShowSubIssueTool] = useState(false);
     const [showCkeditor, setCkeditor] = useState(false);
@@ -116,15 +114,14 @@ export const IssueDetail:React.FunctionComponent<any> = ({
             return false;
         }
 
-        firestore.update('Tasks',idIssue ?? '', { [key]: value }).then(() =>
+        firestore.update('Tasks',idIssue ?? '', { [key]: value ?? deleteField() }).then(() =>
         {
            
             Notify('success','Cập nhật thành công');
             checkLog({
                 action: 'update',
                 field: key,
-                userId: auth.currentUser?.uid ?? '',
-                newValue: value,
+                newValue: value ?? '',
                 oldValue: currentRecord[key] ?? '',
                 taskId: currentRecord.id,
             }).then(()=>
@@ -235,13 +232,18 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     return (
         <Modal
             title="Chi tiết công việc"
-            width="80%"
             footer={false}
+            width="95%"
             visible
             onCancel={reloadAndClose}
         >
             <Form ref={formRef}>
-                <Card className="card-containter">
+                <div
+                    className="card-containter"
+                    style={{
+                        height: '70vh',
+                    }}
+                >
                     <div className="issue-detail-container">
                         <div
                             className="left-side"
@@ -552,27 +554,8 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                                     placeholder="Giao cho"
                                                     className="user_select"
                                                     allowClear
-                                                    onSelect={(val) => handleUpdate('assignTo', val)}
-                                                    onChange={(_val) =>
-                                                    {
-                                                        firestore.update('Tasks',id,{
-                                                            assignTo: _val,
-                                                        }).then(()=>
-                                                        {
-                                                            checkLog({
-                                                                action: 'update',
-                                                                field: 'assignTo',
-                                                                userId: auth.currentUser?.uid ?? '',
-                                                                newValue: _val,
-                                                                oldValue: currentRecord.assignTo ?? '',
-                                                                taskId: currentRecord.id,
-                                                            }).then(()=>
-                                                            {
-                                                                setCurrentRecord({ ...currentRecord, assignTo: _val });
-                                                            });
-                                                            Notify('success','Cập nhật thành công');
-                                                        });
-                                                    }}
+                                                    // onSelect={(val) => handleUpdate('assignTo', val)}
+                                                    onChange={(val) =>handleUpdate('assignTo', val)}
                                                 >
                                                     {userList &&
                         userList.length > 0 &&
@@ -581,8 +564,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                 key={item.id.toString()}
                                 value={item.id.toString()}
                             >
-                                {item?.firstName ?? ''}
-                                {item?.lastName ?? ''}
+                                {item.fullName}
                             </Select.Option>
                         ))}
                                                 </Select>
@@ -705,6 +687,32 @@ export const IssueDetail:React.FunctionComponent<any> = ({
 
                                                                 }
 
+                                                                if (log.field === 'status')
+                                                                {
+                                                                    const u1 = STATUS_LIST.find((u:any) =>u.id === log.oldValue);
+                                                                    const u2 = STATUS_LIST.find((u:any) =>u.id === log.newValue);
+                                                                 
+                                                                    return (
+                                                                        <div key={log.id}>
+                                                                            <b>{moment.unix(log.time.seconds).format('DD/MM/YYYY HH:mm')}</b> <b>{u?.fullName}</b> - {ACTION[log.action]} {LOGKEYS[log.field]} từ <b>{u1?.title}</b> sang <b>{u2?.title}</b>
+                                                                        </div>
+                                                                    );
+
+                                                                }
+
+                                                                if (log.field === 'priority')
+                                                                {
+                                                                    const u1 = PRIORITY_LIST.find((u:any) =>u.id.toString() === log.oldValue.toString());
+                                                                    const u2 = PRIORITY_LIST.find((u:any) =>u.id.toString() === log.newValue.toString());
+                                                                 
+                                                                    return (
+                                                                        <div key={log.id}>
+                                                                            <b>{moment.unix(log.time.seconds).format('DD/MM/YYYY HH:mm')}</b> <b>{u?.fullName}</b> - {ACTION[log.action]} {LOGKEYS[log.field]} từ <b>{u1?.title}</b> sang <b>{u2?.title}</b>
+                                                                        </div>
+                                                                    );
+
+                                                                }
+
                                                                 return <div key={log.id}><b>{moment.unix(log.time.seconds).format('DD/MM/YYYY HH:mm')}</b> <b>{u?.fullName}</b> - {ACTION[log.action]} {LOGKEYS[log.field]} từ <b>{log.oldValue}</b> sang <b>{log.newValue}</b></div>;
                                                             })
                                                         }
@@ -717,7 +725,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                             </div>
                         </div>
                     </div>
-                </Card>
+                </div>
             </Form>
         </Modal>
     );

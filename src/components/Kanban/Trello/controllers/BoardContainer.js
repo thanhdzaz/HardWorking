@@ -255,16 +255,14 @@ class BoardContainer extends Component
               />
           );
 
-          return draggable &&
-        laneDraggable &&
-        index > 0 &&
-        index < reducerData.lanes.length - 1
-              ? (
-                      <Draggable key={lane.id}>{laneToRender}</Draggable>
-                  )
-              : (
-                      laneToRender
-                  ); // control drag lane
+          //   return draggable &&
+          // laneDraggable &&
+          //       ? (
+          //               <Draggable key={lane.id}>{laneToRender}</Draggable>
+          //           )
+          //       : (
+          return laneToRender;
+          //   ); // control drag lane
       });
 
       function getLaneCreate(index)

@@ -3,7 +3,10 @@ import { Button } from 'antd';
 import { KanbanBoard } from 'components/Kanban/Board';
 import { STATUS_LIST } from 'constant';
 import { firestore } from 'firebase';
+import { getDocs, query, where } from 'firebase/firestore/lite';
+import { checkLog } from 'hook/useCheckLog';
 import { observer } from 'mobx-react';
+import { TaskDto } from 'models/Task/dto';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { taskAtom } from 'stores/atom/task';
@@ -44,7 +47,15 @@ const KB = observer((_):JSX.Element=>
     });
     const getAll = async() =>
     {
-        await firestore.get('Tasks').then(setTask);
+        const q = query(firestore.collection('Tasks'),where('projectId', '==', localStorage.getItem('project')));
+        const querySnapshot = await getDocs(q);
+        const t:TaskDto[] = [];
+        querySnapshot.forEach((doc) =>
+        {
+            t.push(doc.data() as any);
+        });
+       
+        setTask(t);
     };
 
     const togglePopupDetail = () => setVisibleIssuePopupDetail(!visibleIssuePopupDetail);
@@ -72,9 +83,9 @@ const KB = observer((_):JSX.Element=>
                         .map((item) => ({
                             ...item,
                             laneId: pj.id,
-                            handleShowPopUp: ()=>
+                            handleShowPopUp: (id)=>
                             {
-                                setId(item.id);
+                                setId(id);
                                 togglePopupDetail();
                             },
                             // permissions.DW__WORK__VIEW
@@ -113,10 +124,19 @@ const KB = observer((_):JSX.Element=>
                     console.log(onLaneAdd);
                     
                 }}
-                onCardMoveAcrossLanes={(_o,n,id)=>
+                onCardMoveAcrossLanes={(o,n,id)=>
                 {
                     firestore.update('Tasks',id,{
                         status: n,
+                    }).then(()=>
+                    {
+                        checkLog({
+                            taskId: id,
+                            action: 'update',
+                            field: 'status',
+                            newValue: n,
+                            oldValue: o,
+                        });
                     });
                     
                 }}
@@ -152,6 +172,7 @@ const KB = observer((_):JSX.Element=>
                             getAll();
                             togglePopupDetail();
                         }}
+                        
                     />
                 )
             }

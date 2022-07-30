@@ -20,7 +20,8 @@ import { PRIORITY_LIST, STATUS_LIST } from 'constant';
 import { firestore } from 'firebase';
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { userAtom } from 'stores/atom/user';
+import { taskAtom } from 'stores/atom/task';
+import { userProjectAtom } from 'stores/atom/user';
 // import { useSearchParams } from 'react-router-dom';
 // import { CharacterAvatar } from '../../../components/avatar/CharacterAvatar';
 // import { priorityObj } from '../../../constants';
@@ -40,10 +41,11 @@ export function CreateIssuePage({
     const form = React.createRef<FormInstance>();
     const [meta] = useState([]);
 
-    const users = useRecoilValue(userAtom);
+    const users = useRecoilValue(userProjectAtom);
     const [createState] = useState(false);
     const [subIssues, setSubIssues] = useState<any[]>([]);
     const [avatar, setAvatar] = useState<string>('');
+    const task = useRecoilValue(taskAtom);
 
     const handleCreate = () =>
     {
@@ -70,6 +72,8 @@ export function CreateIssuePage({
                 priority: vals?.priority ?? '',
                 startTime: vals?.date[0].format('DD/MM/YYYY') ?? '',
                 endTime: vals?.date[1].format('DD/MM/YYYY') ?? '',
+                projectId: localStorage.getItem('project'),
+                ...vals.parentId ? { parentId: vals?.parentId } : {},
             };
             firestore.add('Tasks', data).then(({ id }) =>
             {
@@ -212,15 +216,13 @@ export function CreateIssuePage({
                         </div>
 
                         <Form.Item
-                            name="parent_id"
+                            name="parentId"
                             label="Công việc cha"
                             labelCol={{ span: 24 }}
                         >
                             <Select
                                 placeholder="Tên công việc"
-                                filterOption={(input, option): any =>
-                                    option?.children?.includes(input as any)
-                                }
+                                filterOption={(input, option):any => (option?.children.toLowerCase())?.includes(input.toLowerCase() as any)}
                                 filterSort={(optionA: any, optionB: any) =>
                                     optionA?.children
                                         ?.toLowerCase()
@@ -234,7 +236,14 @@ export function CreateIssuePage({
                                 }}
                             >
                                 {
-                                    //
+                                    task.map(t =>(
+                                        <Select.Option
+                                            key={t.id}
+                                            value={t.id}
+                                        >
+                                            {t.title}
+                                        </Select.Option>
+                                    ))
                                 }
                             </Select>
                         </Form.Item>

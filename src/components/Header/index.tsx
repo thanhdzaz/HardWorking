@@ -1,19 +1,20 @@
 import './index.less';
 import './media_query.less';
 
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Col, Row } from 'antd';
-import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 // import LanguageSelect from '../LanguageSelect';
+import React, { useEffect } from 'react';
 import Title from './BreadcrumbTitle';
 import Project from './ProjectChoose';
-import React, { useEffect } from 'react';
 import UserOverView from './UserOverView';
 // import AppComponentBase from 'components/AppComponentBase';
 
-import utils from '../../utils/utils';
-import { auth, firestore } from 'firebase';
+import { firestore } from 'firebase';
+import { observer } from 'mobx-react';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { listUserInfoAtom, userInfoAtom } from 'stores/atom/user';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import utils from '../../utils/utils';
 
 export interface IHeaderProps {
   collapsed?: any;
@@ -22,30 +23,18 @@ export interface IHeaderProps {
 }
 
 
-export const Header:React.FC <IHeaderProps> = (props)=>
+export const Header:React.FC <IHeaderProps> = observer((props)=>
 {
     const [os, setOs] = React.useState('PC');
-    const [userInfo,setUserInfo] = useRecoilState(userInfoAtom);
+    const userInfo = useRecoilValue(userInfoAtom);
     const setListUserInfo = useSetRecoilState(listUserInfoAtom);
     
     useEffect(()=>
     {
         setOs(utils.getOS());
         firestore.get('Users').then(setListUserInfo);
-       
     },[]);
    
-    useEffect(() =>
-    {
-        if (auth.currentUser?.uid)
-        {
-            firestore.getByDoc('Users',auth.currentUser?.uid ?? '').then((userInfo) =>
-            {
-                setUserInfo(userInfo);
-            });
-        }
-    },[auth.currentUser]);
-    
     return (
         <Row className="header-container">
             <Col
@@ -101,7 +90,7 @@ export const Header:React.FC <IHeaderProps> = (props)=>
             </Col>
         </Row>
     );
-};
+});
 
 
 export default Header;

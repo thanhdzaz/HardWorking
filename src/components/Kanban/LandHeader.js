@@ -42,7 +42,7 @@ export const CustomLaneHeader = observer(({
                 onDoubleClick={onDoubleClick}
             >
                 <Dropdown
-                    trigger={['click']}
+                    trigger={[]}
                     overlay={(
                         <div className="popoverChooseColorKanban">
                             {COLOR_TINT.map((value) => (

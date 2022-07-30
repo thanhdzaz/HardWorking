@@ -1,4 +1,4 @@
-import { firestore } from 'firebase';
+import { auth, firestore } from 'firebase';
 
 
 export const checkLog = async({
@@ -7,28 +7,24 @@ export const checkLog = async({
     newValue,
     action,
     oldValue,
-    userId,
 }:{
     taskId: string,
     field: string,
     newValue: string,
     action: 'add'| 'update'| 'delete',
     oldValue: string,
-    userId: string,
-    
   }):Promise<void> =>
 {
 
+    
     firestore.add('CheckLogs',{
         taskId,
         field,
         newValue,
         action,
         oldValue,
-        userId,
+        userId: auth.currentUser?.uid ?? '',
         time: new Date(),
     });
 
 };
-
-

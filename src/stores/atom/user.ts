@@ -1,7 +1,7 @@
 import { UserInfo } from 'models/User/dto';
 import { atom } from 'recoil';
 
-export const userAtom = atom({
+export const userProjectAtom = atom({
     default: [] as UserInfo[],
     key: 'userAtom',
 });
