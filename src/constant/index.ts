@@ -52,12 +52,12 @@ export const PRIORITY_LIST = [
     {
         id: 1,
         title: 'Thấp',
-        color: '#FFFF00',
+        color: '#00F044',
     },
     {
         id: 2,
         title: 'Trung bình',
-        color: '#00F044',
+        color: 'orange',
     },
     {
         id: 3,

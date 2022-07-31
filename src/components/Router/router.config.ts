@@ -93,6 +93,14 @@ export const appRouters: any = [
                 showInMenu: true,
                 component: LoadableComponent(() => import('scenes/Task/Kanban')),
             },
+            {
+                path: '/calendar',
+                name: 'calendar',
+                permission: '',
+                title: 'Lịch công việc',
+                showInMenu: true,
+                component: LoadableComponent(() => import('scenes/Task/Calendar')),
+            },
         ],
     },
     {
