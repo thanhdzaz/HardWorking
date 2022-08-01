@@ -32,6 +32,7 @@
     "@dhtmlx/trial-react-gantt": "^1.1.4",
     "@types/react-highlight-words": "^0.16.3",
     "abp-web-resources": "5.4.0",
+    "ahooks": "^3.6.2",
     "antd": "4.18.6",
     "atom": "^1.4.1",
     "autosize": "^5.0.1",

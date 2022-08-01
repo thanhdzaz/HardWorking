@@ -189,13 +189,16 @@ export const CreateOrUpdateProject: React.FC<propType> = ({
                 act === 'create'
                     ? (
                             <Button
+                                type="primary"
                                 icon={<PlusOutlined />}
                                 onClick={() =>
                                 {
                                     setViewType('info');
                                     setProjectId('');
                                 }}
-                            />
+                            >
+                                Thêm mới
+                            </Button>
                         )
                     : (
                             <div onClick={() =>

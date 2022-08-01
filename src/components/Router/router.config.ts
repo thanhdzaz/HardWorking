@@ -101,6 +101,14 @@ export const appRouters: any = [
                 showInMenu: true,
                 component: LoadableComponent(() => import('scenes/Task/Calendar')),
             },
+            {
+                path: '/list',
+                name: 'list',
+                permission: '',
+                title: 'Danh sách',
+                showInMenu: true,
+                component: LoadableComponent(() => import('scenes/Task/List')),
+            },
         ],
     },
     {

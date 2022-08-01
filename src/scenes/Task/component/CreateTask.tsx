@@ -17,7 +17,7 @@ import {
 } from 'antd';
 import Notify from 'components/Notify';
 import { PRIORITY_LIST, STATUS_LIST } from 'constant';
-import { firestore } from 'firebase';
+import { auth, firestore } from 'firebase';
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { taskAtom } from 'stores/atom/task';
@@ -45,6 +45,7 @@ export function CreateIssuePage({
     const [createState] = useState(false);
     const [subIssues, setSubIssues] = useState<any[]>([]);
     const [avatar, setAvatar] = useState<string>('');
+    const user = auth?.currentUser;
     const task = useRecoilValue(taskAtom);
 
     const handleCreate = () =>
@@ -68,12 +69,16 @@ export function CreateIssuePage({
             const data = {
                 title: vals?.title ?? '',
                 description: vals?.description ?? '',
+                progress: vals?.progress ?? 0,
                 status: vals?.status ?? '',
                 priority: vals?.priority ?? '',
                 startTime: vals?.date[0].format('DD/MM/YYYY') ?? '',
                 endTime: vals?.date[1].format('DD/MM/YYYY') ?? '',
                 projectId: localStorage.getItem('project'),
                 ...vals.parentId ? { parentId: vals?.parentId } : {},
+                assignBy: user?.uid,
+                assignTo: vals.assignTo,
+                
             };
             firestore.add('Tasks', data).then(({ id }) =>
             {
@@ -282,7 +287,7 @@ export function CreateIssuePage({
                                     /> */}
                                 </Col>
                                 <Col span={22}>
-                                    <Form.Item name="assign_to">
+                                    <Form.Item name="assignTo">
                                         <Select
                                             placeholder="Giao cho"
                                             className="user_select"

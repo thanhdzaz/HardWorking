@@ -5,13 +5,14 @@ import { getDocs, query, where } from 'firebase/firestore/lite';
 import { TaskDto } from 'models/Task/dto';
 import moment from 'moment';
 import { useCallback, useEffect, useState } from 'react';
+import HeaderFilter from '../component/HeaderFilter';
 import { IssueDetail } from '../component/IssueDetails';
 import '../index.less';
-// import { useCallback } from 'react';
 
 const IssueCalendar = (): JSX.Element =>
 {
     const [tasks, setTasks] = useState<TaskDto[]>([]);
+    const [filterdTasks, setFilterdTasks] = useState<TaskDto[]>([]);
     const [visibleIssuePopupDetail, setVisibleIssuePopupDetail] = useState(false);
     const [taskId, setTaskId] = useState<string>();
 
@@ -37,7 +38,7 @@ const IssueCalendar = (): JSX.Element =>
     const dateCellRender = useCallback(
         (dateMoment) =>
         {
-            const tasksOfCell = tasks.filter(
+            const tasksOfCell = filterdTasks.filter(
                 (t) =>
                     moment(t.startTime, 'DD-MM-YYYY').isSameOrBefore(dateMoment, 'day') &&
           moment(t.endTime, 'DD-MM-YYYY').isSameOrAfter(dateMoment, 'day'),
@@ -56,7 +57,11 @@ const IssueCalendar = (): JSX.Element =>
                                             ?.color,
                                         cursor: 'pointer',
                                     }}
-                                    onClick={() => setTaskId(t.id)}
+                                    onClick={() =>
+                                    {
+                                        setTaskId(t.id);
+                                        togglePopupDetail();
+                                    }}
                                 >
                                     {index + 1}. {t.title}
                                 </div>
@@ -71,25 +76,31 @@ const IssueCalendar = (): JSX.Element =>
                 </Popover>
             );
         },
-        [tasks],
+        [filterdTasks],
     );
 
     useEffect(() =>
     {
-        getTasks();
-    }, []);
-
-    useEffect(() =>
-    {
-        if (taskId)
-        {
-            setTaskId(taskId);
-            togglePopupDetail();
-        }
-    }, [taskId]);
+        setFilterdTasks(tasks);
+    }, [tasks]);
 
     return (
         <>
+            <div className="calendar">
+                <div className="calendar__header">
+                    <div className="calendar__content">
+                        <div className="calendar__content-left" />
+                        <div className="calendar__content-right">
+                            <HeaderFilter
+                                showChild={false}
+                                getTasks={getTasks}
+                                tasks={tasks}
+                                renderData={setFilterdTasks}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div className="issue-calendar-container">
                 <Calendar dateCellRender={dateCellRender} />
             </div>

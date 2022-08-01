@@ -1,4 +1,4 @@
-import { SettingFilled } from '@ant-design/icons';
+import { SettingOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import { Button, Card, Dropdown, Menu } from 'antd';
 import { getStore } from 'firebase';
@@ -22,7 +22,7 @@ const ProjectManagement = (): JSX.Element =>
             render: (_, item) => projectData.indexOf(item) + 1,
         },
         {
-            title: <SettingFilled />,
+            title: <SettingOutlined />,
             align: 'center',
             width: 55,
             dataIndex: 'id',
@@ -43,7 +43,10 @@ const ProjectManagement = (): JSX.Element =>
                         )}
                         trigger={['click']}
                     >
-                        <Button icon={<SettingFilled />} />
+                        <Button
+                            type="primary"
+                            icon={<SettingOutlined />}
+                        />
                     </Dropdown>
                 );
             },
