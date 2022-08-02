@@ -33,3 +33,10 @@ export const LOGKEYS = {
     progress: 'Tiến độ',
     priority: 'Độ ưu tiên',
 };
+
+
+export const getDate = (date:string):Date =>
+{
+    const d = date.split('/');
+    return new Date(`${d[1]}/${d[0]}/${d[2]}`);
+};

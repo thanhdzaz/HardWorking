@@ -52,8 +52,7 @@ const HeaderFilter: React.FunctionComponent<any> = ({
     showSearch = true,
     showChild = true,
     tasks,
-    getTasks = () =>
-    {},
+    getTasks,
 }) =>
 {
     const [filterObj, setFilterObj] = useState<any>({});

@@ -179,7 +179,7 @@ export function CreateIssuePage({
                                         >
                                             <Input
                                                 bordered={false} // handleCreateSubIssue(e.target.value, index)}
-                                                onPressEnter={(e) =>
+                                                onChange={(e) =>
                                                 {
                                                     setSubIssues((prev) =>
                                                     {

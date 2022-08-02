@@ -9,9 +9,11 @@ import {
     DownOutlined,
     PlusOutlined,
     RightOutlined,
+    SendOutlined,
 } from '@ant-design/icons';
 import { ProFormDateTimeRangePicker, ProFormSlider } from '@ant-design/pro-form';
 import {
+    Avatar,
     Button, Col,
     Form,
     FormInstance,
@@ -19,14 +21,15 @@ import {
     Select,
     Skeleton,
     Spin,
+    Typography,
 } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import Notify from 'components/Notify';
 import { PRIORITY_LIST, STATUS_LIST } from 'constant';
-import { firestore } from 'firebase';
+import { auth, firestore } from 'firebase';
 import { deleteField, getDocs, query, where } from 'firebase/firestore/lite';
 import { checkLog } from 'hook/useCheckLog';
-import { CheckLog, TaskDto } from 'models/Task/dto';
+import { CheckLog, TaskCommentedDto, TaskDto } from 'models/Task/dto';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
@@ -55,6 +58,9 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     // const [imgLoading] = useState(true);
     const [description,setDescription] = useState('');
     // const tasks = useRecoilValue(taskAtom);
+    const [message,setMessage] = useState('');
+    const [listMessage,setListMessage] = useState<TaskCommentedDto[]>([]);
+
     const [showInputSubIssue, setShowInputSubIssue] = useState(false);
     const titleInputRef = React.createRef<Input>();
     const subIssueInputRef = React.createRef<Input>();
@@ -135,12 +141,29 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         return true;
     };
 
+    const getMessage = async() =>
+    {
+        const q = query(
+            firestore.collection('Comments'),
+            where('taskId', '==', id),
+        );
+        const querySnapshot = await getDocs(q);
+        const t: TaskCommentedDto[] = [];
+        querySnapshot.forEach((doc) =>
+        {
+            t.push(doc.data() as any);
+        });
+
+        setListMessage(t.sort((a,b)=>b.time.seconds - a.time.seconds));
+    };
+
     // get list user
 
     useEffect(() =>
     {
         
         handleGetIssueById();
+        getMessage();
     }, [idIssue]);
 
     // set data
@@ -185,6 +208,19 @@ export const IssueDetail:React.FunctionComponent<any> = ({
             l.push(doc.data());
         });
         setSubIssues(l);
+    };
+
+
+    const handleSubmitMessage = () =>
+    {
+        const content = [...message];
+        setMessage('');
+        firestore.add('Comments',{
+            userId: auth.currentUser?.uid,
+            taskId: id,
+            content,
+            time: new Date(),
+        }).then(getMessage);
     };
 
     // get meta and user by tenant
@@ -245,7 +281,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                     <div className="issue-detail-container">
                         <div
                             className="left-side"
-                            style={{ paddingTop: 0 }}
+                            style={{ paddingTop: 0,overflowX: 'hidden', overflowY: 'scroll' ,maxHeight: '70vh' }}
                         >
                             <Skeleton
                                 loading={loading}
@@ -503,6 +539,86 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                     </Col>
                           
                             
+                                </Row>
+                                <Row>
+                                    <Col span={24}>
+                                        <Form.Item
+                                            label="Trao đổi"
+                                            labelCol={{ span: 24 }}
+                                            wrapperCol={{ span: 24 }}
+                                        >
+                                            <Input
+                                                style={{ width: '100%' }}
+                                                className="child-issue-wrapper"
+                                                placeholder="Nhập tin nhắn trao đổi....."
+                                                value={message}
+                                                addonAfter={(
+                                                    <SendOutlined
+                                                        style={{
+                                                            border: 'none',
+                                                        }}
+                                                        onClick={handleSubmitMessage}
+                                                    />
+                                                )}
+                                                onChange={(e)=>setMessage(e.target.value)}
+                                            />
+                                   
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col
+                                        span={24}
+                                        className="child-issue-wrapper"
+                                        style={{
+                                            height: 400,
+                                        }}
+                                    >
+                                        {
+                                            listMessage && listMessage.map((message) =>
+                                            {
+                                                const u = userList.find((u) =>u.id === message.userId);
+                                                return (
+                                                    <div
+                                                        key={message.id}
+                                                        style={{
+                                                            width: '100%',
+                                                            backgroundColor: '#fff',
+                                                            borderRadius: 10,
+                                                            paddingLeft: 10,
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            paddingTop: 10,
+                                                            paddingBottom: 10,
+                                                            justifyContent: 'center',
+                                                            marginBottom: 5,
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                            }}
+                                                        >
+                                                            <Avatar src={u?.avatarUrl} />
+                                                            <span
+                                                                style={{
+                                                                    marginLeft: 20,
+                                                                    maxWidth: '90%',
+                                                                }}
+                                                            >
+                                                                <Typography.Text strong>{u?.fullName}</Typography.Text>
+                                                                <br />
+                                                                <Typography.Text>{message.content}</Typography.Text>
+                                                            </span>
+                                                        </div>
+                                                        <div style={{ color: '#00000090' }}>{moment.unix(message.time.seconds).format('DD/MM/YYYY HH:mm')}</div>
+                                                        
+                                                    </div>
+                                                );
+                                            })
+                                        }
+                                    </Col>
                                 </Row>
                             </Skeleton>
                         </div>

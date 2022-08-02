@@ -70,3 +70,15 @@ export interface StatusDto{
     order: number;
 }
 
+export interface TaskCommentedDto{
+    id: string;
+    taskId: string;
+    content: string;
+    fileAttachment: string;
+    userId: string;
+    repply: string;
+    time: {
+        seconds: number;
+        nanoseconds: number;
+    }
+}

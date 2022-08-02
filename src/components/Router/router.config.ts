@@ -109,6 +109,14 @@ export const appRouters: any = [
                 showInMenu: true,
                 component: LoadableComponent(() => import('scenes/Task/List')),
             },
+            {
+                path: '/gantt',
+                name: 'gantt',
+                permission: '',
+                title: 'Biểu đồ Gantt',
+                showInMenu: true,
+                component: LoadableComponent(() => import('scenes/Task/Gantt')),
+            },
         ],
     },
     {

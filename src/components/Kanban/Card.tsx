@@ -92,14 +92,18 @@ export const Card = observer((props) =>
                 className="card-item-name"
                 onClick={onClick}
             >
-                <Typography.Text
-                    style={{
-                        width: parent && parent.id ? '90%' : '100%',
-                    }}
-                    ellipsis
+                <Popover
+                    title={title}
                 >
-                    {title}
-                </Typography.Text>
+                    <Typography.Text
+                        style={{
+                            width: parent && parent.id ? '90%' : '100%',
+                        }}
+                        ellipsis
+                    >
+                        {title}
+                    </Typography.Text>
+                </Popover>
             </div>
             {/* {description && (
         <p
