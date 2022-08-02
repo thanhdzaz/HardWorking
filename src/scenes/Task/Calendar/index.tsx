@@ -108,6 +108,7 @@ const IssueCalendar = (): JSX.Element =>
                 <IssueDetail
                     pageMode="modal"
                     id={taskId}
+                    tasks={tasks}
                     reloadAndClose={() =>
                     {
                         getTasks();

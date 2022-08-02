@@ -137,9 +137,16 @@ export function CreateIssuePage({
                                 style={{}}
                             />
                         </Form.Item>
-                        <div>
-                            <h3 style={{ marginTop: 0, fontSize: 14 }}>Mô tả:</h3>
-                        </div>
+                        <h3 style={{ marginTop: 0, fontSize: 14 }}>Mô tả:</h3>
+                        <Form.Item
+                            name="description"
+                            className="child-issue-wrapper"
+                        >
+                            <Input.TextArea
+                                placeholder="Nhập mô tả....."
+                                autoSize
+                            />
+                        </Form.Item>
                         <div
                             className="div-btn"
                             // disabled={!permissions.DW__WORK__EDIT}

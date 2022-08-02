@@ -4,14 +4,13 @@
 
 // import { config } from '@/utils/ckeditor';
 import {
-    CalendarOutlined,
     CheckOutlined,
     CloseOutlined,
     DownOutlined,
     PlusOutlined,
     RightOutlined,
 } from '@ant-design/icons';
-import { ProFormSlider } from '@ant-design/pro-form';
+import { ProFormDateTimeRangePicker, ProFormSlider } from '@ant-design/pro-form';
 import {
     Button, Col,
     Form,
@@ -31,7 +30,6 @@ import { CheckLog, TaskDto } from 'models/Task/dto';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { taskAtom } from 'stores/atom/task';
 import { userProjectAtom } from 'stores/atom/user';
 import { ACTION, LOGKEYS } from 'utils';
 // import ImageCarousel from './ImageCarousel';
@@ -40,6 +38,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     id,
     loading,
     setLoading,
+    tasks,
     reloadAndClose,
 }) =>
 {
@@ -55,7 +54,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     const [hideActivities, setHideActivities] = useState(true);
     // const [imgLoading] = useState(true);
     const [description,setDescription] = useState('');
-    const task = useRecoilValue(taskAtom);
+    // const tasks = useRecoilValue(taskAtom);
     const [showInputSubIssue, setShowInputSubIssue] = useState(false);
     const titleInputRef = React.createRef<Input>();
     const subIssueInputRef = React.createRef<Input>();
@@ -113,7 +112,8 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         {
             return false;
         }
-
+       
+        
         firestore.update('Tasks',idIssue ?? '', { [key]: value ?? deleteField() }).then(() =>
         {
            
@@ -131,6 +131,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
             });
             
         }).catch((err) =>err);
+
         return true;
     };
 
@@ -151,13 +152,10 @@ export const IssueDetail:React.FunctionComponent<any> = ({
            
             formRef?.current?.setFieldsValue({
                 ...currentRecord,
-                date: [
-                    moment(currentRecord.startTime),
-                    moment(currentRecord.endTime),
-                ],
-                assign_to: currentRecord?.assignTo ?? null,
-                priority_real: currentRecord.priority.toString(),
-                parent_id: currentRecord.parentId?.toString(),
+                assignTo: currentRecord?.assignTo ?? null,
+                priority: currentRecord.priority,
+                parentId: currentRecord.parentId,
+                dateRange: [currentRecord.startTime, currentRecord.endTime],
             });
         }
     }, [currentRecord]);
@@ -486,12 +484,12 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                                 onSelect={(val) => handleUpdate('parentId',val)}
                                             >
                                                 {
-                                                    task
-                                                        .filter(
-                                                            (item:any) =>
-                                                                item.id.toString() !== idIssue &&
-                                                !subIssues.map((is) => is.id).includes(item.id),
-                                                        )
+                                                    tasks
+                                                    //         .filter(
+                                                    //             (item:any) =>
+                                                    //                 item.id.toString() !== idIssue &&
+                                                    // !subIssues.map((is) => is.id).includes(item.id),
+                                                    //         )
                                                         .map((item:any) => (
                                                             <Select.Option
                                                                 key={item.id.toString()}
@@ -590,14 +588,15 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                     </Row>
                                     <Row>
                                         <Col>
-                                            <span>
-                                                <CalendarOutlined /> Từ:{' '}
-                                                {currentRecord.startTime}
-                                            </span>
-                                            <span style={{ marginLeft: 15 }}>
-                    Đến:{' '}
-                                                {currentRecord.endTime}
-                                            </span>
+                                            <ProFormDateTimeRangePicker
+                                                name="dateRange"
+                                                label="Deadline"
+                                                className="no-border-select"
+                                                fieldProps={{
+                                                    format: 'DD/MM/YYYY',
+                                                    onChange: (val) => handleUpdate('dateRange', val),
+                                                }}
+                                            />
                                         </Col>
                                     </Row>
                                     <Row style={{ marginTop: 5 }}>
@@ -676,8 +675,8 @@ export const IssueDetail:React.FunctionComponent<any> = ({
 
                                                                 if (log.field === 'parentId')
                                                                 {
-                                                                    const u1 = task.find((u) =>u.id === log.oldValue);
-                                                                    const u2 = task.find((u) =>u.id === log.newValue);
+                                                                    const u1 = tasks.find((u) =>u.id === log.oldValue);
+                                                                    const u2 = tasks.find((u) =>u.id === log.newValue);
                                                                  
                                                                     return (
                                                                         <div key={log.id}>

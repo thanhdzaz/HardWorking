@@ -245,7 +245,6 @@ const ListView = (): JSX.Element =>
 
   useEffect(() =>
 {
-    // getTasks();
     getUsers();
   }, []);
 
@@ -293,6 +292,7 @@ const ListView = (): JSX.Element =>
         <IssueDetail
             pageMode="modal"
             id={taskId}
+            tasks={tasks}
             reloadAndClose={() =>
 {
             getTasks();

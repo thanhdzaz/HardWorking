@@ -183,6 +183,7 @@ const KB = observer((_): JSX.Element =>
             {visibleIssuePopupDetail && (
                 <IssueDetail
                     pageMode="modal"
+                    tasks={task}
                     id={curentId}
                     reloadAndClose={() =>
                     {

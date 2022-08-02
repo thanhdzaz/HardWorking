@@ -8,8 +8,7 @@ import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { taskAtom } from 'stores/atom/task';
 
-
-export const Card = observer((props)=>
+export const Card = observer((props) =>
 {
     const {
         onClick,
@@ -29,15 +28,15 @@ export const Card = observer((props)=>
     {
         if (parentId)
         {
-            setParent(() =>
-                task.find((p) => p.id.toString() === parentId.toString()) ?? null,
+            setParent(
+                () => task.find((p) => p.id.toString() === parentId.toString()) ?? null,
             );
         }
     }, [parentId, task]);
 
-
-    const prio = PRIORITY_LIST.find((item) => item.id.toString() === priority?.toString());
-
+    const prio = PRIORITY_LIST.find(
+        (item) => item.id.toString() === priority?.toString(),
+    );
 
     return (
         <article
@@ -93,7 +92,14 @@ export const Card = observer((props)=>
                 className="card-item-name"
                 onClick={onClick}
             >
-                {title}
+                <Typography.Text
+                    style={{
+                        width: parent && parent.id ? '90%' : '100%',
+                    }}
+                    ellipsis
+                >
+                    {title}
+                </Typography.Text>
             </div>
             {/* {description && (
         <p
