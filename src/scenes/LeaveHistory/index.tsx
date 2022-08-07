@@ -1,18 +1,20 @@
 import ProTable from '@ant-design/pro-table';
-import { Popover, Spin } from 'antd';
+import { Button, Popover, Spin } from 'antd';
 import { LEAVE_STATUS_OBJ } from 'constant';
 import { auth, firestore } from 'firebase';
 import { getDocs, query, where } from 'firebase/firestore/lite';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import LeaveForm from './components/LeaveForm';
-// import LeaveForm from './components/LeaveForm';
+import HistoryModal from 'components/HistoryModal';
 
 const LeaveHistory = (): JSX.Element =>
 {
     const [searchResult, setSearchResult] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState<any>([]);
+    const [id, setId] = useState<string>('');
+    const [visible, setVisible] = useState<boolean>(false);
     const tableRef = useRef();
 
     const columns: any = [
@@ -80,15 +82,30 @@ const LeaveHistory = (): JSX.Element =>
             render: (_, row) => LEAVE_STATUS_OBJ[row.status],
         },
         {
-            title: 'Người chỉnh sửa cuối',
+            title: 'Lịch sử sửa trạng thái',
             width: 150,
-            dataIndex: 'lastModifiedPerson',
             align: 'center',
-            key: 'lastModifiedPerson',
-            render: (_, row) =>
-                users?.find((us) => us.id === row.lastModifiedPerson)?.fullName,
+            render: (_, row) => (
+                <Button
+                    type="link"
+                    onClick={() => handleOpenHistoryModal(row.id)}
+                >Xem
+                </Button>
+            ),
         },
     ];
+
+    const toggleModal = () =>
+    {
+        setVisible(prev => !prev);
+        
+    };
+
+    const handleOpenHistoryModal = (id) =>
+    {
+        toggleModal();
+        setId(id);
+    };
 
     const getAllMyLeaveHistory = async () =>
     {
@@ -128,25 +145,35 @@ const LeaveHistory = (): JSX.Element =>
     }, [auth?.currentUser?.uid]);
 
     return (
-        <Spin spinning={loading}>
-            <ProTable
-                className="leave-history-table"
-                actionRef={tableRef}
-                columns={columns}
-                pagination={{
-                    pageSize: 10,
-                    showTotal: (total, range) =>
-                        `${range[0]} - ${range[1]} trên ${total} bản ghi`,
-                }}
-                dataSource={searchResult}
-                // options={{
-                //     reload: reloadData,
-                // }}
-                search={false}
-                // rowKey={(e) => e.id}
-                headerTitle={<LeaveForm refreshData={refreshData} />}
-            />
-        </Spin>
+        <>
+            <Spin spinning={loading}>
+                <ProTable
+                    className="leave-history-table"
+                    actionRef={tableRef}
+                    columns={columns}
+                    pagination={{
+                        pageSize: 10,
+                        showTotal: (total, range) =>
+                            `${range[0]} - ${range[1]} trên ${total} bản ghi`,
+                    }}
+                    dataSource={searchResult}
+                    // options={{
+                    //     reload: reloadData,
+                    // }}
+                    search={false}
+                    // rowKey={(e) => e.id}
+                    headerTitle={<LeaveForm refreshData={refreshData} />}
+                />
+            </Spin>
+            { visible && (
+                <HistoryModal
+                    id={id}
+                    users={users}
+                    toggleModal={toggleModal}
+                />
+            ) }
+        </>
+       
     );
 };
 

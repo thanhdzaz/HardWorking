@@ -1,11 +1,13 @@
 import { ProFormSelect } from '@ant-design/pro-form';
 import ProTable from '@ant-design/pro-table';
-import { Popover, Spin } from 'antd';
+import { Button, Popover, Spin } from 'antd';
 import Notify from 'components/Notify';
 import { LEAVE_STATUS_OBJ } from 'constant';
 import { auth, firestore } from 'firebase';
+import { checkLog } from 'hook/useCheckLog';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
+import HistoryModal from 'components/HistoryModal';
 import './index.less';
 
 const LeaveList = (): JSX.Element =>
@@ -13,6 +15,9 @@ const LeaveList = (): JSX.Element =>
     const [searchResult, setSearchResult] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState<any>([]);
+    const [id, setId] = useState<string>('');
+    const [visible, setVisible] = useState<boolean>(false);
+
     const tableRef = useRef();
 
     const columns: any = [
@@ -94,7 +99,7 @@ const LeaveList = (): JSX.Element =>
             render: (_, row) =>
             {
                 // check nếu có quyền sửa thì mới cho sửa, không thì chỉ cho xem
-                if (row.status === 0) // Nếu là nghỉ khong phép
+                if (row.userId !== auth?.currentUser?.uid) // Nếu là nghỉ khong phép
                 {
                     return (
                         <ProFormSelect
@@ -102,7 +107,7 @@ const LeaveList = (): JSX.Element =>
                             name={row.id}
                             fieldProps={{
                                 value: row.status.toString(),
-                                onSelect: (val) => handleChangeStatus(val, row.id),
+                                onSelect: (val) => handleChangeStatus(row.status, val, row.id),
                             }}
                             options={Object.keys(LEAVE_STATUS_OBJ).map(key => ({
                                 value: key,
@@ -116,25 +121,52 @@ const LeaveList = (): JSX.Element =>
             },
         },
         {
-            title: 'Người chỉnh sửa cuối',
+            title: 'Lịch sử sửa trạng thái',
             width: 150,
-            dataIndex: 'lastModifiedPerson',
             align: 'center',
-            key: 'lastModifiedPerson',
-            render: (_, row) => users?.find(us => us.id === row.lastModifiedPerson)?.fullName,
+            render: (_, row) => (
+                <Button
+                    type="link"
+                    onClick={() => handleOpenHistoryModal(row.id)}
+                >Xem
+                </Button>
+            ),
         },
     ];
 
-    const handleChangeStatus = (val, id) =>
+    const handleChangeStatus = (oldValue, newValue, id) =>
     {
-        if (val === '1')
+        // if (val === NGHI_CO_PHEP)
+        // {
+        firestore.update('Leave', id, { status: newValue }).then(() =>
         {
-            firestore.update('Leave', id, { status: val, lastModifiedPerson: auth?.currentUser?.uid }).then(() =>
+            checkLog({
+                action: 'update',
+                field: 'status',
+                newValue: newValue,
+                oldValue: oldValue,
+                taskId: id,
+            }).then(() =>
             {
                 Notify('success', 'Cập nhật thành công');
                 refreshData();
             });
-        }
+        });
+        
+        // }
+        
+    };
+
+    const toggleModal = () =>
+    {
+        setVisible(prev => !prev);
+        
+    };
+
+    const handleOpenHistoryModal = (id) =>
+    {
+        toggleModal();
+        setId(id);
     };
 
     const getAllLeaveList = async () =>
@@ -169,25 +201,35 @@ const LeaveList = (): JSX.Element =>
     }, []);
 
     return (
-        <Spin spinning={loading}>
-            <ProTable
-                className="leave-list-table"
-                actionRef={tableRef}
-                columns={columns}
-                pagination={{
-                    pageSize: 10,
-                    showTotal: (total, range) =>
-                        `${range[0]} - ${range[1]} trên ${total} bản ghi`,
-                }}
-                dataSource={searchResult}
-                // options={{
-                //     reload: reloadData,
-                // }}
-                search={false}
-                // rowKey={(e) => e.id}
+        <>
+            <Spin spinning={loading}>
+                <ProTable
+                    className="leave-list-table"
+                    actionRef={tableRef}
+                    columns={columns}
+                    pagination={{
+                        pageSize: 10,
+                        showTotal: (total, range) =>
+                            `${range[0]} - ${range[1]} trên ${total} bản ghi`,
+                    }}
+                    dataSource={searchResult}
+                    // options={{
+                    //     reload: reloadData,
+                    // }}
+                    search={false}
+                    // rowKey={(e) => e.id}
              
-            />
-        </Spin>
+                />
+            </Spin>
+            { visible && (
+                <HistoryModal
+                    id={id}
+                    users={users}
+                    toggleModal={toggleModal}
+                />
+            ) }
+        </>
+        
     );
 };
 

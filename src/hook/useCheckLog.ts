@@ -10,9 +10,9 @@ export const checkLog = async({
 }:{
     taskId: string,
     field: string,
-    newValue: string,
+    newValue: string | number,
     action: 'add'| 'update'| 'delete',
-    oldValue: string,
+    oldValue: string | number,
   }):Promise<void> =>
 {
 
