@@ -1,14 +1,14 @@
+import { ProFormSelect } from '@ant-design/pro-form';
 import ProTable from '@ant-design/pro-table';
 import { Popover, Spin } from 'antd';
+import Notify from 'components/Notify';
 import { LEAVE_STATUS_OBJ } from 'constant';
 import { auth, firestore } from 'firebase';
-import { getDocs, query, where } from 'firebase/firestore/lite';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
-import LeaveForm from './components/LeaveForm';
-// import LeaveForm from './components/LeaveForm';
+import './index.less';
 
-const LeaveHistory = (): JSX.Element =>
+const LeaveList = (): JSX.Element =>
 {
     const [searchResult, setSearchResult] = useState<any>([]);
     const [loading, setLoading] = useState(false);
@@ -31,19 +31,33 @@ const LeaveHistory = (): JSX.Element =>
             hideInTable: true,
         },
         {
+            title: 'Mã người dùng',
+            dataIndex: 'userId',
+            align: 'center',
+            key: 'userId',
+            hideInTable: true,
+        },
+        {
+            title: 'Họ và tên',
+            width: 150,
+            align: 'center',
+            key: 'name',
+            render: (_, row) => users?.find(us => us.id === row.userId)?.fullName,
+        },
+        {
             title: 'Ngày xin nghỉ',
             width: 150,
             dataIndex: 'sendDate',
             align: 'center',
-            key: 'sendDate',
-            render: (_, row) => moment(row.sendDate).format('DD/MM/YYYY'),
+            key: 'name',
+            render: (_, row) => moment(row.startDate).format('DD/MM/YYYY'),
         },
         {
-            title: 'Ngày bắt đầu nghỉ',
+            title: 'Ngày xin đầu nghỉ',
             width: 150,
             dataIndex: 'startDate',
             align: 'center',
-            key: 'startDate',
+            key: 'name',
             render: (_, row) => moment(row.startDate).format('DD/MM/YYYY'),
         },
         {
@@ -51,7 +65,7 @@ const LeaveHistory = (): JSX.Element =>
             width: 150,
             dataIndex: 'endDate',
             align: 'center',
-            key: 'endDate',
+            key: 'name',
             render: (_, row) => moment(row.endDate).format('DD/MM/YYYY'),
         },
         {
@@ -76,8 +90,30 @@ const LeaveHistory = (): JSX.Element =>
             width: 150,
             dataIndex: 'status',
             align: 'center',
-            key: 'status',
-            render: (_, row) => LEAVE_STATUS_OBJ[row.status],
+            key: 'name',
+            render: (_, row) =>
+            {
+                // check nếu có quyền sửa thì mới cho sửa, không thì chỉ cho xem
+                if (row.status === 0) // Nếu là nghỉ khong phép
+                {
+                    return (
+                        <ProFormSelect
+                            key={row.id}
+                            name={row.id}
+                            fieldProps={{
+                                value: row.status.toString(),
+                                onSelect: (val) => handleChangeStatus(val, row.id),
+                            }}
+                            options={Object.keys(LEAVE_STATUS_OBJ).map(key => ({
+                                value: key,
+                                label: LEAVE_STATUS_OBJ[key],
+                            }))}
+                        />
+                    );
+                }
+
+                return LEAVE_STATUS_OBJ[row.status];
+            },
         },
         {
             title: 'Người chỉnh sửa cuối',
@@ -85,24 +121,28 @@ const LeaveHistory = (): JSX.Element =>
             dataIndex: 'lastModifiedPerson',
             align: 'center',
             key: 'lastModifiedPerson',
-            render: (_, row) =>
-                users?.find((us) => us.id === row.lastModifiedPerson)?.fullName,
+            render: (_, row) => users?.find(us => us.id === row.lastModifiedPerson)?.fullName,
         },
     ];
 
-    const getAllMyLeaveHistory = async () =>
+    const handleChangeStatus = (val, id) =>
     {
-        const q = query(
-            firestore.collection('Leave'),
-            where('userId', '==', auth?.currentUser?.uid),
-        );
-        const querySnapshot = await getDocs(q);
-        const l: any = [];
-        querySnapshot.forEach((doc) =>
+        if (val === '1')
         {
-            l.push(doc.data() as any);
-        });
-        setSearchResult(l);
+            firestore.update('Leave', id, { status: val, lastModifiedPerson: auth?.currentUser?.uid }).then(() =>
+            {
+                Notify('success', 'Cập nhật thành công');
+                refreshData();
+            });
+        }
+    };
+
+    const getAllLeaveList = async () =>
+    {
+
+        const res = await firestore.get('Leave');
+        setSearchResult(res);
+
     };
 
     const getAllUsers = async () =>
@@ -114,23 +154,24 @@ const LeaveHistory = (): JSX.Element =>
     const refreshData = () =>
     {
         setLoading(true);
-        getAllMyLeaveHistory();
-        getAllUsers();
+        getAllLeaveList();
         setTimeout(() =>
         {
             setLoading(false);
         }, 300);
     };
 
+
     useEffect(() =>
     {
-        auth?.currentUser?.uid && refreshData();
-    }, [auth?.currentUser?.uid]);
+        refreshData();
+        getAllUsers();
+    }, []);
 
     return (
         <Spin spinning={loading}>
             <ProTable
-                className="leave-history-table"
+                className="leave-list-table"
                 actionRef={tableRef}
                 columns={columns}
                 pagination={{
@@ -144,10 +185,10 @@ const LeaveHistory = (): JSX.Element =>
                 // }}
                 search={false}
                 // rowKey={(e) => e.id}
-                headerTitle={<LeaveForm refreshData={refreshData} />}
+             
             />
         </Spin>
     );
 };
 
-export default LeaveHistory;
+export default LeaveList;

@@ -347,6 +347,7 @@ const HeaderFilter: React.FunctionComponent<any> = ({
                             onChange: (value) => handleChangeFilter('dateRange', value),
                         }}
                         width={270}
+                        placeholder={['Chọn ngày', 'Chọn ngày']}
                         name="dateRange"
                     />
                 </div>

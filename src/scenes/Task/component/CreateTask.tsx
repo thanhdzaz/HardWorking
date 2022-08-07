@@ -359,7 +359,9 @@ export function CreateIssuePage({
                                             },
                                         ]}
                                     >
-                                        <DatePicker.RangePicker showTime />
+                                        <DatePicker.RangePicker
+                                            format={'DD/MM/YYYY'}
+                                        />
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -387,11 +389,6 @@ export function CreateIssuePage({
                                         </Select>
                                     </Form.Item>
                                 </Col>
-                            </Row>
-                            <div className="divider" />
-                            <Row style={{ padding: '5px' }}>
-                                <Col span={12}>Trạng thái: Mới</Col>
-                                <Col span={12}>Id nhiệm vụ: null</Col>
                             </Row>
                         </div>
                     </div>

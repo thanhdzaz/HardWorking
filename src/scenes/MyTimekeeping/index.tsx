@@ -259,6 +259,7 @@ const MyAttendance = (): JSX.Element =>
                 <ProFormDateRangePicker
                     name="dateRange"
                     label="Khoảng thời gian"
+                    placeholder={['Chọn ngày', 'Chọn ngày']}
                     fieldProps={{
                         onChange: handleSelectDateRange,
                     }}

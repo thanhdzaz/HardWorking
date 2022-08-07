@@ -49,6 +49,7 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
                 endDate: endDate.format('YYYY-MM-DD'),
                 userId: auth?.currentUser?.uid,
                 reason: vals.reason ?? '',
+                sendDate: moment().format('YYYY-MM-DD'),
                 status,
             })
             .then((rs) =>
@@ -106,6 +107,7 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
                         fieldProps={{ format: 'DD/MM/YYYY' }}
                         name="dateRange"
                         label={'Khoảng thời gian nghỉ'}
+                        placeholder={['Chọn ngày', 'Chọn ngày']}
                         rules={[{ required: true, message: 'Vui lòng nhập' }]}
                     />
                 </Col>
@@ -114,6 +116,7 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
                         name="reason"
                         width="xl"
                         label="Nội dung xin nghỉ"
+                        placeholder="Nhập nội dung xin nghỉ..."
                     />
                 </Col>
                 <Col span={24}>

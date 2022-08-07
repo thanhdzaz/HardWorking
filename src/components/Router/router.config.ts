@@ -152,6 +152,14 @@ export const appRouters: any = [
                 component: LoadableComponent(() => import('scenes/LeaveHistory')),
             },
             {
+                path: '/leave-list',
+                name: 'leave-list',
+                permission: '',
+                title: 'Danh sách xin nghỉ',
+                showInMenu: true,
+                component: LoadableComponent(() => import('scenes/LeaveList')),
+            },
+            {
                 path: '/my-timekeeping',
                 name: 'my-timekeeping',
                 permission: '',
