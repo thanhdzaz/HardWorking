@@ -82,3 +82,12 @@ export interface TaskCommentedDto{
         nanoseconds: number;
     }
 }
+export interface LeaveDto {
+    id: string;
+    sendDate: string;
+    startDate: string;
+    endDate: string;
+    status: number;
+    reason: string;
+    userId: string;
+}

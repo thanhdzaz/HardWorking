@@ -138,13 +138,13 @@ const LeaveList = (): JSX.Element =>
     {
         // if (val === NGHI_CO_PHEP)
         // {
-        firestore.update('Leave', id, { status: newValue }).then(() =>
+        firestore.update('Leave', id, { status: Number(newValue) }).then(() =>
         {
             checkLog({
                 action: 'update',
                 field: 'status',
-                newValue: newValue,
-                oldValue: oldValue,
+                newValue: Number(newValue),
+                oldValue: Number(oldValue),
                 taskId: id,
             }).then(() =>
             {

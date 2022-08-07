@@ -1,13 +1,15 @@
-import { PlusCircleFilled } from '@ant-design/icons';
+import { ExclamationCircleOutlined, PlusCircleFilled } from '@ant-design/icons';
 import {
     ModalForm,
     ProFormDateRangePicker,
     ProFormTextArea,
 } from '@ant-design/pro-form';
-import { Button, Col, Row, Space } from 'antd';
+import { Button, Col, Modal, Row, Space } from 'antd';
 import Notify from 'components/Notify';
 import { NGHI_CO_PHEP, NGHI_KHONG_PHEP } from 'constant';
 import { auth, firestore } from 'firebase';
+import { getDocs, query, where } from 'firebase/firestore/lite';
+import { LeaveDto } from 'models/Task/dto';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import './LeaveForm.less';
@@ -18,6 +20,20 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
     // const [employee, setEmployee] = useState([]);
     const [dataLeaveRule, setDataLeaveRule] = useState<any>([]);
     const formRef = useRef();
+
+    const addLeave = (data) =>
+    {
+        firestore
+            .add('Leave', data)
+            .then((rs) =>
+            {
+                if (rs.id)
+                {
+                    Notify('success', 'Thêm mới thành công');
+                    refreshData();
+                }
+            });
+    };
     
     const handleSubmit = async (vals) =>
     {
@@ -30,9 +46,53 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
         const isExistInLeaveRule = leaveRule ? true : false;
         let status = NGHI_KHONG_PHEP;
 
-        // Nếu số ngày nghỉ có trong quy định nghỉ
-        if (isExistInLeaveRule)
+        const q = query(
+            firestore.collection('Leave'),
+            where('status', '==', NGHI_CO_PHEP),
+            where('userId', '==', auth?.currentUser?.uid),
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        const l: LeaveDto[] = [];
+        querySnapshot.forEach((doc: any) =>
         {
+            l.push(doc.data());
+        });
+
+        const totalLeaveThisMonth = l.filter(
+            (lv) =>
+                moment(lv.sendDate).isSameOrAfter(moment().startOf('M')) &&
+        moment(lv.sendDate).isSameOrBefore(moment().endOf('M')),
+        ).length;
+
+        if (totalLeaveThisMonth >= 1)
+        {
+            const onOk = async () =>
+            {
+                status = NGHI_KHONG_PHEP;
+                addLeave({
+                    startDate: startDate.format('YYYY-MM-DD'),
+                    endDate: endDate.format('YYYY-MM-DD'),
+                    userId: auth?.currentUser?.uid,
+                    reason: vals.reason ?? '',
+                    sendDate: moment().format('YYYY-MM-DD'),
+                    status,
+                });
+            };
+            Modal.confirm({
+                title: 'Xóa phòng',
+                icon: <ExclamationCircleOutlined />,
+                content:
+          'Bạn đã xin nghỉ quá 1 lần trong tháng, nếu tiếp tục đơn xin nghỉ của bạn sẽ bị tính là không phép, bạn có muốn tiếp tục không?',
+                onOk,
+                okText: 'Có',
+                cancelText: 'Không',
+            });
+        }
+        else if (isExistInLeaveRule)
+        {
+        // Nếu số ngày nghỉ có trong quy định nghỉ
             const { totalDateBefore } = leaveRule;
             const now = moment();
             const totalDayFromNowToDayOff =
@@ -40,26 +100,27 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
             if (totalDayFromNowToDayOff >= totalDateBefore)
             {
                 status = NGHI_CO_PHEP;
+                addLeave({
+                    startDate: startDate.format('YYYY-MM-DD'),
+                    endDate: endDate.format('YYYY-MM-DD'),
+                    userId: auth?.currentUser?.uid,
+                    reason: vals.reason ?? '',
+                    sendDate: moment().format('YYYY-MM-DD'),
+                    status,
+                });
+            }
+            else
+            {
+                addLeave({
+                    startDate: startDate.format('YYYY-MM-DD'),
+                    endDate: endDate.format('YYYY-MM-DD'),
+                    userId: auth?.currentUser?.uid,
+                    reason: vals.reason ?? '',
+                    sendDate: moment().format('YYYY-MM-DD'),
+                    status,
+                });
             }
         }
-
-        firestore
-            .add('Leave', {
-                startDate: startDate.format('YYYY-MM-DD'),
-                endDate: endDate.format('YYYY-MM-DD'),
-                userId: auth?.currentUser?.uid,
-                reason: vals.reason ?? '',
-                sendDate: moment().format('YYYY-MM-DD'),
-                status,
-            })
-            .then((rs) =>
-            {
-                if (rs.id)
-                {
-                    Notify('success', 'Thêm mới thành công');
-                    refreshData();
-                }
-            });
         return true;
     };
     const getAllLeaveRule = async () =>
