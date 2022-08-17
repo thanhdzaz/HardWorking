@@ -4,6 +4,7 @@ import { Button } from 'antd';
 import { firestore } from 'firebase';
 import { UserInfo } from 'models/User/dto';
 
+const avatarDefault = 'https://icon-library.com/images/avatar-png-icon/avatar-png-icon-13.jpg';
 interface Props{
     onClose: (_event: any) => void
 }
@@ -22,7 +23,7 @@ export const CreateUser:React.FunctionComponent<Props> = ({
             trigger={<Button icon={<PlusOutlined />} />}
             onFinish={async(val:UserInfo)=>
             {
-                await firestore.createUser({ ...val,fullName: val.firstName + ' ' + val.lastName,password: '123456' }).then(onClose);
+                await firestore.createUser({ ...val,fullName: val.firstName + ' ' + val.lastName,password: '123456',avatarUrl: avatarDefault,disable: false }).then(onClose);
                 return Promise.resolve(true);
             }}
         >

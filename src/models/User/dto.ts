@@ -11,4 +11,5 @@ export interface UserInfo{
     gender?: number;
     role: string;
     address?: string;
+    disable?: boolean;
 }

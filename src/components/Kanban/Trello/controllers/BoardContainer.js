@@ -294,9 +294,11 @@ class BoardContainer extends Component
               style={style}
               {...otherProps}
               draggable={false}
+              title=''
           >
               <PopoverWrapper>
                   <Container
+                      title=''
                       orientation="horizontal"
                       dragClass={laneDragClass}
                       dropClass={laneDropClass}

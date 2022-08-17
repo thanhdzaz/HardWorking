@@ -77,7 +77,8 @@ export function CreateIssuePage({
                 projectId: localStorage.getItem('project'),
                 ...vals.parentId ? { parentId: vals?.parentId } : {},
                 assignBy: user?.uid,
-                assignTo: vals.assignTo,
+                ...vals.assignTo ? { assignTo: vals?.assignTo } : {},
+
                 
             };
             firestore.add('Tasks', data).then(({ id }) =>

@@ -25,6 +25,7 @@ export const CustomLaneHeader = observer(({
     return (
         <div>
             <header
+                title=''
                 style={{
                     borderTopLeftRadius: 10,
                     borderTopRightRadius: 10,

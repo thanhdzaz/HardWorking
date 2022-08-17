@@ -4,12 +4,11 @@ import './UserLayout.less';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
 import { Col } from 'antd';
-import DocumentTitle from 'react-document-title';
-import Footer from '../Footer';
-import LanguageSelect from '../LanguageSelect';
-import { userRouter } from '../Router/router.config';
-import utils from 'utils/utils';
 import React from 'react';
+import DocumentTitle from 'react-document-title';
+import utils from 'utils/utils';
+import Footer from '../Footer';
+import { userRouter } from '../Router/router.config';
 
 class UserLayout extends React.Component<any>
 {
@@ -22,10 +21,7 @@ class UserLayout extends React.Component<any>
         return (
             <DocumentTitle title={utils.getPageTitle(pathname)}>
                 <Col className="container">
-                    <div style={{ height: 'calc(100vh - 55px)' }}>
-                        <div className="lang">
-                            <LanguageSelect />
-                        </div>
+                    <div style={{ height: 'calc(100vh - 55px)',display: 'flex' }}>
                         <Switch>
                             {userRouter
                                 .filter((item: any) => !item.isLayout)

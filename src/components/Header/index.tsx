@@ -60,7 +60,7 @@ export const Header:React.FC <IHeaderProps> = observer((props)=>
                         )}
             </Col>
             <Col
-                span={13}
+                span={11}
                 style={{ justifyContent: 'center', alignItems: 'center' }}
             >
                 <Title data={props.data} />
@@ -78,7 +78,7 @@ export const Header:React.FC <IHeaderProps> = observer((props)=>
                     justifyContent: 'flex-end',
                     alignContent: 'center',
                     alignItems: 'center' }}
-                span={3}
+                span={5}
             >
                 <div
                     className="user-name"

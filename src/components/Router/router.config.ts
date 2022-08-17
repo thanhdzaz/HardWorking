@@ -71,7 +71,7 @@ export const appRouters: any = [
         path: '/project',
         name: 'project',
         icon: ProjectOutlined,
-        permission: '',
+        permission: 'PJ_VIEW',
         title: 'Dự án',
         showInMenu: true,
         component: LoadableComponent(() => import('scenes/Project')),

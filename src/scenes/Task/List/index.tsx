@@ -47,10 +47,10 @@ const ListView = (): JSX.Element =>
               <Menu.Item
                   key="2"
                   onClick={() =>
-{
-              setTaskId(id);
-              togglePopupDetail();
-                }}
+                  {
+                    setTaskId(id);
+                    togglePopupDetail();
+                  }}
               >
                 Sửa
               </Menu.Item>
@@ -77,6 +77,9 @@ const ListView = (): JSX.Element =>
       dataIndex: 'title',
       width: 300,
       fixed: 'left',
+      ellipsis: {
+        showTitle: false,
+      },
       render: (txt) => (
         <Tooltip title={txt}>
           {txt.length > 125 ? `${txt.substring(0, 125)}...` : txt}

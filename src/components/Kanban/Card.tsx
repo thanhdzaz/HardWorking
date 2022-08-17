@@ -1,4 +1,4 @@
-import { Popover, Progress, Typography } from 'antd';
+import { Avatar, Popover, Progress, Typography } from 'antd';
 import { ReactComponent as Calendar } from 'asset/calendar.svg';
 // import { ReactComponent as Trello } from 'assets/trello.svg';
 import { PRIORITY_LIST } from 'constant';
@@ -7,6 +7,10 @@ import { TaskDto } from 'models/Task/dto';
 import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { taskAtom } from 'stores/atom/task';
+import { userProjectAtom } from 'stores/atom/user';
+
+import { ReactComponent as Child } from 'asset/child.svg';
+
 
 export const Card = observer((props) =>
 {
@@ -21,7 +25,16 @@ export const Card = observer((props) =>
         progress,
     } = props;
 
+    const {
+        assignTo,
+        assignBy,
+    } = props as TaskDto;
+
     const task = useRecoilValue(taskAtom);
+    const users = useRecoilValue(userProjectAtom);
+
+    const nguoiLam = users.find(user => user.id === assignTo);
+    const nguoiGiao = users.find(user => user.id === assignBy);
 
     const [parent, setParent] = React.useState<TaskDto | null>(null);
     React.useEffect(() =>
@@ -33,6 +46,7 @@ export const Card = observer((props) =>
             );
         }
     }, [parentId, task]);
+    
 
     const prio = PRIORITY_LIST.find(
         (item) => item.id.toString() === priority?.toString(),
@@ -88,10 +102,22 @@ export const Card = observer((props) =>
                     fontWeight: 'bold',
                     width: '100%',
                     cursor: 'pointer',
+                    display: 'flex',
                 }}
                 className="card-item-name"
                 onClick={onClick}
             >
+                {
+                    parent && (
+                        <Child
+                            fill='blue'
+                            style={{
+                                alignSelf: 'center',
+                                marginRight: 10,
+                            }}
+                        />
+                    )
+                }
                 <Popover
                     title={title}
                 >
@@ -144,6 +170,23 @@ export const Card = observer((props) =>
                                     : 'grey'
                     }
                 />
+                {nguoiLam && (
+                    <Popover
+                        content={
+                            nguoiLam?.fullName
+                        }
+                    >
+                        <Avatar
+                            style={{
+                                cursor: 'pointer',
+                                marginLeft: 20,
+                            }}
+                            src={nguoiLam?.avatarUrl}
+                        />
+                    </Popover>
+                )}
+                
+
             </div>
             <div>
                 <Calendar fill="#9EA3A9" /> &nbsp;{' '}
@@ -170,18 +213,36 @@ export const Card = observer((props) =>
                 ? (
                         <div
                             style={{
-                                width: 'fit-content',
-                                paddingLeft: 10,
-                                paddingRight: 10,
-                                borderRadius: 5,
-                                fontWeight: 'bold',
-                                height: 24,
-                                backgroundColor: prio.color,
-                                color: 'white',
+                                display: 'flex',
+                                justifyContent: 'space-between',
                             }}
                         >
-                            {prio.title}
+                            <div
+                                style={{
+                                    width: 'fit-content',
+                                    paddingLeft: 10,
+                                    paddingRight: 10,
+                                    borderRadius: 5,
+                                    fontWeight: 'bold',
+                                    height: 24,
+                                    backgroundColor: prio.color,
+                                    color: 'white',
+                                }}
+                            >
+                                {prio.title}
+                            </div>
+                            {nguoiGiao && (
+                                <Popover
+                                    content={
+                                        nguoiGiao?.fullName
+                                    }
+                                >
+                                    <Typography.Text>Người giao: {nguoiGiao.fullName}</Typography.Text>
+                                </Popover>
+                            )}
+                           
                         </div>
+                       
                     )
                 : null}
         </article>

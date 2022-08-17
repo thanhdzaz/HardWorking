@@ -153,6 +153,10 @@ class Login extends React.Component<ILoginProps, State>
           <Form
               ref={this.formRef}
               className=""
+              style={{
+                  alignSelf: 'center',
+                  flex: 1,
+              }}
               onFinish={this.handleSubmit}
           >
               {

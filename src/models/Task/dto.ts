@@ -14,6 +14,13 @@ export interface TaskDto{
     projectId: string;
     parentId?: string;
     // tagId?: string;
+    fileAttachs?: File[];
+}
+
+
+interface File {
+    name: string,
+    realUrl: string
 }
 
 

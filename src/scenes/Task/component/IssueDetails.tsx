@@ -9,9 +9,11 @@ import {
     DownOutlined,
     PlusOutlined,
     RightOutlined,
+    SendOutlined,
 } from '@ant-design/icons';
 import { ProFormDateRangePicker, ProFormSlider } from '@ant-design/pro-form';
 import {
+    Avatar,
     Button, Col,
     Form,
     FormInstance,
@@ -19,30 +21,32 @@ import {
     Select,
     Skeleton,
     Spin,
+    Typography,
 } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import Notify from 'components/Notify';
 import { PRIORITY_LIST, STATUS_LIST } from 'constant';
-import { firestore } from 'firebase';
+import { auth, firestore, storage } from 'firebase';
 import { deleteField, getDocs, query, where } from 'firebase/firestore/lite';
 import { checkLog } from 'hook/useCheckLog';
-import { CheckLog, TaskDto } from 'models/Task/dto';
+import { CheckLog, TaskDto,TaskCommentedDto } from 'models/Task/dto';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { taskAtom } from 'stores/atom/task';
 import { userProjectAtom } from 'stores/atom/user';
-import { ACTION, LOGKEYS } from 'utils';
+import { ACTION, getDate, LOGKEYS } from 'utils';
 // import ImageCarousel from './ImageCarousel';
 
 export const IssueDetail:React.FunctionComponent<any> = ({
     id,
     loading,
     setLoading,
-    tasks,
     reloadAndClose,
 }) =>
 {
     const formRef = React.createRef<FormInstance>();
+    const messageRef = React.createRef<Input>();
     const [imageLinks] = useState([]);
     const [currentRecord, setCurrentRecord] = useState<TaskDto>({ id: '0' } as any);
     const userList = useRecoilValue(userProjectAtom);
@@ -51,10 +55,15 @@ export const IssueDetail:React.FunctionComponent<any> = ({
     const [showCkeditor, setCkeditor] = useState(false);
     const [subIssues,setSubIssues] = useState([] as any);
     const [idIssue, setIdIssue] = useState(id);
+    const [repplingMessage, setRepplingMessage] = useState<TaskCommentedDto | null>(null);
     const [hideActivities, setHideActivities] = useState(true);
     // const [imgLoading] = useState(true);
     const [description,setDescription] = useState('');
-    // const tasks = useRecoilValue(taskAtom);
+    const tasks = useRecoilValue(taskAtom);
+    const [message,setMessage] = useState('');
+    const [listMessage,setListMessage] = useState<TaskCommentedDto[]>([]);
+    const [avatar, setAvatar] = useState<string>('');
+
     const [showInputSubIssue, setShowInputSubIssue] = useState(false);
     const titleInputRef = React.createRef<Input>();
     const subIssueInputRef = React.createRef<Input>();
@@ -166,6 +175,24 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         return true;
     };
 
+    const getMessage = async() =>
+    {
+        setMessage('');
+        setRepplingMessage(null);
+        const q = query(
+            firestore.collection('Comments'),
+            where('taskId', '==', id),
+        );
+        const querySnapshot = await getDocs(q);
+        const t: TaskCommentedDto[] = [];
+        querySnapshot.forEach((doc) =>
+        {
+            t.push(doc.data() as any);
+        });
+
+        setListMessage(t.sort((a,b)=>b.time.seconds - a.time.seconds));
+    };
+
     // get list user
 
     useEffect(() =>
@@ -186,7 +213,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                 assignTo: currentRecord?.assignTo ?? null,
                 priority: currentRecord.priority,
                 parentId: currentRecord.parentId,
-                dateRange: [moment(currentRecord.startTime, 'DD/MM/YYYY'), moment(currentRecord.endTime, 'DD/MM/YYYY')],
+                dateRange: [getDate(currentRecord.startTime as any), getDate(currentRecord.endTime as any)],
             });
         }
     }, [currentRecord]);
@@ -218,6 +245,103 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         setSubIssues(l);
     };
 
+
+    const handleSubmitMessage = () =>
+    {
+    
+        console.log({
+            userId: auth.currentUser?.uid,
+            taskId: id,
+            content: message,
+            time: new Date(),
+            ...repplingMessage && repplingMessage !== undefined ? { repply: repplingMessage.id } : {},
+        });
+       
+        firestore.add('Comments',{
+            userId: auth.currentUser?.uid,
+            taskId: id,
+            content: message,
+            time: new Date(),
+            ...repplingMessage && repplingMessage !== undefined ? { repply: repplingMessage.id } : {},
+        }).then(getMessage);
+    };
+
+
+    const handleUploadFile = (file:any) =>
+    {
+        if (file?.target?.files[0])
+        {
+            storage.upload(`public/task/${currentRecord.id}/${file?.target?.files[0].name}`,file?.target?.files[0]).then((response)=>
+            {
+                firestore.update('Tasks',idIssue ?? '', { fileAttachs: [...currentRecord.fileAttachs ?? [] , { name: file?.target?.files[0].name,realUrl: response }] }).then(()=>
+                {
+                    handleGetIssueById();
+                    Notify('success','Cập nhật thành công');
+                });
+            });
+        }
+        else
+        {
+            console.log('file null');
+            
+        }
+        
+    };
+
+    const handleRepply = (message: TaskCommentedDto) =>
+    {
+        messageRef.current?.focus();
+        setRepplingMessage(message);
+    };
+
+    const renderRep = (currMess: TaskCommentedDto) =>
+    {
+        const message = listMessage.find(m=>m.id === currMess.repply);
+
+        const u = userList.find((u) =>u.id === message?.userId);
+
+        return (
+            <div
+                key={message?.id}
+                style={{
+                    width: '99%',
+                    backgroundColor: '#cccccc80',
+                    borderRadius: 10,
+                    paddingLeft: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    justifyContent: 'center',
+                    marginBottom: 5,
+                    opacity: 0.8,
+                }}
+            >
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+
+                    }}
+                >
+                    <Avatar src={u?.avatarUrl} />
+                    <span
+                        style={{
+                            marginLeft: 20,
+                            maxWidth: '90%',
+                        }}
+                    >
+                        <Typography.Text strong>{u?.fullName}</Typography.Text>
+                        <br />
+                        <Typography.Text>{message?.content}</Typography.Text>
+                    </span>
+                </div>
+                <div style={{ color: '#00000090' }}>{moment.unix(message?.time?.seconds as any).format('DD/MM/YYYY HH:mm')}</div>
+
+            </div>
+        );
+    };
+
     // get meta and user by tenant
     useEffect(() =>
     {
@@ -239,23 +363,11 @@ export const IssueDetail:React.FunctionComponent<any> = ({
 
     useEffect(() =>
     {
-        // if (currentRecord.project_id)
-        // {
-        //     getUserInproject(currentRecord.project_id, 'project').then((res) =>
-        //     {
-        //         setUserProject(res.data);
-        //     });
-        // }
-        // if (idIssue)
-        // {
-        //     getConversationByResourceId(idIssue).then((res) =>
-        //     {
-        //         setConversation(res.data);
-        //     });
-        // }
         getLogs();
         getSubIssue();
-
+        const u = userList.find((user)=> user.id === currentRecord.assignTo);
+        setAvatar(u?.avatarUrl ?? '');
+        getMessage();
     }, [currentRecord]);
 
     return (
@@ -473,22 +585,54 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                         /> */}
 
                                 <div style={{ marginTop: 10 }}>
-                                    {/* <Upload
-                                listType="picture-card"
-                                beforeUpload={() => false}
-                                onChange={(e) => handleUploadFile(e)}
-                            >
-                                <div>
-                                    <PlusOutlined />
+                                    <Col
+                                        span={24}
+                                        style={{ marginTop: -8 }}
+                                    >
+                                        <Button
+                                            type="dashed"
+                                            onClick={() =>
+                                            {
+                                                const btn:any = document.querySelectorAll('#input-file-upload')?.[0];
+                                                btn.click();
+                                            }}
+                                        >
+                                            <Input
+                                                id="input-file-upload"
+                                                type="file"
+                                                style={{
+                                                    display: 'none',
+                                                }}
+                                                onChange={handleUploadFile}
+                                            />
+                                            <PlusOutlined />
+                                            Thêm tệp đính kèm
+                                        </Button>
+                                    </Col>
+
                                     <div
                                         style={{
-                                            marginTop: 8,
+                                            display: 'flex',
+                                            flexDirection: 'column',
                                         }}
                                     >
-                    Upload
+                                        {
+                                            currentRecord?.fileAttachs?.map((fileAttachment,index) =>(
+                                                <a
+                                                    key={index}
+                                                    href={fileAttachment.realUrl}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    style={{
+                                                        marginTop: 10,
+                                                    }}
+                                                >
+                                                    {fileAttachment.name}
+
+                                                </a>
+                                            ))
+                                        }
                                     </div>
-                                </div>
-                            </Upload> */}
                                 </div>
                             </Skeleton>
                             <Skeleton
@@ -516,11 +660,11 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                             >
                                                 {
                                                     tasks
-                                                    //         .filter(
-                                                    //             (item:any) =>
-                                                    //                 item.id.toString() !== idIssue &&
-                                                    // !subIssues.map((is) => is.id).includes(item.id),
-                                                    //         )
+                                                        .filter(
+                                                            (item:any) =>
+                                                                item.id.toString() !== idIssue &&
+                                                    !subIssues.map((is) => is.id).includes(item.id),
+                                                        )
                                                         .map((item:any) => (
                                                             <Select.Option
                                                                 key={item.id?.toString()}
@@ -534,6 +678,146 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                     </Col>
                           
                             
+                                </Row>
+                                <Row>
+                                    <Col span={24}>
+                                        <Form.Item
+                                            label="Trao đổi"
+                                            labelCol={{ span: 24 }}
+                                            wrapperCol={{ span: 24 }}
+                                        >
+                                            <Input
+                                                ref={messageRef}
+                                                style={{ width: '100%' }}
+                                                className="child-issue-wrapper"
+                                                placeholder="Nhập tin nhắn trao đổi....."
+                                                value={message}
+                                                addonAfter={(
+                                                    <SendOutlined
+                                                        style={{
+                                                            border: 'none',
+                                                        }}
+                                                        onClick={handleSubmitMessage}
+                                                    />
+                                                )}
+                                                onChange={(e)=>setMessage(e.target.value)}
+                                            />
+                                   
+                                        </Form.Item>
+                                        {
+                                            repplingMessage && (
+                                                <div
+                                                    style={{
+                                                        marginTop: -20,
+                                                        marginBottom: 10,
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        cursor: 'auto',
+                                                    }}
+                                                >
+                                                    Đang trả lời: &nbsp;
+                                                    <Typography.Text
+                                                        style={{
+                                                            width: '85%',
+                                                        }}
+                                                        ellipsis
+                                                    >{repplingMessage.content}
+                                                    </Typography.Text>
+                                                    <Typography.Link
+                                                        onClick={()=>setRepplingMessage(null)}
+                                                    >
+                                                        Bỏ
+                                                    </Typography.Link>
+                                                </div>
+                                            )
+                                        }
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    {
+                                        listMessage.length > 0 && (
+                                            <Col
+                                                span={24}
+                                                className="child-issue-wrapper"
+                                                style={{
+                                                    height: 400,
+                                                    overflowY: 'scroll' ,
+
+                                                }}
+                                            >
+                                                {
+                                                    listMessage.map((message) =>
+                                                    {
+                                                        const u = userList.find((u) =>u.id === message.userId);
+                                                        return (
+                                                            <div
+                                                                key={message.id}
+                                                                style={{
+                                                                    width: '100%',
+                                                                    backgroundColor: '#fff',
+                                                                    borderRadius: 10,
+                                                                    paddingLeft: 10,
+                                                                    display: 'flex',
+                                                                    flexDirection: 'column',
+                                                                    paddingTop: 10,
+                                                                    paddingBottom: 10,
+                                                                    justifyContent: 'center',
+                                                                    marginBottom: 5,
+                                                                }}
+                                                            >
+                                                                {
+                                                                    message.repply && renderRep(message)
+                                                                }
+                                                        
+
+                                                                <div
+                                                                    style={{
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        ...message.repply && { paddingLeft: '10%' },
+                                                                    }}
+                                                                >
+                                                                    <Avatar src={u?.avatarUrl} />
+                                                                    <span
+                                                                        style={{
+                                                                            marginLeft: 20,
+                                                                            maxWidth: '90%',
+                                                                        }}
+                                                                    >
+                                                                        <Typography.Text strong>{u?.fullName}</Typography.Text>
+                                                                        <br />
+                                                                        <Typography.Text>{message.content}</Typography.Text>
+                                                                    </span>
+                                                                </div>
+                                                               
+                                                                <div style={{ color: '#00000090', ...message.repply && { paddingLeft: '10%' } }}>{moment.unix(message.time.seconds).format('DD/MM/YYYY HH:mm')}</div>
+                                                                <div
+                                                                    style={{
+                                                                        width: message.repply ? 200 : 100,
+                                                                        display: 'flex',
+                                                                        justifyContent: 'space-around',
+                                                                        ...message.repply && { paddingLeft: '10%' },
+                                                                    }}
+                                                                >
+                                                                    <Typography.Link
+                                                                        color='red'
+                                                                        onClick={()=>
+                                                                        {
+                                                                            handleRepply(message);
+                                                                        }}
+                                                                    >Trả lời
+                                                                    </Typography.Link>
+                                                                    <Typography.Link color='red'>Thích</Typography.Link>
+                                                                </div>
+                                                        
+                                                            </div>
+                                                        );
+                                                    })
+                                                }
+                                            </Col>
+                                        )
+                                    }
+                                 
                                 </Row>
                             </Skeleton>
                         </div>
@@ -572,10 +856,14 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                 >
                                     <Row>
                                         <Col span={3}>
-                                            {/* <CharacterAvatar
-                                        title={currentUser}
-                                        size={35}
-                                    /> */}
+                                   
+                                            <Avatar
+                                                src={
+                                                    avatar === ''
+                                                        ? 'https://joeschmoe.io/api/v1/random'
+                                                        : avatar
+                                                }
+                                            />
                                         </Col>
                                         <Col span={21}>
                                             <Form.Item name="assignTo">
@@ -584,7 +872,12 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                                     className="user_select"
                                                     allowClear
                                                     // onSelect={(val) => handleUpdate('assignTo', val)}
-                                                    onChange={(val) =>handleUpdate('assignTo', val)}
+                                                    onSelect={(val) =>
+                                                    {
+                                                        const u = userList.find((user)=> user.id === val);
+                                                        setAvatar(u?.avatarUrl ?? '');
+                                                        handleUpdate('assignTo', val);
+                                                    }}
                                                 >
                                                     {userList &&
                         userList.length > 0 &&

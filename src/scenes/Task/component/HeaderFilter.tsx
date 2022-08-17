@@ -2,6 +2,7 @@
 import { DownOutlined } from '@ant-design/icons';
 import { ProFormDateRangePicker } from '@ant-design/pro-form';
 
+import { useDebounce } from 'ahooks';
 import {
     Avatar,
     Button,
@@ -15,10 +16,11 @@ import {
 import Text from 'antd/lib/typography/Text';
 import { CharacterAvatar } from 'components/Avatar/CharacterAvatar';
 import { STATUS_LIST } from 'constant';
-import { auth, firestore } from 'firebase';
+import { auth } from 'firebase';
 import moment from 'moment';
-import { useDebounce } from 'ahooks';
 import { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { userProjectAtom } from 'stores/atom/user';
 
 const formItemLayout = {
     style: {
@@ -56,16 +58,11 @@ const HeaderFilter: React.FunctionComponent<any> = ({
 }) =>
 {
     const [filterObj, setFilterObj] = useState<any>({});
-    const [users, setUsers] = useState<any>([]);
+    const users = useRecoilValue(userProjectAtom);
     const user = auth?.currentUser;
     const [search, setSearch] = useState('');
     const debounceSearch = useDebounce(search);
-    
-    const getUsers = async () =>
-    {
-        const users = await firestore.get('Users');
-        setUsers(users);
-    };
+
 
     const handleChangeFilter = (key, value?) =>
     {
@@ -227,7 +224,6 @@ const HeaderFilter: React.FunctionComponent<any> = ({
 
     useEffect(() =>
     {
-        getUsers();
         getTasks();
     }, []);
 
@@ -311,10 +307,10 @@ const HeaderFilter: React.FunctionComponent<any> = ({
                                             style={{ marginRight: 5 }}
                                             onChange={() => handleChangeFilter('userIds', us.id)}
                                         />
-                                        {us.imageId ? (
+                                        {us.avatarUrl ? (
                                             <Avatar
                                                 size={35}
-                                                // src={getImageUrl(us.imageId)}
+                                                src={us.avatarUrl}
                                             />
                                         ) : (
                                             <CharacterAvatar
@@ -345,6 +341,8 @@ const HeaderFilter: React.FunctionComponent<any> = ({
                             ...formItemLayout,
                             format: 'DD-MM-YYYY',
                             onChange: (value) => handleChangeFilter('dateRange', value),
+                            placeholder: ['Từ ngày', 'Đến ngày'],
+
                         }}
                         width={270}
                         placeholder={['Chọn ngày', 'Chọn ngày']}

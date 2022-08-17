@@ -8,6 +8,8 @@ import { checkLog } from 'hook/useCheckLog';
 import { observer } from 'mobx-react';
 import { TaskDto } from 'models/Task/dto';
 import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { taskAtom } from 'stores/atom/task';
 import { CreateIssuePage } from '../component/CreateTask';
 import HeaderFilter from '../component/HeaderFilter';
 import { IssueDetail } from '../component/IssueDetails';
@@ -19,7 +21,9 @@ const KB = observer((_): JSX.Element =>
     const [visibleIssueCreate, setVisibleIssueCreate] = useState(false);
     const [curentId, setId] = useState('');
 
-    const [task, setTask] = useState<TaskDto[]>([]);
+    const [task, setTask] = useRecoilState <TaskDto[]>(taskAtom);
+
+
     const [filteredTasks, setFilteredTasks] = useState<TaskDto[]>([]);
 
     const [data, setData] = useState({

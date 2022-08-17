@@ -421,6 +421,7 @@ class Lane extends Component
               key={id}
               draggable={false}
               className={allClassNames}
+              title=''
               onClick={() => onLaneClick && onLaneClick(id)}
           >
               {this.renderHeader({ id, cards, ...otherProps })}

@@ -9,7 +9,7 @@ const Footer = (): JSX.Element =>
             className="footer"
             style={{ marginTop: 0, marginBottom: 0, paddingTop: 5, paddingBottom: 3, textAlign: 'center' }}
         >
-      TTSX - © {year}
+      HardWorking - © {year}
         </Layout.Footer>
     );
 };
