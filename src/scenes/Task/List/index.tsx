@@ -6,8 +6,11 @@ import Notify from 'components/Notify';
 import { PRIORITY_LIST, STATUS_LIST } from 'constant';
 import { firestore } from 'firebase';
 import { getDocs, query, where } from 'firebase/firestore/lite';
+import { isGranted } from 'lib/abpUtility';
 import { TaskDto } from 'models/Task/dto';
 import { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { permissionsAtom } from 'stores/atom/permission';
 import HeaderFilter from '../component/HeaderFilter';
 import { IssueDetail } from '../component/IssueDetails';
 import '../index.less';
@@ -19,6 +22,16 @@ const ListView = (): JSX.Element =>
   const [filteredTasks, setFilteredTasks] = useState<any>([]);
   const [users, setUsers] = useState<any>([]);
   const [taskId, setTaskId] = useState<string>();
+  const permissionList = useRecoilValue(permissionsAtom);
+
+
+  const handleDeleteIssue = (id:string) =>
+  {
+      firestore.delete('Tasks',id).then(() =>
+      {
+        getTasks();
+      });
+  };
 
   const columns: any = [
     {
@@ -54,12 +67,15 @@ const ListView = (): JSX.Element =>
               >
                 Sửa
               </Menu.Item>
-              {/* <Menu.Item
-                  key="1"
-                  onClick={() => handleDeleteIssue(id)}
-              >
+              {
+              isGranted('TASK_DELETE',permissionList) && (
+<Menu.Item
+    key="1"
+    onClick={() => handleDeleteIssue(id)}
+>
                 Xóa
-              </Menu.Item> */}
+</Menu.Item>
+)}
             </Menu>
           )}
             className="user-drop-down"

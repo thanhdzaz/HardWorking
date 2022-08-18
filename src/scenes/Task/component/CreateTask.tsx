@@ -208,7 +208,7 @@ export function CreateIssuePage({
                                 ))
                                 : ''}
                         </Row>
-                        <div style={{ marginTop: 10 }}>
+                        <div style={{ display: 'none' }}>
                             <Upload
                                 listType="picture-card"
                                 // disabled={!permissions.DW__WORK__EDIT}

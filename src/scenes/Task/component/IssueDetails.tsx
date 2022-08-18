@@ -94,6 +94,8 @@ export const IssueDetail:React.FunctionComponent<any> = ({
 
     const handleGetIssueById = () =>
     {
+        console.log('issue');
+
         firestore.getByDoc('Tasks',idIssue ?? '').then(setCurrentRecord);
     };
 
@@ -177,11 +179,13 @@ export const IssueDetail:React.FunctionComponent<any> = ({
 
     const getMessage = async() =>
     {
+        console.log('message');
+        
         setMessage('');
         setRepplingMessage(null);
         const q = query(
             firestore.collection('Comments'),
-            where('taskId', '==', id),
+            where('taskId', '==', idIssue),
         );
         const querySnapshot = await getDocs(q);
         const t: TaskCommentedDto[] = [];
@@ -201,26 +205,11 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         handleGetIssueById();
     }, [idIssue]);
 
-    // set data
-    useEffect(() =>
-    {
-        if (formRef.current && currentRecord.id !== '0')
-        {
-            
-           
-            formRef?.current?.setFieldsValue({
-                ...currentRecord,
-                assignTo: currentRecord?.assignTo ?? null,
-                priority: currentRecord.priority,
-                parentId: currentRecord.parentId,
-                dateRange: [getDate(currentRecord.startTime as any), getDate(currentRecord.endTime as any)],
-            });
-        }
-    }, [currentRecord]);
-
 
     const getLogs = async() =>
     {
+        console.log('logs');
+
         const q = query(firestore.collection('CheckLogs'),where('taskId', '==', currentRecord.id));
         const querySnapshot = await getDocs(q);
                 
@@ -356,6 +345,7 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         delete parent.id;
         delete parent.assignTo;
         delete parent.parentId;
+        delete parent.fileAttachs;
         firestore.add('Tasks',{ ...parent,parentId: currentRecord.id,title }).then(getSubIssue);
         
     };
@@ -368,7 +358,24 @@ export const IssueDetail:React.FunctionComponent<any> = ({
         const u = userList.find((user)=> user.id === currentRecord.assignTo);
         setAvatar(u?.avatarUrl ?? '');
         getMessage();
+
+        if (formRef.current && currentRecord.id !== '0')
+        {
+            
+           
+            formRef?.current?.setFieldsValue({
+                ...currentRecord,
+                assignTo: currentRecord?.assignTo ?? null,
+                priority: currentRecord.priority,
+                parentId: currentRecord.parentId,
+                dateRange: [getDate(currentRecord.startTime as any), getDate(currentRecord.endTime as any)],
+            });
+        }
     }, [currentRecord]);
+
+    console.log('currentRecord',currentRecord);
+    console.log('message',message);
+
 
     return (
         <Modal
@@ -959,7 +966,13 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                     active
                                 >
                                     <Row>
-                                        <Col span={24}>
+                                        <Col
+                                            span={24}
+                                            style={{
+                                                overflowY: hideActivities ? 'auto' : 'hidden',
+                                                maxHeight: '32vh',
+                                            }}
+                                        >
                                             <Title level={5}>
                                                 Lịch sử &nbsp;
                                                 {!hideActivities
@@ -978,7 +991,12 @@ export const IssueDetail:React.FunctionComponent<any> = ({
                                             </Title>
                                             {
                                                 !hideActivities && (
-                                                    <div>
+                                                    <div
+                                                        style={{
+                                                            overflowY: hideActivities ? 'auto' : 'scroll',
+                                                            maxHeight: '32vh',
+                                                        }}
+                                                    >
                                                         {
                                                             logs.map((log) =>
                                                             {
