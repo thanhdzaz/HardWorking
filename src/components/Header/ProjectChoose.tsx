@@ -69,8 +69,7 @@ const ProjectChoose = observer(
 
                     userQuerySnapshot.forEach((doc) =>
                     {
-                        console.log(doc.id,'=>',doc.data());
-                        user.push(doc.data() as any);
+                        user.push({ ...doc.data(),id: doc.id } as any);
                     });
                 
                 }

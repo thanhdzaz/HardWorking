@@ -11,11 +11,12 @@ import { TaskDto } from 'models/Task/dto';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { permissionsAtom } from 'stores/atom/permission';
+import { taskAtom } from 'stores/atom/task';
 import HeaderFilter from '../component/HeaderFilter';
 import { IssueDetail } from '../component/IssueDetails';
 import '../index.less';
 
-const ListView = (): JSX.Element =>
+const ListView: React.FunctionComponent<any> = (): JSX.Element =>
 {
   const [visibleIssuePopupDetail, setVisibleIssuePopupDetail] = useState(false);
   const [tasks, setTasks] = useState<any>([]);
@@ -23,14 +24,23 @@ const ListView = (): JSX.Element =>
   const [users, setUsers] = useState<any>([]);
   const [taskId, setTaskId] = useState<string>();
   const permissionList = useRecoilValue(permissionsAtom);
+  const taskLocalList = useRecoilValue(taskAtom);
 
 
-  const handleDeleteIssue = (id:string) =>
-  {
-      firestore.delete('Tasks',id).then(() =>
-      {
+  const handleDeleteIssue = (id: string) =>
+{
+    const taskFiltered = taskLocalList.filter((task) => task?.parentId?.toString() === id.toString());
+    if (taskFiltered.length === 0)
+{
+      firestore.delete('Tasks', id).then(() =>
+{
         getTasks();
       });
+    }
+else
+{
+      Notify('error',`Công việc này đang có ${taskFiltered.length} công việc con, không thể xóa!!`);
+    }
   };
 
   const columns: any = [
@@ -60,22 +70,22 @@ const ListView = (): JSX.Element =>
               <Menu.Item
                   key="2"
                   onClick={() =>
-                  {
-                    setTaskId(id);
-                    togglePopupDetail();
-                  }}
+{
+                  setTaskId(id);
+                  togglePopupDetail();
+                }}
               >
                 Sửa
               </Menu.Item>
               {
-              isGranted('TASK_DELETE',permissionList) && (
-<Menu.Item
-    key="1"
-    onClick={() => handleDeleteIssue(id)}
->
-                Xóa
-</Menu.Item>
-)}
+                isGranted('TASK_DELETE', permissionList) && (
+                  <Menu.Item
+                      key="1"
+                      onClick={() => handleDeleteIssue(id)}
+                  >
+                    Xóa
+                  </Menu.Item>
+                )}
             </Menu>
           )}
             className="user-drop-down"
@@ -123,10 +133,10 @@ const ListView = (): JSX.Element =>
                 per > 75
                   ? '#00F044'
                   : per <= 75
-                  ? '#F58632'
-                  : per <= 25
-                  ? '#E5493A'
-                  : 'grey'
+                    ? '#F58632'
+                    : per <= 25
+                      ? '#E5493A'
+                      : 'grey'
               }
                 strokeLinecap="butt"
                 status="active"
@@ -143,11 +153,11 @@ const ListView = (): JSX.Element =>
       render: (txt) =>
 {
         const user = users?.find((u) => u.id === txt);
-       if (user)
+        if (user)
 {
-         return `${user.fullName}`;
-       }
-       return txt === '-' ? 'Chưa có' : txt;
+          return `${user.fullName}`;
+        }
+        return txt === '-' ? 'Chưa có' : txt;
       },
     },
     {
@@ -155,14 +165,14 @@ const ListView = (): JSX.Element =>
       title: 'Người giao',
       dataIndex: 'assigned_by',
       render: (txt) =>
-      {
-              const user = users?.find((u) => u.id === txt);
-             if (user)
-      {
-               return `${user.fullName}`;
-             }
-             return txt === '-' ? 'Chưa có' : txt;
-            },
+{
+        const user = users?.find((u) => u.id === txt);
+        if (user)
+{
+          return `${user.fullName}`;
+        }
+        return txt === '-' ? 'Chưa có' : txt;
+      },
     },
     {
       align: 'center',
@@ -201,14 +211,14 @@ const ListView = (): JSX.Element =>
             style={{ width: '100%' }}
             onChange={(val) => handleChangeStatus(val, item.id)}
         >
-         {STATUS_LIST.map(st => (
-      <Select.Option
-          key={st.id}
-          value={st.id}
-      >
-        {st.title}
-      </Select.Option>
-))}
+          {STATUS_LIST.map(st => (
+            <Select.Option
+                key={st.id}
+                value={st.id}
+            >
+              {st.title}
+            </Select.Option>
+          ))}
         </Select>
       ),
     },
@@ -249,8 +259,8 @@ const ListView = (): JSX.Element =>
     setUsers(users);
   };
 
-    function handleChangeStatus(val, id)
-  {
+  function handleChangeStatus(val, id)
+{
     const data = {
       status: val,
     };
@@ -260,7 +270,7 @@ const ListView = (): JSX.Element =>
       getTasks();
     });
 
-    }
+  }
 
   useEffect(() =>
 {

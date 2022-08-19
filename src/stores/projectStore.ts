@@ -28,8 +28,6 @@ class ProjectStore
       const project:ProjectDto[] = [];
       querySnapshot.forEach((doc) =>
       {
-          console.log(doc.data(),'up');
-        
           ids.push(doc.data().projectId);
       });
       if (ids.length > 0)

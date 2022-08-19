@@ -67,7 +67,7 @@ const ProjectManagement = (): JSX.Element =>
     const getProject = async () =>
     {
         const project = await getDocs(projectCollection);
-        const projectList:ProjectDto[] = project.docs.map(doc => doc.data() as ProjectDto);
+        const projectList:ProjectDto[] = project.docs.map(doc => ({ ...doc.data(),id: doc.id }) as ProjectDto);
         setProjectData(projectList);
         return projectList;
     };

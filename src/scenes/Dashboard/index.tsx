@@ -1,13 +1,8 @@
 
-import { Row, Col, Card } from 'antd';
-import { CheckOutlined, QuestionOutlined, MessageOutlined, UserAddOutlined } from '@ant-design/icons';
-import './index.less';
-import TinyLineChartExample from './components/TinyLineChartExample';
-import BarChartExample from './components/BarChartExample';
-import PieChartExample from './components/PieChartExample';
-import LineChartExample from './components/LineChartExample';
-import ListExample from './components/ListExample';
+import { CheckOutlined, MessageOutlined, QuestionOutlined, UserAddOutlined } from '@ant-design/icons';
+import { Card, Col, Row } from 'antd';
 import React from 'react';
+import './index.less';
 
 
 export class Dashboard extends React.Component<any>
@@ -15,10 +10,6 @@ export class Dashboard extends React.Component<any>
     async componentDidMount(): Promise<void>
     {
         setTimeout(() => this.setState({ cardLoading: false }), 1000);
-        setTimeout(() => this.setState({ lineChartLoading: false }), 1500);
-        setTimeout(() => this.setState({ barChartLoading: false }), 2000);
-        setTimeout(() => this.setState({ pieChartLoading: false }), 1000);
-
     }
 
   state = {
@@ -30,13 +21,13 @@ export class Dashboard extends React.Component<any>
 
   render(): JSX.Element
   {
-      const { cardLoading, lineChartLoading, barChartLoading, pieChartLoading } = this.state;
+      const { cardLoading } = this.state;
 
-      const visitorStatisticList = [
-          { title: 'TODAY', body: '1.200 user' },
-          { title: 'YESTERDAY', body: '3.872 user' },
-          { title: 'LAST WEEK', body: '26.582 user' },
-      ];
+      //   const visitorStatisticList = [
+      //       { title: 'TODAY', body: '1.200 user' },
+      //       { title: 'YESTERDAY', body: '3.872 user' },
+      //       { title: 'LAST WEEK', body: '26.582 user' },
+      //   ];
 
       return (
           <div>
@@ -139,7 +130,7 @@ export class Dashboard extends React.Component<any>
                   </Col>
               </Row>
 
-              <Row>
+              {/* <Row>
                   <Col span={24}>
                       <Card
                           className="dashboardBox"
@@ -227,7 +218,7 @@ export class Dashboard extends React.Component<any>
                           <PieChartExample />
                       </Card>
                   </Col>
-              </Row>
+              </Row> */}
           </div>
       );
   }

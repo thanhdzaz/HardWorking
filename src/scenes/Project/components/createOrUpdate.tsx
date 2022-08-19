@@ -127,7 +127,7 @@ export const CreateOrUpdateProject: React.FC<propType> = ({
         {
             await firestore.update('project', record?.id as any, val).then(() =>
             {
-                Notify('success', 'Thêm mới thành công');
+                Notify('success', 'Cập nhật thành công');
                 getProject();
                 setProjectId(record?.id);
             });
