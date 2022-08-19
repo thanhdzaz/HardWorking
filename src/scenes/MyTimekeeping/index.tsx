@@ -3,6 +3,35 @@ import ProTable from '@ant-design/pro-table';
 import { auth, firestore } from 'firebase';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
+import Download from 'components/ExportExcelButton';
+
+const columnsExcel = [
+    {
+        label: 'Ngày',
+        widthPx: 100,
+        value: 'date',
+    },
+    {
+        label: 'Số giờ không tính lương',
+        widthPx: 300,
+        value: 'noSalaryTime',
+    },
+    {
+        label: 'Số giờ tính lương',
+        widthPx: 300,
+        value: 'salaryTime',
+    },
+    {
+        label: 'Số giờ đi muộn',
+        widthPx: 300,
+        value: 'lateTime',
+    },
+    {
+        label: 'Số giờ về sớm',
+        widthPx: 300,
+        value: 'soonTime',
+    },
+];
 
 const MyAttendance = (): JSX.Element =>
 {
@@ -292,6 +321,13 @@ const MyAttendance = (): JSX.Element =>
                 rowKey={(e) => e.date}
                 search={false}
                 dataSource={displayData}
+                headerTitle={(
+                    <Download
+                        columns={columnsExcel}
+                        data={dataTimekeeping}
+                        fileName="Chấm công của tôi"
+                    />
+                )}
                 bordered
             />
         </div>

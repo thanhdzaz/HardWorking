@@ -1,8 +1,7 @@
 import ProTable from '@ant-design/pro-table';
 import { Spin } from 'antd';
-
 import React, { useEffect, useRef, useState } from 'react';
-
+import Download from 'components/ExportExcelButton';
 import moment from 'moment';
 import './index.less';
 
@@ -10,6 +9,7 @@ const Week: React.FunctionComponent<any> = ({
     dataUsers,
     dataTimekeeping,
     dateRange,
+    coloumnsExcel,
 }) =>
 {
     const [loading, setLoading] = useState(true);
@@ -189,6 +189,13 @@ const Week: React.FunctionComponent<any> = ({
                 }}
                 search={false}
                 rowKey={(e: any) => e.id}
+                headerTitle={(
+                    <Download
+                        columns={coloumnsExcel}
+                        data={dataTimekeeping}
+                        fileName="Tổng hợp chấm công"
+                    />
+                )}
                 bordered
             />
         </Spin>

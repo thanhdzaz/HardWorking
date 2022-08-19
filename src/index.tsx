@@ -13,8 +13,10 @@ import initializeStores from './stores/storeInitializer';
 
 import ConfigProvider from 'antd/es/config-provider';
 import { RecoilRoot } from 'recoil';
+import moment from 'moment';
+import 'moment/locale/vi';
 
- 
+
 // moment.tz.setDefault(abp.timing.timeZoneInfo.iana.timeZoneId);
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -24,6 +26,7 @@ import { RecoilRoot } from 'recoil';
 
 
 const stores = initializeStores();
+moment().locale('vi');
 
 firebaseApp();
 

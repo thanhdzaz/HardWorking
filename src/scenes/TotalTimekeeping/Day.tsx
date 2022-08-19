@@ -2,10 +2,10 @@ import ProTable from '@ant-design/pro-table';
 import { Spin } from 'antd';
 
 import React, { useEffect, useRef, useState } from 'react';
-
+import Download from 'components/ExportExcelButton';
 import './index.less';
 
-const Day:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
+const Day:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, coloumnsExcel }) =>
 {
     const [loading, setLoading] = useState<any>(false);
     const [dataDisplay, setDataDisplay] = useState<any>([]);
@@ -124,6 +124,13 @@ const Day:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
                 }}
                 search={false}
                 rowKey={(e:any) => e.id}
+                headerTitle={(
+                    <Download
+                        columns={coloumnsExcel}
+                        data={dataTimekeeping}
+                        fileName="Tổng hợp chấm công"
+                    />
+                )}
             />
         </Spin>
     );
