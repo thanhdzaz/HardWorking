@@ -120,7 +120,7 @@ const Day:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, coloumns
                 pagination={{
                     pageSize: 10,
                     showTotal: (total, range) =>
-                        `${range[0]} - ${range[1]} trên ${total} ca`,
+                        `${range[0]} - ${range[1]} trên ${total} bản ghi`,
                 }}
                 search={false}
                 rowKey={(e:any) => e.id}

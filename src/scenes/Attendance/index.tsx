@@ -1,24 +1,24 @@
-import { DoubleRightOutlined, SettingTwoTone } from '@ant-design/icons';
+import { DoubleRightOutlined } from '@ant-design/icons';
 import { notification } from 'antd';
 import Notify from 'components/Notify';
 import { SHIFT_OBJ } from 'constant';
 import { auth, firestore } from 'firebase';
 import { getDocs, query, where } from 'firebase/firestore/lite';
 
+import ipRangeCheck from 'ip-range-check';
 import moment from 'moment';
 import 'moment/locale/vi';
 import { memo, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ACTIVE } from './constant';
-import ipRangeCheck from 'ip-range-check';
 import './index.less';
+// import localIpV4Address from 'local-ipv4-address';
 
 const Attendance = (): JSX.Element =>
 {
     const [time, setTime] = useState(moment());
     const [leaves, setLeaves] = useState<any>([]);
     const [ips, setIps] = useState<any>([]);
-    const [myIp, setMyIp] = useState<any>([]);
+    const [myIp, setMyIp] = useState<any>();
     const [attendanceRecord, setAttendanceRecord] = useState<any>({});
     const user = auth?.currentUser;
 
@@ -29,7 +29,9 @@ const Attendance = (): JSX.Element =>
 
     const getActiveIps = async () =>
     {
-        firestore.get('IpConfig').then((data) => setIps(data.filter(d => d.status === ACTIVE)));
+        firestore
+            .get('IpConfig')
+            .then((data) => setIps(data.filter((d) => d.status === ACTIVE)));
     };
 
     const convertMsToHourMinSecondFormat = (milisecond) =>
@@ -74,7 +76,10 @@ const Attendance = (): JSX.Element =>
 
     const handleCheckValidIp = (ip) =>
     {
-        const isValid = ipRangeCheck(ip, ips.map(i => i.name));
+        const isValid = ipRangeCheck(
+            ip,
+            ips.map((i) => i.name),
+        );
         if (isValid)
         {
             return true;
@@ -86,6 +91,7 @@ const Attendance = (): JSX.Element =>
     const handleCheckin = (): boolean =>
     {
         const isValid = handleCheckValidIp(myIp);
+
         if (isValid)
         {
             const isLeave = leaves.find(
@@ -96,6 +102,12 @@ const Attendance = (): JSX.Element =>
 
             if (attendanceRecord.checkInTime)
             {
+                notification.warning({
+                    message: `Bạn đã check in vào lúc ${moment(
+                        attendanceRecord.checkInTime,
+                    ).format('HH:mm:ss')}`,
+                    placement: 'topRight',
+                });
                 return false;
             }
 
@@ -147,10 +159,10 @@ const Attendance = (): JSX.Element =>
         if (isValid)
         {
             // nếu đã check out hoặc chưa check in thì không cho check nữa
-            if (attendanceRecord.checkOutTime)
-            {
-                return false;
-            }
+            // if (attendanceRecord.checkOutTime)
+            // {
+            //     return false;
+            // }
             if (!attendanceRecord.checkInTime)
             {
                 notification.warning({
@@ -223,7 +235,7 @@ const Attendance = (): JSX.Element =>
 
             firestore
                 .update('Timekeeping', attendanceRecord.id, {
-                    checkOutTime: checkInTime.format('YYYY-MM-DD HH:mm:ss'),
+                    checkOutTime: checkOutTime.format('YYYY-MM-DD HH:mm:ss'),
                     salaryTime,
                     soonTime,
                     lateTime,
@@ -303,11 +315,11 @@ const Attendance = (): JSX.Element =>
 
     return (
         <div className="attendances-container">
-            <div className="setting-btn">
+            {/* <div className="setting-btn">
                 <Link to="/network-config">
                     <SettingTwoTone className="icon" />
                 </Link>
-            </div>
+            </div> */}
             <div className="header">
                 <h1 className="title">Chấm công</h1>
                 <div className="note">
@@ -324,18 +336,14 @@ const Attendance = (): JSX.Element =>
             </div>
             <div className="content">
                 <div
-                    className={`attendance-btn checkin-btn ${
-                        attendanceRecord.checkInTime ? 'is-check' : ''
-                    }`}
+                    className="attendance-btn check-in-btn"
                     onClick={handleCheckin}
                 >
                     <DoubleRightOutlined />
                     <span className="text">Check-in</span>
                 </div>
                 <div
-                    className={`attendance-btn checkout-btn ${
-                        attendanceRecord.checkOutTime ? 'is-check' : ''
-                    }`}
+                    className="attendance-btn check-out-btn"
                     onClick={handleCheckout}
                 >
                     <DoubleRightOutlined />

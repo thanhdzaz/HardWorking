@@ -30,33 +30,41 @@
     justify-content: space-evenly;
     align-items: center;
     .attendance-btn {
-        width: 300px;
-        height: 300px;
-        display: flex;
-        font-size: 35px;
-        color: #fff;
-        justify-content: center;
-        align-items: center;
-        border-radius: 50%;
-        background-color: rgba(24, 144, 255, 0.8);
-        cursor: pointer;
+      width: 300px;
+      height: 300px;
+      display: flex;
+      font-size: 35px;
+      color: #fff;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      cursor: pointer;
+      .text {
+        margin-left: 10px;
+    }
+    }
+    .check-in-btn {
+        background-color: rgba(255, 37, 37, 0.8);
         &:hover {
-            background-color: rgb(17, 138, 252);
-        }
-        .text {
-            margin-left: 10px;
+            background-color: rgba(255, 37, 37, 1);
         }
     }
+    .check-out-btn {
+      background-color: rgba(56, 255, 17, 0.8);
+      &:hover {
+        background-color: rgba(56, 255, 17, 1);
+      }
+      .text {
+          margin-left: 10px;
+      }
+  }
     .is-check {
       background-color: #666;
       &:hover {
         background-color: #666;
     }
     }
-    .checkin-btn {
-    }
-    .checkout-btn {
-    }
+
   }
 
   .setting-btn {

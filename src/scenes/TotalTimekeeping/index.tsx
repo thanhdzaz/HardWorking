@@ -82,8 +82,6 @@ const TotalTimeKeeping = (): JSX.Element =>
     setDataTimekeeping(timekeepings);
   };
 
-  console.log(dataTimekeeping);
-
   const getUsers = async () =>
 {
     const us = await firestore.get('Users');
@@ -304,6 +302,7 @@ viewMode === 'week'
               <DatePicker
                   name="date"
                   format='DD-MM-YYYY'
+                  value={date}
                   placeholder="Chọn ngày"
                   allowClear={false}
                   onChange={handleSelectDate}

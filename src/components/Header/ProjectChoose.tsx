@@ -59,7 +59,6 @@ const ProjectChoose = observer(
                 {
                     ids.push(doc.data().userId);
                 });
-                console.log(ids,'ids');
                 
                 if (ids.length > 0)
                 {
@@ -73,7 +72,6 @@ const ProjectChoose = observer(
                     });
                 
                 }
-                console.log(user,'user');
                 
                 setUser(user);
             }

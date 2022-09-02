@@ -104,11 +104,9 @@ const MyAttendance = (): JSX.Element =>
         let totalSalarySeconds = 0;
         let totalLateSeconds = 0;
         let totalSoonSeconds = 0;
-        dates.forEach((date) =>
+        dates.forEach((date) => // Lặp qua các ngày trong mảng
         {
-            const dataOfDate: any[] = dataTimekeeping.filter(
-                (dt: any) => dt.date === date,
-            );
+            const dataOfDate: any[] = dataTimekeeping.filter((dt: any) => dt.date === date && dt.checkInTime && dt.checkOutTime);
             if (dataOfDate.length)
             {
                 let totalSeconds = 0;
@@ -291,6 +289,8 @@ const MyAttendance = (): JSX.Element =>
                     placeholder={['Chọn ngày', 'Chọn ngày']}
                     fieldProps={{
                         onChange: handleSelectDateRange,
+                        value: [moment(), moment()],
+                        format: 'DD/MM/YYYY',
                     }}
                 />
             </div>
