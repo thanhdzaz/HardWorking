@@ -24,6 +24,7 @@ import React from 'react';
 import rules from './index.validation';
 import Cookies from 'js-cookie';
 import ProjectStore from 'stores/projectStore';
+import Notify from 'components/Notify';
 
 
 const FormItem = Form.Item;
@@ -97,39 +98,27 @@ class Login extends React.Component<ILoginProps, State>
           })
           .catch((_error) =>
           {
-              //   const errorCode = error.code;
-              //   const errorMessage = error.message;
+              const errorCode = _error.code;
+              this.setState({ loading: false });
+
+              switch (errorCode)
+              {
+                  case 'auth/invalid-email':
+                  {
+                      Notify('error',`Địa chỉ email '${values.userNameOrEmailAddress}' không tồn tại trên hệ thống tài khoản!!`);
+                      break;
+                  }
+                  case 'auth/wrong-password':
+                  {
+                      Notify('error','Bạn đã nhập sai mật khẩu vui lòng kiểm tra lại!!');
+                      break;
+                  }
+                  default:
+                      break;
+              }
+
           });
 
-      //   await authenticationStore
-      //       ?.login(values)
-      //       .then((_rs) =>
-      //       {
-      //           if (_rs === true)
-      //           {
-
-              
-      //               sessionStorage.setItem('rememberMe', loginModel.rememberMe ? '1' : '0');
-      //               const { state } = location;
-      //               window.location = state ? state.from.pathname : '/';
-      //           }
-      //           else
-      //           {
-                  
-      //               setTimeout(() =>
-      //               {
-      //                   this.setState({ loading: false });
-      //                   Notify('error',_rs);
-      //               },1000);
-      //           }
-      //       })
-      //       .catch((err) =>
-      //       {
-      //           const error = err as AxiosError;
-      //           console.log('catch',error);
-      //           Notify('error', error.response?.data.error.details);
-      //       });
-      //   //   this.setState({ loading: false });
 
   };
   showModal = (): void =>
