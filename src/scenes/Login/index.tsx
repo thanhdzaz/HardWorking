@@ -25,6 +25,8 @@ import rules from './index.validation';
 import Cookies from 'js-cookie';
 import ProjectStore from 'stores/projectStore';
 import Notify from 'components/Notify';
+import { firestore } from 'firebase';
+import { UserInfo } from 'models/User/dto';
 
 
 const FormItem = Form.Item;
@@ -86,15 +88,25 @@ class Login extends React.Component<ILoginProps, State>
           {
               // Signed in
               const user = userCredential.user;
-              console.log(user,'hehe');
-              Cookies.set('Abp.AuthToken',user.getIdToken());
+              await firestore.getByDoc('Users',user.uid).then((doc:UserInfo)=>
+              {
+                  if (doc.disable)
+                  {
+                      Notify('error','Tài khoản của bạn bị khóa hãy liên hệ quản trị viên để biết thêm chi tiết');
+                      auth.signOut();
+                  }
+                  else
+                  {
+                      Cookies.set('Abp.AuthToken',user.getIdToken());
+                      const { state } = location as any;
+                      
+                      window.location = state ? state.from.pathname : '/';
+                  }
+                
+              });
               this.setState({ loading: false });
               
-              const { state } = location as any;
-              
-              window.location = state ? state.from.pathname : '/';
-            
-              // ...
+
           })
           .catch((_error) =>
           {
