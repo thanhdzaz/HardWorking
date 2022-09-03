@@ -169,21 +169,18 @@ const User = (): JSX.Element =>
                     <CreateUser
                         onClose={async () =>
                         {
-                            console.log('????1');
-
-                            await getAllUsers();
                             setVisible(false);
+                            getAllUsers();
                         }}
-                        onOk={
-                            async (p) =>
+                        onOk={(result) =>
+                        {
+                            if (result === true)
                             {
-                                const result = await p;
-                                if (result === true)
-                                {
-                                    Notify('success', 'Tạo mới người dùng thành công');
-                                    getAllUsers();
-                                }
+                                getAllUsers();
+                                setVisible(false);
+                                Notify('success', 'Tạo mới người dùng thành công');
                             }
+                        }
                         }
                     />
                 )

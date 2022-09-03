@@ -141,26 +141,43 @@ class FirestoreService
 
        try
        {
+           let result:any = false;
            const auth = getAuth(firebaseAppForUser());
-           createUserWithEmailAndPassword(auth, user.email, user.password ?? '123456')
+           await createUserWithEmailAndPassword(auth, user.email, user.password ?? '123456')
                .then(async(userCredential) =>
                {
                // Signed in
                    const u = userCredential.user;
                    await this.addWithId('Users',u.uid,user);
+                   result = true;
                // ...
                })
-               .catch((error) =>
+               .catch((error:any) =>
                {
-               //    const errorCode = error.code;
-                   const errorMessage = error.message;
-                   Notify('error',errorMessage);
+                   const errorCode = error.code;
+                   switch (errorCode)
+                   {
+                       case 'auth/email-already-in-use':
+                       {
+                           Notify('error',`Địa chỉ email '${user.email}' đã tồn tại trên hệ thống tài khoản!!`);
+                           result = false;
+                           break;
+                       }
+                       case 'auth/wrong-password':
+                       {
+                           Notify('error','Bạn đã nhập sai mật khẩu vui lòng kiểm tra lại!!');
+                           break;
+                       }
+                       default:
+                           break;
+                   }
                // ..
                });
-           return Promise.resolve(user);
+           return Promise.resolve(result);
        }
        catch (error)
        {
+           console.log(error);
         
            return Promise.reject(error);
        }

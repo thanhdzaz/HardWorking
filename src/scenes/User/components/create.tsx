@@ -7,7 +7,7 @@ import { useRef } from 'react';
 const avatarDefault = 'https://icon-library.com/images/avatar-png-icon/avatar-png-icon-13.jpg';
 interface Props{
     onClose: (_event: any) => void
-    onOk: (_p:Promise<any>) => void
+    onOk: (_p:boolean) => void
 }
 
 export const CreateUser:React.FunctionComponent<Props> = ({
@@ -29,16 +29,12 @@ export const CreateUser:React.FunctionComponent<Props> = ({
             onCancel={onClose}
             onOk={()=>
             {
-                form.current?.validateFields().then((val: UserInfo)=>
+                form.current?.validateFields().then(async (val: UserInfo)=>
                 {
-                    onOk(new Promise((resolve,_reject) =>
-                    {
-                        return resolve(async()=>
-                        {
-                            await firestore.createUser({ ...val,fullName: val.firstName + ' ' + val.lastName,password: '123456',avatarUrl: avatarDefault,disable: false }).then(onClose);
-                            return Promise.resolve(true);
-                        });
-                    }));
+                
+                    const res:boolean = await firestore.createUser({ ...val,fullName: val.firstName + ' ' + val.lastName,password: '123456',avatarUrl: avatarDefault,disable: false });
+                    onOk(res);
+                    
                 }).catch(e=>e);
                 
                 
