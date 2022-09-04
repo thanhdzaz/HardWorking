@@ -6,9 +6,9 @@
     align-items: center;
     .header-filter {
       margin: 24px;
-      width: 70%;
+      width: 100%;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       // align-items: center;
       .title{ 
         // margin-top: 10px;
@@ -16,8 +16,11 @@
         font-weight: bold;
       }
       .header-filter-item {
-        width: 30%;
-        margin-left: 10px
+        width: 300px;
+        margin-left: 20px;
+        .ant-picker{
+          width: 100%;
+        }
       }
     }
   }

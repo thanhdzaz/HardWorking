@@ -133,5 +133,10 @@ export const LEAVE_STATUS_OBJ = {
 
 export const SHIFT_OBJ = {
     startTime: '08:00:00',
-    endTime: '17:00:00',
+    endTime: '18:00:00',
+};
+
+export const LAUCH_OBJ = {
+    startTime: '12:00:00',
+    endTime: '13:30:00',
 };

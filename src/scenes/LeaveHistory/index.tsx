@@ -7,6 +7,7 @@ import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import LeaveForm from './components/LeaveForm';
 import HistoryModal from 'components/HistoryModal';
+import './index.less';
 
 const LeaveHistory = (): JSX.Element =>
 {
@@ -103,8 +104,8 @@ const LeaveHistory = (): JSX.Element =>
 
     const handleOpenHistoryModal = (id) =>
     {
-        toggleModal();
         setId(id);
+        toggleModal();
     };
 
     const getAllMyLeaveHistory = async () =>
@@ -121,6 +122,9 @@ const LeaveHistory = (): JSX.Element =>
         });
         setSearchResult(l);
     };
+
+    console.log(searchResult);
+    
 
     const getAllUsers = async () =>
     {

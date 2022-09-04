@@ -11,7 +11,7 @@ const Download: React.FunctionComponent<any> = ({ columns, data, fileName }) =>
     return (
         <ExcelFile
             element={<Button type="primary"><DownloadOutlined /> Export Excel</Button>}
-            filename="Chấm công"
+            filename={fileName}
         >
             <ExcelSheet
                 data={data}

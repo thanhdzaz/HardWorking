@@ -40,6 +40,33 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
         const startDate = moment(vals.dateRange[0], 'DD-MM-YYYY');
         const endDate = moment(vals.dateRange[1], 'DD-MM-YYYY');
         const totalDayOff = endDate.diff(startDate, 'days') + 1;
+        const dayOffList:any = [];
+        for (let i = 0; i < totalDayOff; i++)
+        {
+            dayOffList.push(startDate.format('YYYY-MM-DD'));
+            startDate.clone().add(1, 'days');
+        }
+
+        // Check xem những ngày mình xin nghỉ mình đã chấm công chưa
+        const timekeepingList:any = [];
+        const queryTimekeeping = query(
+            firestore.collection('Timekeeping'),
+            where('date', 'in', dayOffList),
+            where('userId', '==', auth?.currentUser?.uid),
+        );
+        const queryTimekeepingSnapshot = await getDocs(queryTimekeeping);
+        queryTimekeepingSnapshot.forEach((doc: any) =>
+        {
+            timekeepingList.push(doc.data());
+        });
+
+        if (timekeepingList.length)
+        {
+            Notify('error', `Không thể xin nghỉ vì bạn đã chấm công ngày: ${timekeepingList.map(t => moment(t.date).format('DD/MM/YYYY')).join(', ')}`);
+            return false;
+        }
+        // End check xem những ngày mình xin nghỉ mình đã chấm công chưa
+        
         const leaveRule: any = dataLeaveRule.find(
             (lr) => lr.totalDate === totalDayOff,
         );
@@ -94,9 +121,10 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
         {
         // Nếu số ngày nghỉ có trong quy định nghỉ
             const { totalDateBefore } = leaveRule;
-            const now = moment();
-            const totalDayFromNowToDayOff =
-        moment(startDate, 'YYYY-MM-DD 00:00:00').diff(now, 'days') + 1;
+            const now = moment(moment().format('YYYY-MM-DD'));
+            const totalDayFromNowToDayOff = startDate.diff(now, 'days');
+            console.log(totalDayFromNowToDayOff);
+            
             if (totalDayFromNowToDayOff >= totalDateBefore)
             {
                 status = NGHI_CO_PHEP;
@@ -162,9 +190,9 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
                 gutter={[80, 0]}
                 style={{ padding: 10 }}
             >
-                <Col span={12}>
+                <Col span={24}>
                     <ProFormDateRangePicker
-                        width="xl"
+                        // width={}
                         fieldProps={{ format: 'DD/MM/YYYY' }}
                         name="dateRange"
                         label={'Khoảng thời gian nghỉ'}
@@ -172,10 +200,10 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
                         rules={[{ required: true, message: 'Vui lòng nhập' }]}
                     />
                 </Col>
-                <Col span={12}>
+                <Col span={24}>
                     <ProFormTextArea
+                        // width="100%"
                         name="reason"
-                        width="xl"
                         label="Nội dung xin nghỉ"
                         placeholder="Nhập nội dung xin nghỉ..."
                     />

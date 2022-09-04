@@ -1,10 +1,10 @@
-import { Calendar, Spin } from 'antd';
+import { Calendar, Popover, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 // import { ReactComponent as CalendarIcon } from '@/assets/svg/calendar.svg';
 // import { ReactComponent as ListIcon } from '@/assets/svg/list.svg';
 import './index.less';
 
-const Month:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRange }) =>
+const Month:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
 {
     const [loading, setLoading] = useState(true);
     const [dataCalendar, setDataCalendar] = useState([]);
@@ -13,12 +13,25 @@ const Month:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRa
     {
         const dateCell = value.format('YYYY-MM-DD');
         const data:any = dataCalendar.find((i:any) => i.date === dateCell);
+        
         return data?.totalEmployee
             ? (
-                    <div style={{ fontSize: 17 }}>
-                        <span style={{ fontWeight: 600 }}>{data.totalEmployee}</span>/
-                        {dataUsers.length} thành viên
-                    </div>
+                    <Popover
+                        placement="right"
+                        className="popover-calendar"
+                        content={data.listName.map((name, index) => (
+                            <div key={index}>
+                                {name}
+                            </div>
+                        ))}
+                        trigger="hover"
+                    >
+                        <div style={{ fontSize: 17 }}>
+                            <span style={{ fontWeight: 600 }}>{data.totalEmployee}</span>/
+                            {dataUsers.length} thành viên
+                        </div>
+                    </Popover>
+                    
                 )
             : (
                     ''
@@ -58,34 +71,18 @@ const Month:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping, dateRa
 
             return {
                 date: atendancesOfDate[0].date,
+                listName: Object.keys(dt).map(key => dataUsers.find(us => us.id === key).fullName),
                 totalEmployee: Object.keys(dt).length,
             };
         });
         setDataCalendar(_dataCalendar);
         setLoading(false);
     };
-
+    
     useEffect(() =>
     {
-
         handleMapDataCalendar();
     }, [dataTimekeeping, dataUsers]);
-
-    useEffect(() =>
-    {
-        if (dateRange.length)
-        {
-            const startDate = dateRange[0];
-            const endDate = dateRange[1];
-            const totalDate = endDate.diff(startDate, 'days');
-            const dates:any[] = [];
-            for (let i = 0; i <= totalDate; i++)
-            {
-                const date = startDate.clone().add(i, 'days').format('YYYY-MM-DD');
-                dates.push(date);
-            }
-        }
-    }, [dateRange]);
 
     return (
         <div className="month">

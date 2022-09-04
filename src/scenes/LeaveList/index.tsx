@@ -55,10 +55,10 @@ const LeaveList = (): JSX.Element =>
             dataIndex: 'sendDate',
             align: 'center',
             key: 'name',
-            render: (_, row) => moment(row.startDate).format('DD/MM/YYYY'),
+            render: (_, row) => moment(row.sendDate).format('DD/MM/YYYY'),
         },
         {
-            title: 'Ngày xin đầu nghỉ',
+            title: 'Ngày bắt đầu nghỉ',
             width: 150,
             dataIndex: 'startDate',
             align: 'center',

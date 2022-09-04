@@ -160,22 +160,6 @@ export const appRouters: any = [
                 component: LoadableComponent(() => import('scenes/LeaveList')),
             },
             {
-                path: '/attendance',
-                name: 'attendance',
-                permission: '',
-                title: 'Chấm công',
-                showInMenu: true,
-                component: LoadableComponent(() => import('scenes/Attendance')),
-            },
-            {
-                path: '/network-config',
-                name: 'network-config',
-                permission: '',
-                title: 'Cấu hình dải mạng',
-                showInMenu: true,
-                component: LoadableComponent(() => import('scenes/Attendance/components/IpConfig')),
-            },
-            {
                 path: '/my-timekeeping',
                 name: 'my-timekeeping',
                 permission: '',
