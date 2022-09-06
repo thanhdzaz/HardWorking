@@ -40,41 +40,29 @@ const Month:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
 
     const handleMapDataCalendar = () =>
     {
-        const dates = {};
-        dataTimekeeping.forEach((dt) =>
+        const data = {};
+        dataTimekeeping.map(dt => dt.date).filter((dt, index, arr) => index === arr.indexOf(dt)).forEach((dt) =>
         {
             dataTimekeeping.forEach((d) =>
             {
-                if (dt.date === d.date)
+                if (dt === d.date)
                 {
-                    dates[d.date] = dates[d.date] ? [...dates[d.date], d] : [d];
+                    data[d.date] = data[d.date] ? [...data[d.date], d] : [d];
                 }
             });
         });
 
-        const dt = {};
-        const _dataCalendar:any = Object.keys(dates).map((key) =>
+        // const dt = {};
+        console.log(data);
+        const _dataCalendar:any = Object.keys(data).map((date) =>
         {
-            const atendancesOfDate = dates[key];
-            atendancesOfDate.forEach((at) =>
-            {
-                atendancesOfDate.forEach((a) =>
-                {
-                    if (at.userId === a.userId)
-                    {
-                        dt[a.userId] = dt[a.userId]
-                            ? [...dt[a.userId], a]
-                            : [a];
-                    }
-                });
-            });
-
             return {
-                date: atendancesOfDate[0].date,
-                listName: Object.keys(dt).map(key => dataUsers.find(us => us.id === key).fullName),
-                totalEmployee: Object.keys(dt).length,
+                date: date,
+                listName: data[date].map(tk => dataUsers.find(us => us.id === tk.userId).fullName),
+                totalEmployee: data[date].length,
             };
         });
+
         setDataCalendar(_dataCalendar);
         setLoading(false);
     };
