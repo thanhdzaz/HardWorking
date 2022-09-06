@@ -67,7 +67,7 @@ export const Card = observer((props) =>
             onDoubleClick={onClick}
         >
             {parent && (
-                <Popover content={'Công việc cha'}>
+                <Popover content={parent.title}>
                     <div
                         style={{
                             cursor: 'pointer',

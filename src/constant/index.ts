@@ -18,7 +18,7 @@ export const STATUS_LIST = [
     {
         id: 0,
         title: 'Khởi tạo',
-        color: 'red',
+        color: 'blue',
     },
     {
         id: 1,
@@ -28,17 +28,17 @@ export const STATUS_LIST = [
     {
         id: 2,
         title: 'Hoàn thành',
-        color: '#FFFF00',
+        color: 'green',
     },
     {
         id: 3,
         title: 'Xác nhận',
-        color: '#FFFF00',
+        color: 'orange',
     },
     {
         id: 4,
         title: 'Đóng',
-        color: '#FFFF00',
+        color: 'red',
     },
 ];
 

@@ -8,12 +8,14 @@ import { Select } from 'antd';
 import { firestore } from 'firebase';
 import { getDocs, query, where } from 'firebase/firestore/lite';
 import { UserInfo } from 'models/User/dto';
-import { useEffect } from 'react';
-import { useSetRecoilState } from 'recoil';
+import { useEffect, useState } from 'react';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useStore } from 'stores';
 import { userProjectAtom } from 'stores/atom/user';
 import ProjectStore from 'stores/projectStore';
 import SessionStore from 'stores/sessionStore';
+import { ProjectAtom } from 'stores/atom/project';
+import { useLocation } from 'react-router-dom';
 
 // const { Option } = Select;
 
@@ -21,11 +23,6 @@ export interface IProjectChooseProps {
   sessionStore?: SessionStore;
   projectStore?: ProjectStore;
   os: string;
-}
-
-export interface State {
-    project: any;
-    visible: boolean;
 }
 
 const ProjectChoose = observer(
@@ -39,12 +36,29 @@ const ProjectChoose = observer(
         } = useStore();
 
         const setUser = useSetRecoilState(userProjectAtom);
+        const [project,setProject] = useRecoilState(ProjectAtom);
+        const lo = useLocation();
 
+        const [hidden,setHidden] = useState(false);
 
         useEffect(()=>
         {
             getUserProject();
         },[]);
+
+        useEffect(()=>
+        {
+            console.log(lo);
+            
+            if (hidden && !lo.pathname.includes('dashboard'))
+            {
+                setHidden(false);
+            }
+            if (!hidden && lo.pathname.includes('dashboard'))
+            {
+                setHidden(true);
+            }
+        },[lo]);
     
         const getUserProject = async() =>
         {
@@ -82,17 +96,20 @@ const ProjectChoose = observer(
         {
             sessionStore?.setProject(id);
             localStorage.setItem('project',id);
-            setTimeout(() =>window.location.reload(),200);
+            setProject(id);
         };
-        if (props.os !== 'PC')
+
+        if (hidden || props.os !== 'PC')
         {
             return <div />;
         }
+        
+
         return (
             <>
                 <Select
                     style={{ width: '100%' }}
-                    defaultValue={sessionStore?.project}
+                    defaultValue={project}
                     placeholder="Search to Select"
                     optionFilterProp="children"
                     filterOption={(input:any, option:any) =>

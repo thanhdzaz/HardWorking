@@ -32,7 +32,7 @@ export const CreateUser:React.FunctionComponent<Props> = ({
                 form.current?.validateFields().then(async (val: UserInfo)=>
                 {
                 
-                    const res:boolean = await firestore.createUser({ ...val,fullName: val.firstName + ' ' + val.lastName,password: '123456',avatarUrl: avatarDefault,disable: false });
+                    const res:boolean = await firestore.createUser({ ...val,fullName: val.firstName + ' ' + val.lastName,password: '123456',avatarUrl: avatarDefault,disable: false,role: 'USER' });
                     onOk(res);
                     
                 }).catch(e=>e);

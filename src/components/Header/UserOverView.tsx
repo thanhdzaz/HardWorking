@@ -1,5 +1,8 @@
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Dropdown, Menu, Modal, Select } from 'antd';
+import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Badge, Button, Dropdown, Form, FormInstance, Input, Menu, Modal } from 'antd';
+import Notify from 'components/Notify';
+import { auth } from 'firebase';
+import { updatePassword } from 'firebase/auth';
 import { L } from 'lib/abpUtility';
 import { inject, observer } from 'mobx-react';
 import React from 'react';
@@ -29,13 +32,14 @@ const userDropdownMenu = (that) => (
                 }
             </div>
         </Menu.Item>
-        <Menu.Item
+        {/* <Menu.Item
             key="0"
             className="user-name-drop"
             onClick={()=>that.setState({ visible: true })}
         >
            Dự án
-        </Menu.Item>
+        </Menu.Item> */}
+ 
         <Menu.Item
             key="11"
         >
@@ -43,6 +47,13 @@ const userDropdownMenu = (that) => (
                 <UserOutlined />
                 <span> {L('Thông tin cá nhân')}</span>
             </Link>
+        </Menu.Item>
+        <Menu.Item
+            key="122"
+            onClick={()=>that.setState({ visible: true })}
+        >
+            <LockOutlined />
+           &nbsp;Đổi mật khẩu
         </Menu.Item>
         <Menu.Item key="2">
             
@@ -62,6 +73,7 @@ interface State{
 @observer
 class UserOverView extends React.Component<Props,State>
 {
+    form = React.createRef<FormInstance>();
     state = {
         userData: {} as GetUserOutput,
         visible: false,
@@ -74,45 +86,44 @@ class UserOverView extends React.Component<Props,State>
         setTimeout(() =>window.location.reload(),200);
     }
 
+    submit = ():void =>
+    {
+
+        this.form.current?.validateFields().then(val=>
+        {
+            console.log(val);
+            
+            if (val.old === '1234567')
+            {
+                Notify('error','Sai mật khẩu cũ!!');
+            }
+            else
+            {
+              
+                auth.currentUser && updatePassword(auth.currentUser,val.new).then(() =>
+                {
+                    Notify('success','Thay đổi mật khẩu thành công');
+                    this.setState({ visible: false });
+                    
+                }).catch((e)=>
+                {
+                    console.error(e);
+                    
+                });
+            }
+        }).catch(e=>
+        {
+            console.log(e);
+            
+        });
+    };
+
     render(): JSX.Element
     {
      
         return (
             <>
-                <Modal
-                    visible={this.state.visible}
-                    title={'Thay đổi dự án'}
-                    okButtonProps={{ style: {
-                        display: 'none',
-                    } }}
-                    cancelText={'Đóng'}
-                    onCancel={()=>this.setState({ visible: false })}
-                >
-                    
-                    <Select
-                        style={{ width: '100%' }}
-                        defaultValue={this.props.sessionStore?.project}
-                        placeholder="Search to Select"
-                        optionFilterProp="children"
-                        filterOption={(input:any, option:any) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        filterSort={(optionA, optionB) =>
-                            optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
-                        }
-                        showSearch
-                        onChange={(val)=>this.changeProject(val)}
-                    >
-                        {/* {this.props.projectStore?.allProject !== null && this.props.projectStore?.allProject.length > 0 && this.props.projectStore?.allProject.map((p:any) =>(
-                            <Select.Option
-                                key={p.idProject}
-                                value={p.idProject}
-                            >
-                                {p.nameProject}
-                            </Select.Option>
-                        ))} */}
-                    </Select>
-                </Modal>
+               
                 <Dropdown
                     overlay={()=>userDropdownMenu(this)}
                     className={'user-drop-down'}
@@ -131,6 +142,82 @@ class UserOverView extends React.Component<Props,State>
                         />
                     </Badge>
                 </Dropdown>
+
+
+                {
+                    this.state.visible && (
+                        <Modal
+                            title={'Thay đổi mật khẩu'}
+                            okButtonProps={{ style: {
+                                display: 'none',
+                            } }}
+                            cancelText={'Đóng'}
+                            footer={false}
+                            visible
+                            onCancel={()=>this.setState({ visible: false })}
+                        >
+                        
+                            <Form ref={this.form}>
+                                <Form.Item
+                                    name='old'
+                                    rules={[
+                                        { required: true, message: 'Nhập mật khẩu' },
+                                        { message: 'Mật khẩu tối thiểu 6 ký tự', min: 6 },
+                                    ]}
+                                >
+                                    <Input
+                                        type='password'
+                                        placeholder="Nhập mật khẩu cũ"
+                                    />
+                                </Form.Item>
+                                <Form.Item
+                                    name='new'
+                                    rules={[
+                                        { required: true, message: 'Nhập mật khẩu' },
+                                        { message: 'Mật khẩu tối thiểu 6 ký tự', min: 6 },
+                                    ]}
+                                >
+                                    <Input
+                                        type='password'
+                                        placeholder="Nhập mật khẩu mới"
+                                    />
+                                </Form.Item>
+                                <Form.Item
+                                    name='new2'
+                                    rules={[
+                                        { required: true, message: 'Nhập mật khẩu' },
+                                        { message: 'Mật khẩu tối thiểu 6 ký tự', min: 6 },
+                                        {
+                                            validator: (_rule:any, value:string, callback:any) =>
+                                            {
+                                                if (this.form.current?.getFieldValue('new') !== value && value.length >= 6)
+                                                {
+                                                    callback('Mật khẩu mới không trùng nhau');
+                                                    return Promise.reject('Mật khẩu mới không trùng nhau');
+                                                }
+                                                else
+                                                {
+                                                    return Promise.resolve(true);
+                                                }
+                                            },
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        type='password'
+                                        placeholder="Nhập lại mật khẩu mới"
+                                    />
+                                </Form.Item>
+                            </Form>
+                            <Button
+                                type='primary'
+                                onClick={this.submit}
+                            >Thay đổi
+                            </Button>
+                           
+                        </Modal>
+                    )
+                }
             </>
         );
     }

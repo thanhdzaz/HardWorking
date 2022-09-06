@@ -1,227 +1,189 @@
 
-import { CheckOutlined, MessageOutlined, QuestionOutlined, UserAddOutlined } from '@ant-design/icons';
-import { Card, Col, Row } from 'antd';
+import { Card, Col, Row, Select } from 'antd';
+import { observer } from 'mobx-react';
 import React from 'react';
+import { useRecoilState } from 'recoil';
+import { useStore } from 'stores';
+import { ProjectAtom } from 'stores/atom/project';
+import { useGetTasks } from 'utils';
 import './index.less';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+import { STATUS_LIST } from 'constant';
 
 
-export class Dashboard extends React.Component<any>
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+
+const Dashboard: React.FunctionComponent = observer(() =>
 {
-    async componentDidMount(): Promise<void>
+
+    const {
+        sessionStore, projectStore,
+    } = useStore();
+
+    const {
+        task,
+    } = useGetTasks();
+
+    const [project,setProject] = useRecoilState(ProjectAtom);
+
+    const changeProject = (id:string):void =>
     {
-        setTimeout(() => this.setState({ cardLoading: false }), 1000);
-    }
+        sessionStore?.setProject(id);
+        localStorage.setItem('project',id);
+        setProject(id);
+    };
 
-  state = {
-      cardLoading: true,
-      lineChartLoading: true,
-      barChartLoading: true,
-      pieChartLoading: true,
-  };
+    const data = {
+        labels: [...STATUS_LIST.map(status => status.title)],
+        datasets: [
+            {
+                label: '# công việc',
+                data: [...STATUS_LIST.map(status =>task.filter(t=>t.status === status.id).length ?? 0)],
+                backgroundColor: [
+                    ...STATUS_LIST.map(status =>status.color),
+                ],
+                borderColor: [
+                    ...STATUS_LIST.map(status =>status.color),
 
-  render(): JSX.Element
-  {
-      const { cardLoading } = this.state;
+                ],
+                borderWidth: 1,
+            },
+        ],
+    };
 
-      //   const visitorStatisticList = [
-      //       { title: 'TODAY', body: '1.200 user' },
-      //       { title: 'YESTERDAY', body: '3.872 user' },
-      //       { title: 'LAST WEEK', body: '26.582 user' },
-      //   ];
+    return (
+        <Card>
+            <Row
+                style={{
+                    marginBottom: 15,
+                }}
+            >
+                Dự án:
+                <Select
+                    style={{ width: '100%' }}
+                    defaultValue={project}
+                    placeholder="Search to Select"
+                    optionFilterProp="children"
+                    filterOption={(input:any, option:any) =>
+                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                        optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+                    }
+                    showSearch
+                    onChange={(val)=>changeProject(val)}
+                >
+                    {projectStore?.listProject !== null && (projectStore?.listProject?.length ?? 0) > 0 && projectStore?.listProject?.map((p:any) =>(
+                        <Select.Option
+                            key={p.id}
+                            value={p.id}
+                        >
+                            {p.title}
+                        </Select.Option>
+                    ))}
+                </Select>
+            </Row>
+            <Row
+                gutter={[16,16]}
+                style={{
+                    overflow: 'hidden',
+                }}
+            >
+                <Col span={12}>
+                    <Card
+                        className="card-dashboard-chart"
+                        style={{
+                            padding: '20%',
+                            height: '70vh',
+                        }}
+                    >
+                        <p
+                            className="dashboardCardName"
+                            style={{
+                                position: 'absolute',
+                                top: 10, left: 10,
+                            }}
+                        >Biểu đồ công việc
+                        </p>
+                        <Doughnut
+                            data={data}
+                            width="90%"
+                        />
 
-      return (
-          <div>
-              <Row gutter={16}>
-                  <Col
-                      className="dashboardCard"
-                      xs={{ offset: 1, span: 22 }}
-                      sm={{ offset: 1, span: 22 }}
-                      md={{ offset: 1, span: 11 }}
-                      lg={{ offset: 1, span: 11 }}
-                      xl={{ offset: 0, span: 6 }}
-                      xxl={{ offset: 0, span: 6 }}
-                  >
-                      <Card
-                          className="dasboardCard-task"
-                          bodyStyle={{ padding: 10 }}
-                          loading={cardLoading}
-                          bordered={false}
-                      >
-                          <Col span={8}>
-                              <CheckOutlined className="dashboardCardIcon" />
-                          </Col>
-                          <Col span={16}>
-                              <p className="dashboardCardName">New Task</p>
-                              <label className="dashboardCardCounter">125</label>
-                          </Col>
-                      </Card>
-                  </Col>
-                  <Col
-                      className="dashboardCard"
-                      xs={{ offset: 1, span: 22 }}
-                      sm={{ offset: 1, span: 22 }}
-                      md={{ offset: 1, span: 11 }}
-                      lg={{ offset: 1, span: 11 }}
-                      xl={{ offset: 0, span: 6 }}
-                      xxl={{ offset: 0, span: 6 }}
-                  >
-                      <Card
-                          className="dasboardCard-ticket"
-                          bodyStyle={{ padding: 10 }}
-                          loading={cardLoading}
-                          bordered={false}
-                      >
-                          <Col span={8}>
-                              <QuestionOutlined className="dashboardCardIcon" />
-                          </Col>
-                          <Col span={16}>
-                              <p className="dashboardCardName">New Ticket</p>
-                              <label className="dashboardCardCounter">257</label>
-                          </Col>
-                      </Card>
-                  </Col>
-                  <Col
-                      className="dashboardCard"
-                      xs={{ offset: 1, span: 22 }}
-                      sm={{ offset: 1, span: 22 }}
-                      md={{ offset: 1, span: 11 }}
-                      lg={{ offset: 1, span: 11 }}
-                      xl={{ offset: 0, span: 6 }}
-                      xxl={{ offset: 0, span: 6 }}
-                  >
-                      <Card
-                          className="dasboardCard-comment"
-                          bodyStyle={{ padding: 10 }}
-                          loading={cardLoading}
-                          bordered={false}
-                      >
-                          <Col span={8}>
-                              <MessageOutlined className="dashboardCardIcon" />
-                          </Col>
-                          <Col span={16}>
-                              <p className="dashboardCardName">New Comments</p>
-                              <label className="dashboardCardCounter">243</label>
-                          </Col>
-                      </Card>
-                  </Col>
-                  <Col
-                      className="dashboardCard"
-                      xs={{ offset: 1, span: 22 }}
-                      sm={{ offset: 1, span: 22 }}
-                      md={{ offset: 1, span: 11 }}
-                      lg={{ offset: 1, span: 11 }}
-                      xl={{ offset: 0, span: 6 }}
-                      xxl={{ offset: 0, span: 6 }}
-                  >
-                      <Card
-                          className="dasboardCard-visitor"
-                          bodyStyle={{ padding: 10 }}
-                          loading={cardLoading}
-                          bordered={false}
-                      >
-                          <Col span={8}>
-                              <UserAddOutlined className="dashboardCardIcon" />
-                          </Col>
-                          <Col span={16}>
-                              <p className="dashboardCardName">New Visitors</p>
-                              <label className="dashboardCardCounter">1225</label>
-                          </Col>
-                      </Card>
-                  </Col>
-              </Row>
+                    </Card>
+                </Col>
+                <Col span={12}>
+                    <Row gutter={[16,16]}>
+                        <Col span={12}>
+                            <Card
+                                className="card-dashboard"
+                                style={{
+                                    backgroundColor: STATUS_LIST[0].color,
+                                }}
+                            >
+                                <p className="dashboardCardName">Công việc mới</p>
+                                <label className="dashboardCardCounter">
+                                    {
+                                        task.filter(t=>t.status === 0).length ?? 0
+                                    }
+                                </label>
+                            </Card>
+                        </Col>
+                        <Col span={12}>
+                            <Card
+                                className="card-dashboard"
+                                style={{
+                                    backgroundColor: STATUS_LIST[1].color,
+                                }}
+                            >
+                                <p className="dashboardCardName">Công việc đang làm</p>
+                                <label className="dashboardCardCounter">
+                                    {
+                                        task.filter(t=>t.status === 1).length ?? 0
+                                    }
+                                </label>
+                            </Card>
+                        </Col>
+                        <Col span={12}>
+                            <Card
+                                className="card-dashboard"
+                                style={{
+                                    backgroundColor: STATUS_LIST[2].color,
+                                }}
+                            >
+                                <p className="dashboardCardName">Công việc đã hoàn thành</p>
+                                <label className="dashboardCardCounter">
+                                    {
+                                        task.filter(t=>t.status === 2).length ?? 0
+                                    }
+                                </label>
+                            </Card>
+                        </Col>
+                        <Col span={12}>
+                            <Card
+                                className="card-dashboard"
+                                style={{
+                                    backgroundColor: STATUS_LIST[3].color,
+                                }}
+                            >
+                                <p className="dashboardCardName">Công việc đã xác nhận</p>
+                                <label className="dashboardCardCounter">
+                                    {
+                                        task.filter(t=>t.status === 3).length ?? 0
+                                    }
+                                </label>
+                            </Card>
+                        </Col>
+                
+                    </Row>
+                </Col>
+            </Row>
 
-              {/* <Row>
-                  <Col span={24}>
-                      <Card
-                          className="dashboardBox"
-                          title="Visit Statistics"
-                          loading={lineChartLoading}
-                          bordered={false}
-                      >
-                          <LineChartExample />
-                      </Card>
-                  </Col>
-              </Row>
+        </Card>
+    );
+});
 
-              <Row gutter={16}>
-                  <Col
-                      xs={{ offset: 1, span: 22 }}
-                      sm={{ offset: 1, span: 22 }}
-                      md={{ offset: 1, span: 22 }}
-                      lg={{ offset: 0, span: 8 }}
-                      xl={{ offset: 0, span: 8 }}
-                      xxl={{ offset: 0, span: 8 }}
-                  >
-                      <Card
-                          className="dashboardCardTinyLine"
-                          loading={barChartLoading}
-                          bordered={false}
-                      >
-                          <TinyLineChartExample />
-                          <ListExample value={visitorStatisticList} />
-                      </Card>
-                  </Col>
-                  <Col
-                      xs={{ offset: 1, span: 22 }}
-                      sm={{ offset: 1, span: 22 }}
-                      md={{ offset: 1, span: 22 }}
-                      lg={{ offset: 0, span: 8 }}
-                      xl={{ offset: 0, span: 8 }}
-                      xxl={{ offset: 0, span: 8 }}
-                  >
-                      <Card
-                          className="latestSocialTrendsList"
-                          loading={barChartLoading}
-                          bordered={false}
-                      >
-                          <TinyLineChartExample />
-                          <ListExample value={visitorStatisticList} />
-                      </Card>
-                  </Col>
-                  <Col
-                      xs={{ offset: 1, span: 22 }}
-                      sm={{ offset: 1, span: 22 }}
-                      md={{ offset: 1, span: 22 }}
-                      lg={{ offset: 0, span: 8 }}
-                      xl={{ offset: 0, span: 8 }}
-                      xxl={{ offset: 0, span: 8 }}
-                  >
-                      <Card
-                          className="answeredTickeds"
-                          loading={barChartLoading}
-                          bordered={false}
-                      >
-                          <TinyLineChartExample />
-                          <ListExample value={visitorStatisticList} />
-                      </Card>
-                  </Col>
-              </Row>
-
-              <Row gutter={16}>
-                  <Col span={16}>
-                      <Card
-                          title="Payment Statistics"
-                          className="dashboardBox"
-                          loading={barChartLoading}
-                          bordered={false}
-                      >
-                          <BarChartExample />
-                      </Card>
-                  </Col>
-                  <Col span={8}>
-                      <Card
-                          title="Browser Usage"
-                          className="dashboardBox"
-                          loading={pieChartLoading}
-                          bordered={false}
-                      >
-                          <PieChartExample />
-                      </Card>
-                  </Col>
-              </Row> */}
-          </div>
-      );
-  }
-}
 
 export default Dashboard;
