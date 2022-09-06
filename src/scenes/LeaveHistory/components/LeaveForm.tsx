@@ -43,9 +43,9 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
         const dayOffList:any = [];
         for (let i = 0; i < totalDayOff; i++)
         {
-            dayOffList.push(startDate.format('YYYY-MM-DD'));
-            startDate.clone().add(1, 'days');
+            dayOffList.push(startDate.clone().add(i, 'days').format('YYYY-MM-DD'));
         }
+
 
         // Check xem những ngày mình xin nghỉ mình đã chấm công chưa
         const timekeepingList:any = [];
