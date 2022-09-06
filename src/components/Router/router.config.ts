@@ -126,13 +126,12 @@ export const appRouters: any = [
         title: 'Thông tin người dùng',
         component: LoadableComponent(() => import('scenes/UserInfo')),
     },
-
     {
-        path: '/timekeeping',
-        name: 'timekeeping',
+        path: '/leave',
+        name: 'leave',
         icon: CheckSquareOutlined,
         permission: '',
-        title: 'Chấm công',
+        title: 'Quản lý nghỉ phép',
         showInMenu: true,
         children: [
             {
@@ -159,6 +158,16 @@ export const appRouters: any = [
                 showInMenu: true,
                 component: LoadableComponent(() => import('scenes/LeaveList')),
             },
+        ],
+    },
+    {
+        path: '/timekeeping',
+        name: 'timekeeping',
+        icon: CheckSquareOutlined,
+        permission: '',
+        title: 'Chấm công',
+        showInMenu: true,
+        children: [
             {
                 path: '/my-timekeeping',
                 name: 'my-timekeeping',
@@ -177,7 +186,6 @@ export const appRouters: any = [
             },
         ],
     },
-
     {
         path: '/about',
         name: 'abiot',

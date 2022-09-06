@@ -14,7 +14,7 @@ const LeaveHistory = (): JSX.Element =>
     const [searchResult, setSearchResult] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState<any>([]);
-    const [id, setId] = useState<string>('');
+    const [id, setId] = useState<any>('');
     const [visible, setVisible] = useState<boolean>(false);
     const tableRef = useRef();
 
@@ -98,8 +98,14 @@ const LeaveHistory = (): JSX.Element =>
 
     const toggleModal = () =>
     {
-        setVisible(prev => !prev);
-        
+        setVisible(prev =>
+        {
+            if (prev)
+            {
+                setId(null);
+            }
+            return !prev;
+        });
     };
 
     const handleOpenHistoryModal = (id) =>
@@ -169,13 +175,15 @@ const LeaveHistory = (): JSX.Element =>
                     headerTitle={<LeaveForm refreshData={refreshData} />}
                 />
             </Spin>
-            { visible && (
-                <HistoryModal
-                    id={id}
-                    users={users}
-                    toggleModal={toggleModal}
-                />
-            ) }
+            { visible && id
+                ? (
+                        <HistoryModal
+                            id={id}
+                            users={users}
+                            toggleModal={toggleModal}
+                        />
+                    )
+                : '' }
         </>
        
     );
