@@ -121,7 +121,56 @@ export const PERMISSIONS = [
         'name': 'Sửa dự án',
         'key': 'PJ_EDIT',
     },
+    // qlcv
+    {
+        'name': 'Xem công việc',
+        'key': 'IS_VIEW',
+    },
+    {
+        'name': 'Thêm công việc',
+        'key': 'IS_ADD',
+    }, {
+        'name': 'Xóa công việc',
+        'key': 'IS_DELETE',
+    },
+    {
+        'name': 'Sửa công việc',
+        'key': 'IS_EDIT',
+    },
+    // quy định xin nghỉ
+    {
+        'name': 'Xem quy định xin nghỉ',
+        'key': 'LR_VIEW',
+    },
+    {
+        'name': 'Thêm quy định xin nghỉ',
+        'key': 'LR_ADD',
+    }, {
+        'name': 'Xóa quy định xin nghỉ',
+        'key': 'LR_DELETE',
+    },
+    {
+        'name': 'Sửa quy định xin nghỉ',
+        'key': 'LR_EDIT',
+    },
+
+    // danh sách nghỉ
+    {
+        'name': 'Xem danh sách xin nghỉ',
+        'key': 'LL_VIEW',
+    },
+    {
+        'name': 'Sửa trạng thái nghỉ',
+        'key': 'LL_EDIT',
+    },
+
+    // tổng hợp chấm công
+    {
+        'name': 'Xem danh sách tổng hợp chấm công',
+        'key': 'TT_VIEW',
+    },
 ];
+
 
 export const NGHI_KHONG_PHEP = 0;
 export const NGHI_CO_PHEP = 1;

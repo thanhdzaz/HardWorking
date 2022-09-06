@@ -14,8 +14,7 @@ const Attendance = (): JSX.Element =>
 {
     const [time, setTime] = useState(moment());
     const [leaves, setLeaves] = useState<any>([]);
-    // const [ips, setIps] = useState<any>([]);
-    // const [myIp, setMyIp] = useState<any>();
+
     const [attendanceRecord, setAttendanceRecord] = useState<any>({});
     const user = auth?.currentUser;
 

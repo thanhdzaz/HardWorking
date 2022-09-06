@@ -138,7 +138,7 @@ export const appRouters: any = [
             {
                 path: '/leave-rule',
                 name: 'leave-rule',
-                permission: '',
+                permission: 'LR_VIEW|LR_ADD|LR_EDIT|LR_DELETE',
                 title: 'Quy định xin nghỉ',
                 showInMenu: true,
                 component: LoadableComponent(() => import('scenes/LeaveRule')),
@@ -154,7 +154,7 @@ export const appRouters: any = [
             {
                 path: '/leave-list',
                 name: 'leave-list',
-                permission: '',
+                permission: 'LL_VIEW|LL_EDIT|',
                 title: 'Danh sách xin nghỉ',
                 showInMenu: true,
                 component: LoadableComponent(() => import('scenes/LeaveList')),
@@ -170,7 +170,7 @@ export const appRouters: any = [
             {
                 path: '/total-timekeeping',
                 name: 'total-timekeeping',
-                permission: '',
+                permission: 'TT_VIEW',
                 title: 'Bảng tổng hợp chấm công',
                 showInMenu: true,
                 component: LoadableComponent(() => import('scenes/TotalTimekeeping')),
