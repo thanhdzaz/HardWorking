@@ -254,7 +254,7 @@ const MyAttendance = (): JSX.Element =>
                         const isAcceptedLeave = myLeave.find(
                             (ml) =>
                                 moment(ml.startDate).isSameOrBefore(moment(date)) &&
-                moment(ml.endDate).isSameOrAfter(moment(date)),
+                moment(ml.endDate).isSameOrAfter(moment(date)) && ml.userId === auth?.currentUser?.uid,
                         );
 
                         _displayData.push({

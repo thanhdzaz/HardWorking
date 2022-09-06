@@ -8,21 +8,36 @@ import React, { useEffect, useState } from 'react';
 import { ACTION, LOGKEYS } from 'utils';
 import './index.less';
 
-const HistoryModal: React.FunctionComponent<any> = ({ id, users, toggleModal }) =>
+const HistoryModal: React.FunctionComponent<any> = ({
+    id,
+    users,
+    toggleModal,
+}) =>
 {
-    const [logs,setLogs] = useState<CheckLog[]>([]);
+    const [logs, setLogs] = useState<CheckLog[]>([]);
 
-    const getLogs = async() =>
+    const getLogs = async () =>
     {
-        const q = query(firestore.collection('CheckLogs'),where('taskId', '==', id));
-        const querySnapshot = await getDocs(q);
-                
-        const l:CheckLog[] = [];
-        querySnapshot.forEach((doc: any) =>
+        try
         {
-            l.push(doc.data());
-        });
-        setLogs(l.sort((a, b) =>b.time.seconds - a.time.seconds));
+            const q = query(
+                firestore.collection('CheckLogs'),
+                where('taskId', '==', id),
+            );
+            const querySnapshot = await getDocs(q);
+
+            const l: CheckLog[] = [];
+            querySnapshot.forEach((doc: any) =>
+            {
+                l.push(doc.data());
+            });
+            setLogs(l.sort((a, b) => b.time.seconds - a.time.seconds));
+        }
+        catch (e)
+        {
+            return [];
+        }
+        return;
     };
 
     useEffect(() =>
@@ -40,35 +55,38 @@ const HistoryModal: React.FunctionComponent<any> = ({ id, users, toggleModal }) 
                         display: 'none',
                     },
                 }}
-                cancelText='Đóng'
+                cancelText="Đóng"
                 visible
                 onCancel={toggleModal}
                 onOk={toggleModal}
             >
                 <div className="checklog-box">
-                    {
-                        logs.length
-                            ? logs.map((log) =>
-                            {
-                                const u = users.find((u) =>u.id === log.userId);
-  
-                                const oldVal = LEAVE_STATUS_OBJ[log.oldValue];
-                                const newVal = LEAVE_STATUS_OBJ[log.newValue];
-                                                                 
-                                return (
-                                    <div key={log.id}>
-                                        <b>{moment.unix(log.time.seconds).format('DD/MM/YYYY HH:mm')}</b> <b>{u?.fullName}</b> - {ACTION[log.action]} {LOGKEYS[log.field]} từ <b>{oldVal}</b> sang <b>{newVal}</b>
-                                    </div>
-                                );
+                    {logs.length
+                        ? (
+                                logs.map((log) =>
+                                {
+                                    const u = users.find((u) => u.id === log.userId);
 
+                                    const oldVal = LEAVE_STATUS_OBJ[log.oldValue];
+                                    const newVal = LEAVE_STATUS_OBJ[log.newValue];
 
-                            })
-                            : <div className="empty-text">Trống</div>
-                    }
+                                    return (
+                                        <div key={log.id}>
+                                            <b>
+                                                {moment.unix(log.time.seconds).format('DD/MM/YYYY HH:mm')}
+                                            </b>{' '}
+                                            <b>{u?.fullName}</b> - {ACTION[log.action]}{' '}
+                                            {LOGKEYS[log.field]} từ <b>{oldVal}</b> sang <b>{newVal}</b>
+                                        </div>
+                                    );
+                                })
+                            )
+                        : (
+                                <div className="empty-text">Trống</div>
+                            )}
                 </div>
             </Modal>
         </div>
-       
     );
 };
 

@@ -89,7 +89,10 @@ const LeaveHistory = (): JSX.Element =>
             render: (_, row) => (
                 <Button
                     type="link"
-                    onClick={() => handleOpenHistoryModal(row.id)}
+                    onClick={() =>
+                    {
+                        handleOpenHistoryModal(row.id);
+                    }}
                 >Xem
                 </Button>
             ),
@@ -110,8 +113,8 @@ const LeaveHistory = (): JSX.Element =>
 
     const handleOpenHistoryModal = (id) =>
     {
-        setId(id);
         toggleModal();
+        setId(id);
     };
 
     const getAllMyLeaveHistory = async () =>
@@ -128,10 +131,7 @@ const LeaveHistory = (): JSX.Element =>
         });
         setSearchResult(l);
     };
-
-    console.log(searchResult);
     
-
     const getAllUsers = async () =>
     {
         const res = await firestore.get('Users');
@@ -175,7 +175,7 @@ const LeaveHistory = (): JSX.Element =>
                     headerTitle={<LeaveForm refreshData={refreshData} />}
                 />
             </Spin>
-            { visible && id
+            { visible
                 ? (
                         <HistoryModal
                             id={id}

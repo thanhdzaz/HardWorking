@@ -149,6 +149,18 @@ const LeaveForm:React.FunctionComponent<any> = ({ refreshData }): JSX.Element =>
                 });
             }
         }
+        else
+        {
+            status = NGHI_KHONG_PHEP;
+            addLeave({
+                startDate: startDate.format('YYYY-MM-DD'),
+                endDate: endDate.format('YYYY-MM-DD'),
+                userId: auth?.currentUser?.uid,
+                reason: vals.reason ?? '',
+                sendDate: moment().format('YYYY-MM-DD'),
+                status,
+            });
+        }
         return true;
     };
     const getAllLeaveRule = async () =>
