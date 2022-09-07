@@ -112,10 +112,17 @@ class Login extends React.Component<ILoginProps, State>
           {
               const errorCode = _error.code;
               this.setState({ loading: false });
+              console.log(errorCode);
 
               switch (errorCode)
               {
+            
                   case 'auth/invalid-email':
+                  {
+                      Notify('error',`Địa chỉ email '${values.userNameOrEmailAddress}' không hợp lệ!!`);
+                      break;
+                  }
+                  case 'auth/user-not-found':
                   {
                       Notify('error',`Địa chỉ email '${values.userNameOrEmailAddress}' không tồn tại trên hệ thống tài khoản!!`);
                       break;
