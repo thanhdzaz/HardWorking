@@ -52,8 +52,6 @@ const Month:React.FunctionComponent<any> = ({ dataUsers, dataTimekeeping }) =>
             });
         });
 
-        // const dt = {};
-        console.log(data);
         const _dataCalendar:any = Object.keys(data).map((date) =>
         {
             return {

@@ -3,13 +3,11 @@ import { Button } from 'antd';
 import { KanbanBoard } from 'components/Kanban/Board';
 import { STATUS_LIST } from 'constant';
 import { firestore } from 'firebase';
-import { getDocs, query, where } from 'firebase/firestore/lite';
 import { checkLog } from 'hook/useCheckLog';
 import { observer } from 'mobx-react';
 import { TaskDto } from 'models/Task/dto';
 import { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { taskAtom } from 'stores/atom/task';
+import { useGetTasks } from 'utils';
 import { CreateIssuePage } from '../component/CreateTask';
 import HeaderFilter from '../component/HeaderFilter';
 import { IssueDetail } from '../component/IssueDetails';
@@ -21,8 +19,10 @@ const KB = observer((_): JSX.Element =>
     const [visibleIssueCreate, setVisibleIssueCreate] = useState(false);
     const [curentId, setId] = useState('');
 
-    const [task, setTask] = useRecoilState <TaskDto[]>(taskAtom);
-
+    const {
+        task,refresh: getAll,
+    } = useGetTasks();
+    
 
     const [filteredTasks, setFilteredTasks] = useState<TaskDto[]>([]);
 
@@ -47,23 +47,7 @@ const KB = observer((_): JSX.Element =>
             },
         ],
     });
-
-
-    const getAll = async () =>
-    {
-        const q = query(
-            firestore.collection('Tasks'),
-            where('projectId', '==', localStorage.getItem('project')),
-        );
-        const querySnapshot = await getDocs(q);
-        const t: TaskDto[] = [];
-        querySnapshot.forEach((doc) =>
-        {
-            t.push(doc.data() as any);
-        });
-
-        setTask(t);
-    };
+   
 
     const togglePopupDetail = () =>
         setVisibleIssuePopupDetail(!visibleIssuePopupDetail);
